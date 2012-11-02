@@ -1,0 +1,36 @@
+There are 4 parts: scanner, table walker, parser, and driver.
+
+the scanner creates two lists that define the lexicon: charClasses and tokenClasses
+
+the classes Character and Token are objects that will allow us to match input to the lexspec
+
+part of the parsers job is to be able to understand the reg-exps and character classes contained in each Character and Token object
+
+the parsers job is also to create the NFAs and DFAs, and perform the translation from regex to NFA to DFA
+	it will do this through a recursive descent parser
+	the CharacterC and TokenC classes are intended to be a basic blocks of the regexp as defined in the project
+	a sample implementation can be found in the back of the book. page 516, line 900 parse.c
+	
+the parser will also output a StateTable object (composed of Character and Token objects ) that is either the DFA or NFA table
+the TableWalker will traverse the StateTable with each character of input until a valid token is produced
+the driver will call the tableWalker on this statetTable with the scanner's input and then store the generated tokens
+
+
+FUNCTIONAL REQUIREMENTS:
+Parse
+1A	read lexical specification into Character and Token classes
+	-to do this we have to write a recursive descent parser
+2A	generate primitive NFAs according to Spec(1)	
+3A	combine all NFAs(2) to create single large NFA
+4A	create DFA from NFA(3)
+
+Scan
+1B	get a character from the input file buffer, skipping whitespace, tabs, newlines, eofs,
+2B	put a character back onto input file buffer
+
+
+TableWalk:
+1C	use scanner to get input file
+2C	lookup in statetable current char
+3C	track current state returned by table
+4	build the token string and return it when finished 

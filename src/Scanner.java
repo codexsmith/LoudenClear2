@@ -12,8 +12,8 @@ import java.util.ArrayList;
 
 public class Scanner {
 	
-	private static ArrayList<iIdentifier> charClasses = new ArrayList<iIdentifier>(0);
-	private static ArrayList<iIdentifier> tokenClasses = new ArrayList<iIdentifier>(0);
+	public static ArrayList<iIdentifier> charClasses = new ArrayList<iIdentifier>(0);
+	public static ArrayList<iIdentifier> tokenClasses = new ArrayList<iIdentifier>(0);
 
 	
 	//dictionary to contain lexical spec
@@ -39,12 +39,12 @@ public class Scanner {
 		if(pre_tok.startsWith("%%")){
 			while(!scan.getLine().startsWith("%%") && !scan.endOfFile()){
 				line = scan.getLine();
-				out = new Character(line);
+				out = new CharacterC(line);
 				charClasses.add(out);
 			}
 			while (!scan.endOfFile()){
 				line = scan.getLine();
-				out = new Token(line);
+				out = new TokenC(line);
 				tokenClasses.add(out);
 			}
 		}
