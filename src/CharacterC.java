@@ -38,21 +38,18 @@ public class CharacterC extends iIdentifier{
 	}
 
 	@Override
-	public boolean match(String title) {
-		if (title.compareTo(this.title) == 0){
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public boolean islegal(String c) {
+	public boolean isLegal(String c) {
 		for (String s : legal){
 			if (s.compareTo(c) == 0){
 				return true;
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public String getTitle() {
+		return title;
 	}
 	
 	

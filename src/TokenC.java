@@ -29,20 +29,15 @@ public class TokenC extends iIdentifier{
 	}
 
 	@Override
-	public boolean match(String title) {
-		if (title.compareTo(this.title) == 0){
-			return true;
-		}
+	public boolean isLegal(String c) {
+		String regexp = legal.get(0); 
+		
 		return false;
 	}
 
 	@Override
-	public boolean islegal(String c) {
-		String regexp = legal.get(0); 
-		
-		
-		
-		return false;
+	public String getTitle() {
+		return title;	
 	}
 	
 }
