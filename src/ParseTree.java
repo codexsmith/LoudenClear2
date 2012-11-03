@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-/**
+/**for regex
  * 
  * @author nick
  *
