@@ -1,0 +1,11 @@
+.project
+.metadata
+bin/**
+tmp/**
+tmp/**/*
+*.tmp
+*.swp
+local.properties
+.classpath
+.settings/
+.loadpath
