@@ -16,10 +16,10 @@ the TableWalker will traverse the StateTable with each character of input until 
 the driver will call the tableWalker on this statetTable with the scanner's input and then store the generated tokens
 
 
+
 FUNCTIONAL REQUIREMENTS:
 Parse
 1A	read lexical specification into Character and Token classes
-	-to do this we have to write a recursive descent parser
 2A	generate primitive NFAs according to Spec(1)	
 3A	combine all NFAs(2) to create single large NFA
 4A	create DFA from NFA(3)

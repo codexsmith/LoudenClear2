@@ -1,5 +1,5 @@
 import java.util.ArrayList;
-/** Character classes require input that is fully enumerated. [a-z] will not work. you must use [a,b,...,w,x,y,z]
+/**
  * 
  * @author nick
  *	
@@ -50,6 +50,12 @@ public class CharacterC extends iIdentifier{
 	@Override
 	public String getTitle() {
 		return title;
+	}
+
+	@Override
+	public int compareTo(iIdentifier a) {
+		
+		return 0;
 	}
 	
 	

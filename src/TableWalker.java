@@ -1,5 +1,4 @@
 /**
- * 
  * @author nick
  *
  *	To create the table walker
