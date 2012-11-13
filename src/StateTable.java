@@ -13,8 +13,12 @@ public class StateTable {
 		
 	}
 	
-	public void addState(){
-		tableRow newRow = new tableRow(); //create
+	public tableRow getTableRow(int i){
+		return stateTable.get(i);
+	}
+	
+	public void addState(Map<String, Integer> map, String name){
+		tableRow newRow = new tableRow(map, name); //create
 		stateTable.add(newRow);
 	}
 	
@@ -34,20 +38,17 @@ public class StateTable {
 	 * @author nick
 	 *
 	 */
-	private class tableRow{
+	public class tableRow{
 		//Map of strings to tableRows
 		private Map<String,Integer> successorStates;
 		private boolean accept;
+		private String name;
 		
-		public tableRow(){
-			
+		public tableRow(Map<String,Integer> nextStates, String n){
+			successorStates = nextStates;
+			name = n;
 		}
 		
-		/**
-		 * 
-		 * @param c
-		 * @return
-		 */
 		public Integer getNextState(String c){
 			return successorStates.get(c);
 		}
