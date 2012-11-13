@@ -1,7 +1,10 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.StringTokenizer;
 
 /**
  * 
@@ -12,13 +15,9 @@ import java.util.Scanner;
  *	need the helper methods
  */
 
-
 public class PScanner {
 	
 	public static final boolean DEBUG = true;
-	
-	public static ArrayList<iIdentifier> charClasses = new ArrayList<iIdentifier>(0);
-	public static ArrayList<iIdentifier> tokenClasses = new ArrayList<iIdentifier>(0);
 	
 	private File in;
 	private Scanner iScan;
@@ -57,29 +56,42 @@ public class PScanner {
 	}
 	
 	/**reads lexical input file
+	 * @return 
 	 * 
 	 */
-	public static void scanLexicon(String lexFilePath){
+	public static Lexical scanLexicon(String lexFilePath){		
 		String line= "";
 		iIdentifier out;
 		PScanner scan = new PScanner(lexFilePath);
-
-		String pre_tok = scan.getLine(); 
-		if(pre_tok.startsWith("%%")){
-			while(!scan.getLine().startsWith("%%") && !scan.endOfFile()){
-				line = scan.getLine();
-				out = new CharacterC(line);
-				charClasses.add(out);
+		HashMap<String, CharacterC> chars = new HashMap<String, CharacterC>();
+		ArrayList<TokenC> tokens = new ArrayList<TokenC>();
+		
+		int state = 0; //state 0 = first comments, 1 = in characters, 2 = in identifiers.
+		
+		while((line = scan.getLine()) != null)
+		{
+			if(line.startsWith("%") || line.isEmpty())
+			{
+				if(state == 0) //advance state
+					state = 1;
+				else if(state == 1)
+					state = 2;
 			}
-			while (!scan.endOfFile()){
-				line = scan.getLine();
-				out = new TokenC(line);
-				tokenClasses.add(out);
-			}
+			else
+				if(state == 1 || state == 0) // characters
+				{
+					if(state == 0) state = 1;
+					
+					CharacterC character = new CharacterC(line, chars);
+					chars.put(character.getTitle(), character);
+				}
+				else if(state == 2) // identifiers
+				{
+					TokenC token = new TokenC(line);
+					tokens.add(token);
+				}			
 		}
-		else{
-			System.out.println("invalid lex spec");
-		}
+		return new Lexical(tokens, chars);
 	}
 	
 	
@@ -88,11 +100,16 @@ public class PScanner {
      * @return the remaining current line as a string, placing the reader at the start of the next line
      */
 	public String getLine(){
-		return iScan.nextLine();
+		if(iScan.hasNext())
+			return iScan.nextLine();
+		else
+			return null;
 	}
 	
 	public boolean endOfFile(){
 		return !iScan.hasNext();
 	}
+	
+	
 
 }

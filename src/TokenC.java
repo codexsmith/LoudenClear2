@@ -7,19 +7,20 @@ public class TokenC extends iIdentifier{
 	private String title;
 	
 	public TokenC(String line){
-		String title, symbols;
+		String symbols;
+		legal = new ArrayList<String>();
+		
 		
 		line = line.trim();//removes leading & trailing whitespaces
 		
 		if(line.substring(0, 1).compareTo("$") == 0){ //proper identifier
-			title = line.substring(1, line.indexOf(" "));
+			this.title = line.substring(0, line.indexOf(" "));
 			
-			symbols = line.substring(line.lastIndexOf(" ")+1);
+			symbols = line.substring(line.indexOf(" ")+1);
 			
-			symbols.trim();
+			symbols = symbols.replace(" ", "");
 			
 			this.legal.add(symbols);
-			this.title = title;
 		}
 	}
 	
