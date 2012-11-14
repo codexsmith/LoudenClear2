@@ -1,11 +1,9 @@
 
-
-
 public class NFAGenerator {
 	private final boolean DEBUG = true;
 	private StateTable nfa;
+	private StateTable subnfa;
 	private int index;
-	private boolean failed;
 	private Lexical lex;
 	private String regex;
 	
@@ -16,164 +14,195 @@ public class NFAGenerator {
 		regex = new String();
 	}
 	
-	
 	public StateTable genNFA(){
 		if(DEBUG)System.out.println("genNFA()");
-		regex();
+		StateTable temp;
+		for(TokenC t: lex.getTokens()){
+			regex = t.getLegal().get(0);
+			regex();
+		}
 		return nfa;
 	}
 	
-	private void regex(){
+	private boolean regex(){
 		if(DEBUG)System.out.println("regex()");
-		rexp();
+		return rexp();
 	}
 	
-	private void rexp(){
+	private boolean rexp(){
 		if(DEBUG)System.out.println("rexp()");
-		rexp1(); rexpprime();
+		if(rexp1()&&rexpprime())
+			return true;
+		else
+			return false;
 	}
 	
-	private void rexpprime(){
+	private boolean rexpprime(){
 		if(DEBUG)System.out.println("rexpprime()");
+		if(index>=regex.length()){
+			return true;
+		}
 		if(peekChar()=='|'){
-			match('|'); rexp1(); rexpprime();
+			if(match('|')&&rexp1()&&rexpprime())
+				return true;
 		}
-		else {
-			return;
-		}			
+		return true;
 	}
 	
-	private void rexp1(){
+	private boolean rexp1(){
 		if(DEBUG)System.out.println("rexp1()");
-		rexp2();rexp1prime();
+		if(rexp2()&&rexp1prime())
+			return true;
+		return false;
 	}
 	
-	private void rexp1prime(){
+	private boolean rexp1prime(){
 		if(DEBUG)System.out.println("rexp1prime()");
-		if(peekChar()=='\0')
-			return;
-		else{
-			rexp2();rexp1prime();
+		if(index>=regex.length()){
+			return true;
 		}
+		if(rexp2()&&rexp1prime())
+			return true;
+		return true;
 	}
 	
-	private void rexp2(){
+	private boolean rexp2(){
 		if(DEBUG)System.out.println("rexp2()");
 		if(peekChar()=='('){
-			match('(');rexp();match(')');
-		}
-		else if(isRE_CHAR(peekChar())){
-			match(peekChar());rexp2_tail();
-		}
-		else{
-			rexp3();
-		}
-	}
-	
-	private void rexp2_tail(){
-		if(DEBUG)System.out.println("rexp2_tail()");
-		if(peekChar()=='*'){
-			return;
-		}
-		else if(peekChar()=='+'){
-			return;
-		}
-		else{
-			return;
-		}
-	}
-	
-	private void rexp3(){
-		if(DEBUG)System.out.println("rexp3()");
-		if(peekChar()=='\0'){
-			return;
-		}
-		else{
-			char_class();
-		}
-	}
-	
-	private void char_class(){
-		if(DEBUG)System.out.println("char_class()");
-		if(peekChar()=='.'){
-			return;
-		}
-		if(peekChar()=='['){
-			match('[');char_class1();
-		}
-		else{
-			defined_class();
-		}
-	}
-	
-	private void char_class1(){
-		if(DEBUG)System.out.println("char_class1()");
-		if(peekChar()=='^'){
-			exclude_set();
-		}
-		else{
-			char_set_list();
-		}
-	}
-	
-	private void char_set_list(){
-		if(DEBUG)System.out.println("char_set_list()");
-		if(peekChar()==']'){
-			return;
-		}
-		else{
-			char_set(); char_set_list();
-		}
-	}
-	
-	private void char_set(){
-		if(DEBUG)System.out.println("char_set()");
-		if(isCLS_CHAR(peekChar())){
-			match(peekChar()); char_set_tail();
-		}
-		else{
-			error();
-		}
-	}
-	
-	private void char_set_tail(){
-		if(DEBUG)System.out.println("char_set_tail()");
-		if(peekChar()=='-'){
-			match('-');
-			if(isCLS_CHAR(peekChar())){
-				match(peekChar());
-				return;
+			if(match('(')&&rexp()&&match(')')){
+				return true;
 			}
 		}
+		if(isRE_CHAR(peekChar())){
+			if(match(peekChar())&&rexp2_tail())
+				return true;
+		}
+		if(rexp3())
+			return true;
+		return false;
+	}
+	
+	private boolean rexp2_tail(){
+		if(DEBUG)System.out.println("rexp2_tail()");
+		if(index>=regex.length()){
+			return true;
+		}
+		if(peekChar()=='*'){
+			return true;
+		}
+		if(peekChar()=='+'){
+			return true;
+		}
 		else{
-			return;
+			return true;
 		}
 	}
 	
-	private void exclude_set(){
+	private boolean rexp3(){
+		if(DEBUG)System.out.println("rexp3()");
+		if(index>=regex.length()){
+			return true;
+		}
+		if(char_class()){
+			return true;
+		}
+		return true;
+	}
+	
+	private boolean char_class(){
+		if(DEBUG)System.out.println("char_class()");
+		if(peekChar()=='.'){
+			return true;
+		}
+		if(peekChar()=='['){
+			if(match('[')&&char_class1())
+				return true;
+		}
+		if(defined_class())
+			return true;
+		return false;
+	}
+	
+	private boolean char_class1(){
+		if(DEBUG)System.out.println("char_class1()");
+		if(char_set_list())
+			return true;
+		if(exclude_set())
+			return true;
+		return false;
+	}
+	
+	private boolean char_set_list(){
+		if(DEBUG)System.out.println("char_set_list()");
+		if(char_set()&&char_set_list()){
+			return true;
+		}
+		if(peekChar()==']'){
+			if(match(']'))
+				return true;
+		}
+		return false;
+	}
+	
+	private boolean char_set(){
+		if(DEBUG)System.out.println("char_set()");
+		if(isCLS_CHAR(peekChar())){
+			if(match(peekChar())&&char_set_tail())
+				return true;
+		}
+		return false;
+	}
+	
+	private boolean char_set_tail(){
+		if(DEBUG)System.out.println("char_set_tail()");
+		if(index>=regex.length()){
+			return true;
+		}
+		if(peekChar()=='-'){
+			if(match('-')&&isCLS_CHAR(peekChar())){
+				match(peekChar());
+				return true;
+			}
+		}
+		return true;
+	}
+	
+	private boolean exclude_set(){
 		if(DEBUG)System.out.println("exclude_set()");
 		if(peekChar()=='^'){
-			match('^'); char_set();match(']');match('I');match('N');exclude_set_tail();
+			if(match('^')&&char_set()&&match(']')&&match('I')&&match('N')&&exclude_set_tail())
+				return true;
 		}
+		return false;
 	}
 	
-	private void exclude_set_tail(){
+	private boolean exclude_set_tail(){
 		if(DEBUG)System.out.println("exclude_set_tail()");
 		if(peekChar()=='['){
-			match('['); char_set();match(']');
+			if(match('[')&&char_set()&&match(']'))
+				return true;
 		}
-		else{
-			defined_class();
-		}
+		if(defined_class())
+			return true;
+		return false;
 	}
 
-	private void defined_class(){
+	private boolean defined_class(){
 		if(DEBUG)System.out.println("define_class()");
-		
+		String token = "";
+		if(peekChar()=='$'){
+			match('$');
+			while(isUpper(peekChar())){
+				token+=peekChar();
+				match(peekChar());
+			}
+			System.out.println(token);
+		}
+		return false;
 	}
 	
 	private char peekChar(){
-		if(index>regex.length())
+		if(index>=regex.length())
 			return '\0';
 		if(DEBUG)System.out.println(regex.charAt(index));
 		return regex.charAt(index);
@@ -185,27 +214,27 @@ public class NFAGenerator {
 		return result;
 	}
 	
-	private void match(char c){
+	private boolean match(char c){
 		if(peekChar()==c){
 			System.out.printf("Consumed: %c\n",getChar());
-			return;
+			return true;
 		}
 		
 		else{
 			System.out.printf("Error: Expected %c but found %c\n", c,peekChar());
-			System.exit(1);
+			return false;
 		}
 	}
 	
 	private boolean isRE_CHAR(char c){
 		if(c>=0x20&&c<=0x7E){
-			if(c!='\\'&&c!='*'&&c!='+'&&c!='?'&&c!='|'&&c!='['&&c!=']'&&c!='('&&c!=')'&&c!='.'&&c!='\''&&c!='\"'){
+			if(c!='\\'&&c!='*'&&c!='+'&&c!='?'&&c!='|'&&c!='['&&c!=']'&&c!='('&&c!=')'&&c!='.'&&c!='\''&&c!='\"'&&c!='$'){
 				return true;
 			}
 			else if(c=='\\'){
 				match('\\');
 				char t = peekChar();
-				if(t==' '||t=='\\'||t=='*'||t=='?'||t=='|'||t=='['||t==']'||t=='('||t==')'||t=='.'||t=='\''||t=='\"'){
+				if(t==' '||t=='\\'||t=='*'||t=='?'||t=='|'||t=='['||t==']'||t=='('||t==')'||t=='.'||t=='\''||t=='\"'||t=='$'){
 					return true;
 				}
 			}
@@ -229,7 +258,9 @@ public class NFAGenerator {
 		return false;
 	}
 	
-
+	private boolean isUpper(char c){
+		return c>='A'&&c<='Z';
+	}
 	
 	private void error(){
 		System.out.println("Error: Unexpected token found!");
