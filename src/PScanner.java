@@ -91,6 +91,8 @@ public class PScanner {
 					tokens.add(token);
 				}			
 		}
+		String epsilonStr = "$Epsilon [@]";
+		chars.put("$Epsilon", new CharacterC(epsilonStr, chars));
 		return new Lexical(tokens, chars);
 	}
 	

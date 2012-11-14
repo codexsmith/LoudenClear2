@@ -42,7 +42,7 @@ public class StateTable {
 		}
 		return replace;
 	}
-
+	
 	/**
 	 * 
 	 * @return a list of integers that are currently listed as next states
@@ -72,15 +72,15 @@ public class StateTable {
 		return values;
 	}
 	
-	public ArrayList<Map<Integer,String>> getMagic(){
-		ArrayList<Map<Integer,String>> values = new ArrayList<ArrayList<String>>();
-		
-		for (tableRow row : stateTable){
-			values.add((ArrayList<String>) row.successorStates.keySet());
-		}
-		
-		return values;
-	}
+//	public ArrayList<Map<Integer,String>> getMagic(){
+//		ArrayList<ArrayList<String>> values = new ArrayList<ArrayList<String>>();
+//		
+//		for (tableRow row : stateTable){
+//			values.add((ArrayList<String>) row.successorStates.keySet());
+//		}
+//		
+//		return values;
+//	}
 	
 	/**EXTRA CREDIT
 	 * 
