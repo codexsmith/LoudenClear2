@@ -5,8 +5,9 @@ import java.util.Map;
 public class StateTable {
 
 	private static ArrayList<tableRow> stateTable = new ArrayList<tableRow>(0);
-	private Integer currState;
-	
+	private Integer currState = 0;
+	private ArrayList<Integer> NFAState = new ArrayList<Integer>(0); 
+	private boolean accepted = false;
 	
 	
 	public StateTable(){
@@ -41,13 +42,15 @@ public class StateTable {
 	 * 
 	 * @return a list of integers that are currently listed as next states
 	 */
-	public ArrayList<Integer> getSuccessorStates(){
-		ArrayList<Integer> values = new ArrayList<Integer>();
+	public ArrayList<ArrayList<Integer>> getSuccessorStates(){
+		ArrayList<Integer> rowKey = new ArrayList<Integer>();
+		ArrayList<ArrayList<Integer>> values = new ArrayList<ArrayList<Integer>>();
 		
 		for (tableRow row : stateTable){
 			for (String key : row.successorStates.keySet()){
-				values.add(row.successorStates.get(key));
+				rowKey.add(row.successorStates.get(key));
 			}
+			values.add(rowKey);
 		}
 		return values;
 	}
@@ -56,14 +59,26 @@ public class StateTable {
 	 * 
 	 * @return a list of strings that are currently listed as next states
 	 */
-	public ArrayList<String> getSuccessorTransitions(){
-		ArrayList<String> values = new ArrayList<String>();
+	public ArrayList<ArrayList<String>> getSuccessorTransitions(){
+		ArrayList<ArrayList<String>> values = new ArrayList<ArrayList<String>>();
 		
 		for (tableRow row : stateTable){
-			values.addAll(row.successorStates.keySet());
+			values.add((ArrayList<String>) row.successorStates.keySet());
 		}
 		
 		return values;
+	}
+	
+	/**EXTRA CREDIT
+	 * 
+	 * @param c
+	 */
+	public void NFAlookUp(String c){
+		ArrayList<Integer> next = new ArrayList<Integer>(0);
+		for (Integer state : NFAState){
+			next.add(stateTable.get(state).getNextState(c));
+		}
+		
 	}
 	
 	//this will tell us if the symbol has a valid translation from the currentState to another state in the table
@@ -73,6 +88,9 @@ public class StateTable {
 		nextState = stateTable.get(currState).getNextState(c);
 		if (nextState != null){
 			currState = nextState;
+		}
+		if (stateTable.get(currState).accept()){
+			
 		}
 		return val;
 	}
