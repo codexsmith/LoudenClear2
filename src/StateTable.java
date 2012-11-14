@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 
 public class StateTable {
@@ -42,15 +44,13 @@ public class StateTable {
 	 * 
 	 * @return a list of integers that are currently listed as next states
 	 */
-	public ArrayList<ArrayList<Integer>> getSuccessorStates(){
-		ArrayList<Integer> rowKey = new ArrayList<Integer>();
-		ArrayList<ArrayList<Integer>> values = new ArrayList<ArrayList<Integer>>();
+	public ArrayList<Set<Entry<String, Integer>>>getSuccessorStates(){
+		Set<Entry<String, Integer>> rowvalues;
+		ArrayList<Set<Entry<String,Integer>>> values = new ArrayList<Set<Entry<String,Integer>>>(0);
 		
 		for (tableRow row : stateTable){
-			for (String key : row.successorStates.keySet()){
-				rowKey.add(row.successorStates.get(key));
-			}
-			values.add(rowKey);
+			rowvalues = row.successorStates.entrySet();
+			values.add(rowvalues);
 		}
 		return values;
 	}
@@ -69,6 +69,16 @@ public class StateTable {
 		return values;
 	}
 	
+	public ArrayList<Map<Integer,String>> getMagic(){
+		ArrayList<Map<Integer,String>> values = new ArrayList<ArrayList<String>>();
+		
+		for (tableRow row : stateTable){
+			values.add((ArrayList<String>) row.successorStates.keySet());
+		}
+		
+		return values;
+	}
+	
 	/**EXTRA CREDIT
 	 * 
 	 * @param c
@@ -76,7 +86,13 @@ public class StateTable {
 	public void NFAlookUp(String c){
 		ArrayList<Integer> next = new ArrayList<Integer>(0);
 		for (Integer state : NFAState){
-			next.add(stateTable.get(state).getNextState(c));
+			Integer nextState = stateTable.get(state).getNextState(c);
+			if (nextState != null){
+				next.add(nextState);
+			}
+		}
+		for (Integer state : next){
+			
 		}
 		
 	}
@@ -90,7 +106,7 @@ public class StateTable {
 			currState = nextState;
 		}
 		if (stateTable.get(currState).accept()){
-			
+			accepted = true;
 		}
 		return val;
 	}
