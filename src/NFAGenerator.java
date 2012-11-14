@@ -9,12 +9,14 @@ public class NFAGenerator {
 	private int index;
 	private Lexical lex;
 	private String regex;
+	private int entry_ind;
 	
 	public NFAGenerator(Lexical l){
 		lex = l;
 		index = 0;
 		nfa = new StateTable();
 		regex = new String();
+		entry_ind = 0;
 	}
 	
 	public StateTable genNFA(){
