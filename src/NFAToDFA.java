@@ -24,7 +24,9 @@ public class NFAToDFA {
 		Queue<ArrayList<Integer>> nextToParse = new LinkedList<ArrayList<Integer>>();
 		
 		ArrayList<Integer> currState = new ArrayList<Integer>();
+		
 		ArrayList<String> alreadyProcessed = new ArrayList<String>();
+		
 		currState.add(0);
 		alreadyProcessed.add("0,");
 		while(!currState.isEmpty())

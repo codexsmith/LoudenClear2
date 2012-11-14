@@ -90,6 +90,8 @@ public class StateTable {
 	 */
 	public void NFAlookUp(String c){
 		ArrayList<Integer> next = new ArrayList<Integer>(0);
+		
+		
 		for (Integer state : NFAState){
 			Integer nextState = stateTable.get(state).getNextState(c);
 			if (nextState != null){
@@ -97,7 +99,7 @@ public class StateTable {
 			}
 		}
 		for (Integer state : next){
-			
+			possibleNext = stateTable.get(state);
 		}
 		
 	}
