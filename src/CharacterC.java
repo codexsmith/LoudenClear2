@@ -69,12 +69,6 @@ public class CharacterC extends iIdentifier{
 		return title;
 	}
 
-	@Override
-	public int compareTo(iIdentifier a) {
-		
-		return 0;
-	}
-	
 	private void parseRegex(String regex) //a-z, ^0, A-Z
 	{
 		int strLen = regex.length();
