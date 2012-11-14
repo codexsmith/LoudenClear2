@@ -50,7 +50,7 @@ public class NFAToDFA {
 					nextToParse.add(nextStates.get(key));
 				}
 			}
-			
+			outputStateTable.addState(nextStates, "something", 0);
 			currState = nextToParse.poll();
 		}
 		
