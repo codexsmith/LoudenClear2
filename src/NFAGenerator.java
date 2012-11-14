@@ -1,22 +1,26 @@
-
+/**
+ * 
+ * @author andrew
+ *
+ */
 public class NFAGenerator {
 	private final boolean DEBUG = true;
 	private StateTable nfa;
-	private StateTable subnfa;
 	private int index;
 	private Lexical lex;
 	private String regex;
+	private int entry_ind;
 	
 	public NFAGenerator(Lexical l){
 		lex = l;
 		index = 0;
 		nfa = new StateTable();
 		regex = new String();
+		entry_ind = 0;
 	}
 	
 	public StateTable genNFA(){
 		if(DEBUG)System.out.println("genNFA()");
-		StateTable temp;
 		for(TokenC t: lex.getTokens()){
 			regex = t.getLegal().get(0);
 			regex();
@@ -216,7 +220,7 @@ public class NFAGenerator {
 	
 	private boolean match(char c){
 		if(peekChar()==c){
-			System.out.printf("Consumed: %c\n",getChar());
+			if(DEBUG)System.out.printf("Consumed: %c\n",getChar());
 			return true;
 		}
 		
@@ -260,10 +264,5 @@ public class NFAGenerator {
 	
 	private boolean isUpper(char c){
 		return c>='A'&&c<='Z';
-	}
-	
-	private void error(){
-		System.out.println("Error: Unexpected token found!");
-		System.exit(1);
 	}
 }
