@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 
-public abstract class iIdentifier extends Node{
+public abstract class iIdentifier{
 	
 	public abstract ArrayList<String> getLegal();
 //	public abstract boolean match(String title); //ignore this for now

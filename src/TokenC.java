@@ -40,5 +40,11 @@ public class TokenC extends iIdentifier{
 	public String getTitle() {
 		return title;	
 	}
+
+	@Override
+	public int compareTo(iIdentifier a) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 	
 }
