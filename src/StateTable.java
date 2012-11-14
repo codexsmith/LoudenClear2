@@ -11,6 +11,8 @@ public class StateTable {
 	private ArrayList<Integer> NFAState = new ArrayList<Integer>(0); 
 	private boolean accepted = false;
 	private tableRow removedRow;
+	private Integer acceptedState;
+	private enum TableType {NFA,DFA};
 	
 	
 	public StateTable(){
@@ -90,17 +92,28 @@ public class StateTable {
 	 */
 	public void NFAlookUp(String c){
 		ArrayList<Integer> next = new ArrayList<Integer>(0);
+		Integer nextState;
 		
-		
-		for (Integer state : NFAState){
-			Integer nextState = stateTable.get(state).getNextState(c);
+		for (Integer state : NFAState){//
+			nextState = stateTable.get(state).getNextState(c);
 			if (nextState != null){
 				next.add(nextState);
 			}
 		}
-		for (Integer state : next){
-			possibleNext = stateTable.get(state);
+		for (Integer state : next){//follows epsilon transitions
+			nextState = stateTable.get(state).getNextState("@");
+			if(nextState != null){
+				next.add(nextState);
+			}
 		}
+		
+		for(Integer state : next){//checks for accepting state
+			if(stateTable.get(state).accept()){
+				accepted = true;
+				acceptedState = state;
+			}
+		}
+		NFAState = next;
 		
 	}
 	

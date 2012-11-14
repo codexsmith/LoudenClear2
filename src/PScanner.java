@@ -10,9 +10,6 @@ import java.util.StringTokenizer;
  * 
  * @author nick
  * 
- *	code starts on page 512
- *	book discusses it on page 77 
- *	need the helper methods
  */
 
 public class PScanner {
