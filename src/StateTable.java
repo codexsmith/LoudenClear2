@@ -35,9 +35,8 @@ public class StateTable {
 		else if(index < 0){ //append to end
 			stateTable.add(newRow);
 		}
-		
-		
 	}
+	
 	/**
 	 * 
 	 * @return a list of integers that are currently listed as next states
