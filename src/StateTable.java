@@ -10,6 +10,7 @@ public class StateTable {
 	private Integer currState = 0;
 	private ArrayList<Integer> NFAState = new ArrayList<Integer>(0); 
 	private boolean accepted = false;
+	private tableRow removedRow;
 	
 	
 	public StateTable(){
@@ -24,6 +25,7 @@ public class StateTable {
 	 * @param map - transitions
 	 * @param name
 	 * @param index - if table size is less than index, it will REPLACE the current table entry
+	 * @return boolean, if a row is replaced true is returned an the replaced row is stored in a removedRow
 	 */
 	public boolean addState(Map<String, Integer> map, String name,int index){
 		tableRow newRow = new tableRow(map, name); //create
@@ -33,7 +35,7 @@ public class StateTable {
 			stateTable.add(index, newRow);
 		}
 		else if(stateTable.size() > index){ //REPLACE CURRENT TABLEROW AT INDEX
-			stateTable.remove(index);
+			removedRow = stateTable.remove(index);
 			stateTable.add(index, newRow);
 			replace = true;
 		}
