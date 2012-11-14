@@ -7,6 +7,5 @@ public abstract class iIdentifier{
 //	public abstract boolean match(String title); //ignore this for now
 	public abstract boolean isLegal(String c);
 	public abstract String getTitle();
-	
 
 }

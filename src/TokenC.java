@@ -10,7 +10,6 @@ public class TokenC extends iIdentifier{
 		String symbols;
 		legal = new ArrayList<String>();
 		
-		
 		line = line.trim();//removes leading & trailing whitespaces
 		
 		if(line.substring(0, 1).compareTo("$") == 0){ //proper identifier

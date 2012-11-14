@@ -16,13 +16,58 @@ public class StateTable {
 	public tableRow getTableRow(int i){
 		return stateTable.get(i);
 	}
-	
-	public void addState(Map<String, Integer> map, String name){
+	/**
+	 * 
+	 * @param map - transitions
+	 * @param name
+	 * @param index - if table size is less than index, it will REPLACE the current table entry
+	 */
+	public void addState(Map<String, Integer> map, String name,int index){
 		tableRow newRow = new tableRow(map, name); //create
-		stateTable.add(newRow);
+		
+		if (stateTable.size() < index && index >=0){ //append at index
+			stateTable.add(index, newRow);
+		}
+		else if(stateTable.size() > index){ //REPLACE CURRENT TABLEROW AT INDEX
+			stateTable.remove(index);
+			stateTable.add(index, newRow);
+		}
+		else if(index < 0){ //append to end
+			stateTable.add(newRow);
+		}
+		
+		
+	}
+	/**
+	 * 
+	 * @return a list of integers that are currently listed as next states
+	 */
+	public ArrayList<Integer> getSuccessorStates(){
+		ArrayList<Integer> values = new ArrayList<Integer>();
+		
+		for (tableRow row : stateTable){
+			for (String key : row.successorStates.keySet()){
+				values.add(row.successorStates.get(key));
+			}
+		}
+		return values;
 	}
 	
-	//this will tell us if the symbol has a valid translation in the stateTable
+	/**
+	 * 
+	 * @return a list of strings that are currently listed as next states
+	 */
+	public ArrayList<String> getSuccessorTransitions(){
+		ArrayList<String> values = new ArrayList<String>();
+		
+		for (tableRow row : stateTable){
+			values.addAll(row.successorStates.keySet());
+		}
+		
+		return values;
+	}
+	
+	//this will tell us if the symbol has a valid translation from the currentState to another state in the table
 	public boolean DFAlookUp(String c){
 		Integer nextState; //state table index
 		boolean val = false;
