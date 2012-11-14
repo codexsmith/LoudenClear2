@@ -28,8 +28,9 @@ public class StateTable {
 	 * @param name
 	 * @param index - if table size is less than index, it will REPLACE the current table entry
 	 */
-	public void addState(Map<String, Integer> map, String name,int index){
+	public boolean addState(Map<String, Integer> map, String name,int index){
 		tableRow newRow = new tableRow(map, name); //create
+		boolean replace = false;
 		
 		if (stateTable.size() < index && index >=0){ //append at index
 			stateTable.add(index, newRow);
@@ -37,17 +38,19 @@ public class StateTable {
 		else if(stateTable.size() > index){ //REPLACE CURRENT TABLEROW AT INDEX
 			stateTable.remove(index);
 			stateTable.add(index, newRow);
+			replace = true;
 		}
 		else if(index < 0){ //append to end
 			stateTable.add(newRow);
 		}
+		return replace;
 	}
 	
 	/**
 	 * 
 	 * @return a list of integers that are currently listed as next states
 	 */
-	public ArrayList<Set<Entry<String, Integer>>>getSuccessorStates(){
+	public ArrayList<Set<Entry<String, Integer>>> getSuccessorStates(){
 		Set<Entry<String, Integer>> rowvalues;
 		ArrayList<Set<Entry<String,Integer>>> values = new ArrayList<Set<Entry<String,Integer>>>(0);
 		
