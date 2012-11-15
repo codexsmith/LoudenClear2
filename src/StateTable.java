@@ -6,19 +6,11 @@ import java.util.Set;
 
 public class StateTable {
 
-<<<<<<< HEAD
-	private static ArrayList<tableRow> stateTable;
-	private Integer currState;
-	private ArrayList<Integer> NFAState; 
-	private boolean accepted;
-=======
 	private static ArrayList<tableRow> stateTable = new ArrayList<tableRow>(0);
 	private Integer currState = 0;
 	private ArrayList<Integer> NFAState = new ArrayList<Integer>(0); 
 	private boolean accepted = false;
 	private tableRow removedRow;
->>>>>>> 0731c7224809e3f28f8030ca183481b172b95a63
-	
 	
 	public StateTable(){
 		stateTable = new ArrayList<tableRow>(0);

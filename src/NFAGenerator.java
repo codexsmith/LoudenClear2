@@ -9,20 +9,23 @@ public class NFAGenerator {
 	private int index;
 	private Lexical lex;
 	private String regex;
+	private String token;
 	private int entry_ind;
 	
 	public NFAGenerator(Lexical l){
 		lex = l;
 		index = 0;
+		entry_ind = 0;
 		nfa = new StateTable();
 		regex = new String();
-		entry_ind = 0;
+		token = new String();
 	}
 	
 	public StateTable genNFA(){
 		if(DEBUG)System.out.println("genNFA()");
 		for(TokenC t: lex.getTokens()){
 			regex = t.getLegal().get(0);
+			token = t.getTitle().substring(1);
 			regex();
 		}
 		return nfa;
@@ -30,7 +33,12 @@ public class NFAGenerator {
 	
 	private boolean regex(){
 		if(DEBUG)System.out.println("regex()");
-		return rexp();
+		if(rexp()){
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
 	
 	private boolean rexp(){

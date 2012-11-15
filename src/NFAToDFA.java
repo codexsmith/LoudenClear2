@@ -10,10 +10,7 @@ import java.util.Set;
  * Converts the NFA StateTable to a DFA StateTable
  *
  */
-/**
- * @author donovanhatch
- *
- */
+
 public class NFAToDFA {
 	
 	private static StateTable inputStateTable;
