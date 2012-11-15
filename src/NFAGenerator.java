@@ -1,3 +1,6 @@
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 
  * @author andrew
@@ -9,28 +12,37 @@ public class NFAGenerator {
 	private int index;
 	private Lexical lex;
 	private String regex;
+	private String token;
 	private int entry_ind;
 	
-	public NFAGenerator(Lexical l){
-		lex = l;
+	public NFAGenerator(String s){
+		//lex = l;
 		index = 0;
-		nfa = new StateTable();
-		regex = new String();
 		entry_ind = 0;
+		nfa = new StateTable();
+		regex = s; // new String();
+		token = new String();
 	}
 	
 	public StateTable genNFA(){
 		if(DEBUG)System.out.println("genNFA()");
-		for(TokenC t: lex.getTokens()){
+/*		for(TokenC t: lex.getTokens()){
 			regex = t.getLegal().get(0);
+			token = t.getTitle().substring(1);
 			regex();
-		}
+		}*/
+		regex();
 		return nfa;
 	}
 	
 	private boolean regex(){
 		if(DEBUG)System.out.println("regex()");
-		return rexp();
+		if(rexp()){
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
 	
 	private boolean rexp(){
@@ -78,8 +90,11 @@ public class NFAGenerator {
 			}
 		}
 		if(isRE_CHAR(peekChar())){
-			if(match(peekChar())&&rexp2_tail())
+			char temp = peekChar();
+			if(match(peekChar())&&rexp2_tail()){
+				handleChar(String.valueOf(temp));
 				return true;
+			}
 		}
 		if(rexp3())
 			return true;
@@ -264,5 +279,29 @@ public class NFAGenerator {
 	
 	private boolean isUpper(char c){
 		return c>='A'&&c<='Z';
+	}
+	
+	private void handleChar(String c){
+		Map<String,StateTable.tableRow> trans = new HashMap<String,StateTable.tableRow>();
+		nfa.addState(null, Integer.toString(entry_ind)+1,"Invalid Type", entry_ind+1);
+		trans.put(c, nfa.getTableRow(entry_ind+1));
+		nfa.addState(trans, Integer.toString(entry_ind), "Invalid Type", entry_ind);
+		entry_ind++;
+	}
+	
+	private void handleToken(TokenC t){
+		
+	}
+	
+	private void handleUnion(){
+		
+	}
+	
+	private void handleStar(){
+		
+	}
+	
+	private void handlePlus(){
+		
 	}
 }
