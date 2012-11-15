@@ -179,7 +179,7 @@ public class StateTable {
 	public void printTable(){
 		for(TableRow t:stateTable){
 			System.out.println(t);
-			System.out.println(getSuccessorStates());
+			System.out.println(t.getSuccessorStates());
 /*			for(int i=0;i<t.getSuccessorStates().size();i++){
 				t.getSuccessorStates().
 			}*/
