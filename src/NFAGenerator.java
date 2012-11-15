@@ -283,9 +283,8 @@ public class NFAGenerator {
 	}
 	
 	private void handleChar(String c){
-		Map<String,StateTable.tableRow> trans = new HashMap<String,StateTable.tableRow>();
-		StateTable.tableRow newRow = new tableRow(null, Integer.toString(entry_ind+1), "Invalid Type");
-		nfa.addState(null, Integer.toString(entry_ind+1),"Invalid Type", entry_ind+1);
+		Map<String,StateTable.TableRow> trans = new HashMap<String,StateTable.TableRow>();
+		nfa.addState(null, Integer.toString(entry_ind)+1,"Invalid Type", entry_ind+1);
 		trans.put(c, nfa.getTableRow(entry_ind+1));
 		nfa.addState(trans, Integer.toString(entry_ind), "Invalid Type", entry_ind);
 		entry_ind++;
