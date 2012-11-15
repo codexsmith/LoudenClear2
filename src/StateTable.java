@@ -109,7 +109,6 @@ public class StateTable {
 		System.out.println("Size: "+stateTable.size());
 		for (TableRow row : stateTable){
 			rowvalues = row.getSuccessorStates().entrySet();
-			System.out.println("Rowvalues: "+rowvalues);
 			values.add(rowvalues);
 		}
 		return values;
@@ -178,7 +177,7 @@ public class StateTable {
 	public void printTable(){
 		for(TableRow t:stateTable){
 			System.out.println(t);
-			System.out.println(t.getSuccessorStates());
+			System.out.println(getSuccessorStates());
 /*			for(int i=0;i<t.getSuccessorStates().size();i++){
 				t.getSuccessorStates().
 			}*/
