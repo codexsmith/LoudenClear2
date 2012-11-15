@@ -33,6 +33,16 @@ public class StateTable {
 	}
 	
 	/**
+	 * @param index into stateTable
+	 * @return ArrayList of tableRow object at that index
+	 */
+	public ArrayList<TableRow> getTableRowArray(int i){
+		ArrayList<TableRow> s = new ArrayList<TableRow>();
+		s.add(stateTable.get(i));
+		return s;
+	}
+	
+	/**
 	 * @param name of the table row to return
 	 * @return a matching tableRow
 	 */
@@ -95,11 +105,14 @@ public class StateTable {
 	 */
 	public ArrayList<Set<Entry<String, ArrayList<TableRow>>>> getSuccessorStates(){
 		Set<Entry<String, ArrayList<TableRow>>> rowvalues;
-		ArrayList<Set<Entry<String,ArrayList<TableRow>>>> values = new ArrayList<Set<Entry<String,ArrayList<TableRow>>>>(0);
+		ArrayList<Set<Entry<String,ArrayList<TableRow>>>> values = new ArrayList<Set<Entry<String,ArrayList<TableRow>>>>();
 		
 		for (TableRow row : stateTable){
-			rowvalues = row.getSuccessorStates().entrySet();
-			values.add(rowvalues);
+			if (row.getSuccessorStates() != null){
+				rowvalues = row.getSuccessorStates().entrySet();
+				System.out.println(rowvalues);
+				values.add(rowvalues);
+			}
 		}
 		return values;
 	}
@@ -121,20 +134,20 @@ public class StateTable {
 	 * 
 	 * @param string to lookup
 	 */
-	public void NFAlookUp(String c){
+	public void NFAlookUp(String c){//redo
 		ArrayList<TableRow> next = new ArrayList<TableRow>(0);
 		ArrayList<TableRow> nextState;
 		
 		for (TableRow state : NFAState){//
 			nextState = stateTable.get(stateTable.indexOf(state)).getNextState(c);
 			if (nextState != null){
-				next.add(nextState);
+				next.addAll(nextState);
 			}
 		}
 		for (TableRow state : next){//follows epsilon transitions
 			nextState = stateTable.get(stateTable.indexOf(state)).getNextState("@");
 			if(nextState != null){
-				next.add(nextState);
+				next.addAll(nextState);
 			}
 		}
 		
@@ -156,8 +169,10 @@ public class StateTable {
 		if (nextState != null){
 			currState = nextState;
 		}
-		if (currState.accept()){
-			accepted = true;
+		for (TableRow state : currState){
+			if (state.accept()){
+				accepted = true;
+			}
 		}
 	}
 	
