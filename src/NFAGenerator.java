@@ -273,4 +273,25 @@ public class NFAGenerator {
 	private boolean isUpper(char c){
 		return c>='A'&&c<='Z';
 	}
+	
+	private void handleChar(char c){
+		nfa.addState(map, name, entry_ind);
+		entry_ind++;
+	}
+	
+	private void handleToken(TokenC t){
+		
+	}
+	
+	private void handleUnion(){
+		
+	}
+	
+	private void handleStar(){
+		
+	}
+	
+	private void handlePlus(){
+		
+	}
 }

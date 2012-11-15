@@ -6,13 +6,6 @@ import java.util.Set;
 
 public class StateTable {
 
-<<<<<<< HEAD
-	private static ArrayList<tableRow> stateTable = new ArrayList<tableRow>(0);
-	private Integer currState = 0;
-	private ArrayList<Integer> NFAState = new ArrayList<Integer>(0); 
-	private boolean accepted = false;
-	private tableRow removedRow;
-=======
 	private static ArrayList<tableRow> stateTable;
 	private Integer currState;
 	private ArrayList<Integer> NFAState; 
@@ -22,7 +15,6 @@ public class StateTable {
 	
 	private enum TableType {NFA,DFA};
 	private tableRow removedRow; //storage for addState's remove state
->>>>>>> e0f69b9e761851a1f2bb7ee101bc3fd4a5cfcc0a
 	
 	public StateTable(){
 		stateTable = new ArrayList<tableRow>(0);
