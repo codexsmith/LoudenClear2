@@ -28,6 +28,10 @@ public class TableRow{
 		return "State: "+getName()+" :: Accept: "+accept;
 	}
 	
+	/**
+	 * 
+	 * @param val
+	 */
 	public void setAccept(boolean val){
 		accept = val;
 	}
