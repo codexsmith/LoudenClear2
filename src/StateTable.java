@@ -105,11 +105,14 @@ public class StateTable {
 	 */
 	public ArrayList<Set<Entry<String, ArrayList<TableRow>>>> getSuccessorStates(){
 		Set<Entry<String, ArrayList<TableRow>>> rowvalues;
-		ArrayList<Set<Entry<String,ArrayList<TableRow>>>> values = new ArrayList<Set<Entry<String,ArrayList<TableRow>>>>(0);
+		ArrayList<Set<Entry<String,ArrayList<TableRow>>>> values = new ArrayList<Set<Entry<String,ArrayList<TableRow>>>>();
 		
 		for (TableRow row : stateTable){
-			rowvalues = row.getSuccessorStates().entrySet();
-			values.add(rowvalues);
+			if (row.getSuccessorStates() != null){
+				rowvalues = row.getSuccessorStates().entrySet();
+				System.out.println(rowvalues);
+				values.add(rowvalues);
+			}
 		}
 		return values;
 	}
@@ -134,18 +137,17 @@ public class StateTable {
 	public void NFAlookUp(String c){//redo
 		ArrayList<TableRow> next = new ArrayList<TableRow>(0);
 		ArrayList<TableRow> nextState;
-		ArrayList<ArrayList<TableRow>> nextStates;
 		
 		for (TableRow state : NFAState){//
 			nextState = stateTable.get(stateTable.indexOf(state)).getNextState(c);
 			if (nextState != null){
-				next.add(nextState);
+				next.addAll(nextState);
 			}
 		}
 		for (TableRow state : next){//follows epsilon transitions
 			nextState = stateTable.get(stateTable.indexOf(state)).getNextState("@");
 			if(nextState != null){
-				next.add(nextState);
+				next.addAll(nextState);
 			}
 		}
 		
