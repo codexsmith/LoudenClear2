@@ -33,6 +33,16 @@ public class StateTable {
 	}
 	
 	/**
+	 * @param index into stateTable
+	 * @return ArrayList of tableRow object at that index
+	 */
+	public ArrayList<TableRow> getTableRowArray(int i){
+		ArrayList<TableRow> s = new ArrayList<TableRow>();
+		s.add(stateTable.get(i));
+		return s;
+	}
+	
+	/**
 	 * @param name of the table row to return
 	 * @return a matching tableRow
 	 */
@@ -121,9 +131,10 @@ public class StateTable {
 	 * 
 	 * @param string to lookup
 	 */
-	public void NFAlookUp(String c){
+	public void NFAlookUp(String c){//redo
 		ArrayList<TableRow> next = new ArrayList<TableRow>(0);
 		ArrayList<TableRow> nextState;
+		ArrayList<ArrayList<TableRow>> nextStates;
 		
 		for (TableRow state : NFAState){//
 			nextState = stateTable.get(stateTable.indexOf(state)).getNextState(c);
@@ -156,8 +167,10 @@ public class StateTable {
 		if (nextState != null){
 			currState = nextState;
 		}
-		if (currState.accept()){
-			accepted = true;
+		for (TableRow state : currState){
+			if (state.accept()){
+				accepted = true;
+			}
 		}
 	}
 	
