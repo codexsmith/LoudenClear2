@@ -17,7 +17,7 @@ public class Driver {
 		String regex = "a";
 		NFAGenerator gen = new NFAGenerator(regex);
 		StateTable table = gen.genNFA();
-//		table.printTable();
+		table.printTable();
 	}
 
 }

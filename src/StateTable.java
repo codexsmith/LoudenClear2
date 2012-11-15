@@ -55,7 +55,7 @@ public class StateTable {
 	
 	
 	public void add(TableRow t, int index){
-		if (stateTable.size() < index){
+		if (stateTable.size() <= index){
 			stateTable.ensureCapacity(index+1);
 			stateTable.add(index, t);
 		}
@@ -164,6 +164,10 @@ public class StateTable {
 	public void printTable(){
 		for(TableRow t:stateTable){
 			System.out.println(t);
+			System.out.println(t.getSuccessorStates());
+/*			for(int i=0;i<t.getSuccessorStates().size();i++){
+				t.getSuccessorStates().
+			}*/
 		}
 	}
 	/**
