@@ -70,6 +70,7 @@ public class StateTable {
 			stateTable.add(index, newRow);
 		}
 		else if(stateTable.size() > index){ //REPLACE CURRENT TABLEROW AT INDEX
+			stateTable.ensureCapacity(index+1);
 			removedRow = stateTable.remove(index);//stores removed row
 			stateTable.add(index, newRow);
 			replace = true;
