@@ -3,23 +3,22 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-
 public class StateTable {
 
-	private static ArrayList<tableRow> stateTable;
-	private tableRow currState;
-	private ArrayList<tableRow> NFAState; 
+	private static ArrayList<TableRow> stateTable;
+	private TableRow currState;
+	private ArrayList<TableRow> NFAState; 
 	private boolean accepted;
-	private tableRow acceptedState;
+	private TableRow acceptedState;
 	private String tokenGenerated;
 	
 	private enum TableType {NFA,DFA};
-	private tableRow removedRow; //storage for addState's remove state
+	private TableRow removedRow; //storage for addState's remove state
 	
 	public StateTable(){
-		stateTable = new ArrayList<tableRow>(0);
+		stateTable = new ArrayList<TableRow>(0);
 		currState = null;
-		NFAState = new ArrayList<tableRow>(0); 
+		NFAState = new ArrayList<TableRow>(0); 
 		accepted = false;
 		acceptedState = null;
 		tokenGenerated = "";
@@ -29,7 +28,7 @@ public class StateTable {
 	 * @param index into stateTable
 	 * @return tableRow object at that index
 	 */
-	public tableRow getTableRow(int i){
+	public TableRow getTableRow(int i){
 		return stateTable.get(i);
 	}
 	
@@ -37,9 +36,9 @@ public class StateTable {
 	 * @param name of the table row to return
 	 * @return a matching tableRow
 	 */
-	public tableRow getTableRowbyName(String name){
-		for (tableRow row : stateTable){
-			if (row.name.compareTo(name) == 0){
+	public TableRow getTableRowbyName(String name){
+		for (TableRow row : stateTable){
+			if (row.getName().compareTo(name) == 0){
 				return row;
 			}
 		}
@@ -47,15 +46,15 @@ public class StateTable {
 	}
 	
 	/** 
-	 * @param tableRow to lookup in stateTable
+	 * @param TableRow to lookup in stateTable
 	 * @return index of tableRow in stateTable, or null if not
 	 */
-	public int getIndexOf(tableRow t){
+	public int getIndexOf(TableRow t){
 		return stateTable.indexOf(t);
 	}
 	
 	
-	public void add(tableRow t, int index){
+	public void add(TableRow t, int index){
 		if (stateTable.size() < index){
 			stateTable.ensureCapacity(index+1);
 			stateTable.add(index, t);
@@ -71,8 +70,8 @@ public class StateTable {
 	 * @param index - if table size is less than index, it will REPLACE the current table entry
 	 * @return boolean if a row is replaced true is returned an the replaced row is stored in a removedRow
 	 */
-	public boolean addState(Map<String, tableRow> map, String name, String type, int index){
-		tableRow newRow = new tableRow(map, name, type); //create
+	public boolean addState(Map<String, TableRow> map, String name, String type, int index){
+		TableRow newRow = new TableRow(map, name, type); //create
 		boolean replace = false;
 		
 		if (stateTable.size() < index && index >=0){ //append at index
@@ -94,12 +93,12 @@ public class StateTable {
 	/**
 	 * @return a list of all the transition maps that are currently in the stateTable
 	 */
-	public ArrayList<Set<Entry<String, tableRow>>> getSuccessorStates(){
-		Set<Entry<String, tableRow>> rowvalues;
-		ArrayList<Set<Entry<String,tableRow>>> values = new ArrayList<Set<Entry<String,tableRow>>>(0);
+	public ArrayList<Set<Entry<String, TableRow>>> getSuccessorStates(){
+		Set<Entry<String, TableRow>> rowvalues;
+		ArrayList<Set<Entry<String,TableRow>>> values = new ArrayList<Set<Entry<String,TableRow>>>(0);
 		
-		for (tableRow row : stateTable){
-			rowvalues = row.successorStates.entrySet();
+		for (TableRow row : stateTable){
+			rowvalues = row.getSuccessorStates().entrySet();
 			values.add(rowvalues);
 		}
 		return values;
@@ -111,8 +110,8 @@ public class StateTable {
 	public ArrayList<ArrayList<String>> getSuccessorTransitions(){
 		ArrayList<ArrayList<String>> values = new ArrayList<ArrayList<String>>();
 		
-		for (tableRow row : stateTable){
-			values.add((ArrayList<String>) row.successorStates.keySet());
+		for (TableRow row : stateTable){
+			values.add((ArrayList<String>) row.getSuccessorStates().keySet());
 		}
 		
 		return values;
@@ -123,23 +122,23 @@ public class StateTable {
 	 * @param string to lookup
 	 */
 	public void NFAlookUp(String c){
-		ArrayList<tableRow> next = new ArrayList<tableRow>(0);
-		tableRow nextState;
+		ArrayList<TableRow> next = new ArrayList<TableRow>(0);
+		TableRow nextState;
 		
-		for (tableRow state : NFAState){//
+		for (TableRow state : NFAState){//
 			nextState = stateTable.get(stateTable.indexOf(state)).getNextState(c);
 			if (nextState != null){
 				next.add(nextState);
 			}
 		}
-		for (tableRow state : next){//follows epsilon transitions
+		for (TableRow state : next){//follows epsilon transitions
 			nextState = stateTable.get(stateTable.indexOf(state)).getNextState("@");
 			if(nextState != null){
 				next.add(nextState);
 			}
 		}
 		
-		for(tableRow state : next){//checks for accepting state
+		for(TableRow state : next){//checks for accepting state
 			if(stateTable.get(stateTable.indexOf(state)).accept()){
 				accepted = true;
 				acceptedState = state;
@@ -151,7 +150,7 @@ public class StateTable {
 	
 	//this will tell us if the symbol has a valid translation from the currentState to another state in the table
 	public void DFAlookUp(String c){
-		tableRow nextState; //state table index
+		TableRow nextState; //state table index
 		boolean val = false;
 		nextState = stateTable.get(stateTable.indexOf(currState)).getNextState(c);
 		if (nextState != null){
@@ -163,7 +162,7 @@ public class StateTable {
 	}
 	
 	public void printTable(){
-		for(tableRow t:stateTable){
+		for(TableRow t:stateTable){
 			System.out.println(t);
 		}
 	}
