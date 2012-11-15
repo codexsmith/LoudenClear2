@@ -14,7 +14,7 @@ public class Driver {
 	public static void main(String[] args) {
 		
 		Lexical lexSpec = PScanner.scanLexicon("sample_spec.txt");
-		String regex = "a";
+		String regex = "$FUCK";
 		NFAGenerator gen = new NFAGenerator(regex);
 		StateTable table = gen.genNFA();
 		table.printTable();

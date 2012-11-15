@@ -96,7 +96,7 @@ public class NFAGenerator {
 		if(isRE_CHAR(peekChar())){
 			char temp = peekChar();
 			if(match(peekChar())&&rexp2_tail()){
-				handleChar(String.valueOf(temp));
+				populate(String.valueOf(temp));
 				return true;
 			}
 		}
@@ -135,14 +135,19 @@ public class NFAGenerator {
 	private boolean char_class(){
 		if(DEBUG)System.out.println("char_class()");
 		if(peekChar()=='.'){
+			match('.');
+			populate(".");
 			return true;
 		}
 		if(peekChar()=='['){
 			if(match('[')&&char_class1())
 				return true;
 		}
-		if(defined_class())
+		String temp = defined_class();
+		if(temp!=null){
+			populate(temp);
 			return true;
+		}
 		return false;
 	}
 	
@@ -205,23 +210,27 @@ public class NFAGenerator {
 			if(match('[')&&char_set()&&match(']'))
 				return true;
 		}
-		if(defined_class())
+		String temp = defined_class();
+		if(temp!=null){
 			return true;
+		}
 		return false;
 	}
 
-	private boolean defined_class(){
+	private String defined_class(){
 		if(DEBUG)System.out.println("define_class()");
 		String token = "";
 		if(peekChar()=='$'){
+			token+='$';
 			match('$');
 			while(isUpper(peekChar())){
 				token+=peekChar();
 				match(peekChar());
 			}
 			System.out.println(token);
+			return token;
 		}
-		return false;
+		return null;
 	}
 	
 	private char peekChar(){
@@ -288,7 +297,7 @@ public class NFAGenerator {
 		return c>='A'&&c<='Z';
 	}
 	
-	private void handleChar(String c){
+	private void populate(String c){
 		Map<String,ArrayList<TableRow>> trans = new HashMap<String,ArrayList<TableRow>>();
 		TableRow nextRow = new TableRow(null, Integer.toString(entry_ind+1), "Invliad Type");
 		nfa.add(null, entry_ind);
@@ -296,11 +305,6 @@ public class NFAGenerator {
 		trans.put(c, nfa.getTableRowArray(entry_ind+1));
 		nfa.addState(trans, Integer.toString(entry_ind), "Invalid Type", entry_ind);
 		entry_ind+=2;
-	}
-	
-	private void handleToken(TokenC t){
-		Map<String,ArrayList<TableRow>> trans = new HashMap<String,ArrayList<TableRow>>();
-		TableRow nextRow = new TableRow(null, Integer.toString(entry_ind+1),"Invalid Type");
 	}
 	
 	private void handleUnion(){
