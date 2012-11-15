@@ -52,9 +52,12 @@ public class PScanner {
 		buff = tok.concat(buff);
 	}
 	
-	/**reads lexical input file
-	 * @return 
+	/**
+	 * reads lexical input file
 	 * 
+	 * Use states to keep track of what I'm looking at inside of the file (char/token)
+	 * 
+	 * @return lexical container for tokens and characters
 	 */
 	public static Lexical scanLexicon(String lexFilePath){		
 		String line= "";
@@ -69,7 +72,7 @@ public class PScanner {
 		{
 			if(line.startsWith("%") || line.isEmpty())
 			{
-				if(state == 0) //advance state
+				if(state == 0)
 					state = 1;
 				else if(state == 1)
 					state = 2;
@@ -79,15 +82,18 @@ public class PScanner {
 				{
 					if(state == 0) state = 1;
 					
+					//Create new char and parse line.
 					CharacterC character = new CharacterC(line, chars);
 					chars.put(character.getTitle(), character);
 				}
 				else if(state == 2) // identifiers
 				{
+					//create new token and parse line
 					TokenC token = new TokenC(line);
 					tokens.add(token);
 				}			
 		}
+		//Create epsilon using @ symbol
 		String epsilonStr = "$Epsilon [@]";
 		chars.put("$Epsilon", new CharacterC(epsilonStr, chars));
 		return new Lexical(tokens, chars);

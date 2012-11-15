@@ -34,6 +34,19 @@ public class StateTable {
 	}
 	
 	/**
+	 * @param name of the table row to return
+	 * @return a matching tableRow
+	 */
+	public tableRow getTableRowbyName(String name){
+		for (tableRow row : stateTable){
+			if (row.name.compareTo(name) == 0){
+				return row;
+			}
+		}
+		return null;
+	}
+	
+	/**
 	 * 
 	 * @param title is a title to search for in the table
 	 * @return tableRow with matching title, or null if it doesn't exist
@@ -144,16 +157,16 @@ public class StateTable {
 	 */
 	public class tableRow{
 		//Map of strings to tableRows, transitions
-		private Map<String,Integer> successorStates;
+		private Map<String,tableRow> successorStates;
 		private boolean accept;
 		private String name;
 		
-		public tableRow(Map<String,Integer> nextStates, String n){
+		public tableRow(Map<String,tableRow> nextStates, String n){
 			successorStates = nextStates;
 			name = n;
 		}
 		
-		public Integer getNextState(String c){
+		public tableRow getNextState(String c){
 			return successorStates.get(c);
 		}
 		
