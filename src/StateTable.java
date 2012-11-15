@@ -7,10 +7,10 @@ import java.util.Set;
 public class StateTable {
 
 	private static ArrayList<tableRow> stateTable;
-	private Integer currState;
-	private ArrayList<Integer> NFAState; 
+	private tableRow currState;
+	private ArrayList<tableRow> NFAState; 
 	private boolean accepted;
-	private Integer acceptedState;
+	private tableRow acceptedState;
 	private String tokenGenerated;
 	
 	private enum TableType {NFA,DFA};
@@ -18,10 +18,10 @@ public class StateTable {
 	
 	public StateTable(){
 		stateTable = new ArrayList<tableRow>(0);
-		currState = 0;
-		NFAState = new ArrayList<Integer>(0); 
+		currState = null;
+		NFAState = new ArrayList<tableRow>(0); 
 		accepted = false;
-		acceptedState = -1;
+		acceptedState = null;
 		tokenGenerated = "";
 	}
 	
@@ -46,14 +46,14 @@ public class StateTable {
 		return null;
 	}
 	
-	/**
-	 * 
-	 * @param title is a title to search for in the table
-	 * @return tableRow with matching title, or null if it doesn't exist
+	/** 
+	 * @param tableRow to lookup in stateTable
+	 * @return index of tableRow in stateTable, or null if not
 	 */
-	public tableRow getTableRow(String title){
-		return stateTable.get(0);
+	public int getIndexOf(tableRow t){
+		return stateTable.indexOf(t);
 	}
+	
 	
 	/**
 	 * 
@@ -112,24 +112,24 @@ public class StateTable {
 	 * @param string to lookup
 	 */
 	public void NFAlookUp(String c){
-		ArrayList<Integer> next = new ArrayList<Integer>(0);
-		Integer nextState;
+		ArrayList<tableRow> next = new ArrayList<tableRow>(0);
+		tableRow nextState;
 		
-		for (Integer state : NFAState){//
-			nextState = stateTable.get(state).getNextState(c);
+		for (tableRow state : NFAState){//
+			nextState = stateTable.get(stateTable.indexOf(state)).getNextState(c);
 			if (nextState != null){
 				next.add(nextState);
 			}
 		}
-		for (Integer state : next){//follows epsilon transitions
-			nextState = stateTable.get(state).getNextState("@");
+		for (tableRow state : next){//follows epsilon transitions
+			nextState = stateTable.get(stateTable.indexOf(state)).getNextState("@");
 			if(nextState != null){
 				next.add(nextState);
 			}
 		}
 		
-		for(Integer state : next){//checks for accepting state
-			if(stateTable.get(state).accept()){
+		for(tableRow state : next){//checks for accepting state
+			if(stateTable.get(stateTable.indexOf(state)).accept()){
 				accepted = true;
 				acceptedState = state;
 			}
@@ -140,13 +140,13 @@ public class StateTable {
 	
 	//this will tell us if the symbol has a valid translation from the currentState to another state in the table
 	public void DFAlookUp(String c){
-		Integer nextState; //state table index
+		tableRow nextState; //state table index
 		boolean val = false;
-		nextState = stateTable.get(currState).getNextState(c);
+		nextState = stateTable.get(stateTable.indexOf(currState)).getNextState(c);
 		if (nextState != null){
 			currState = nextState;
 		}
-		if (stateTable.get(currState).accept()){
+		if (currState.accept()){
 			accepted = true;
 		}
 		
