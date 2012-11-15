@@ -185,8 +185,4 @@ public class StateTable {
 			}*/
 		}
 	}
-	/**
-	 * represents a single state in the automaton 
-	 */
-
 }
