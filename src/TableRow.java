@@ -1,21 +1,22 @@
+import java.util.ArrayList;
 import java.util.Map;
 
 
 public class TableRow{
 	//Map of strings to tableRows, transitions
-	private Map<String,TableRow> successorStates;
+	private Map<String,ArrayList<TableRow>> successorStates;
 	private boolean accept;
 	private String name;
 	private String type;
 	
-	public TableRow(Map<String,TableRow> nextStates, String n, String t){
+	public TableRow(Map<String,ArrayList<TableRow>> nextStates, String n, String t){
 		setSuccessorStates(nextStates);
 		setName(n);
 		type = t;
 		accept = false;
 	}
 	
-	public TableRow getNextState(String c){
+	public ArrayList<TableRow> getNextState(String c){
 		return getSuccessorStates().get(c);
 	}
 	
@@ -39,11 +40,11 @@ public class TableRow{
 		this.name = name;
 	}
 
-	public Map<String,TableRow> getSuccessorStates() {
+	public Map<String,ArrayList<TableRow>> getSuccessorStates() {
 		return successorStates;
 	}
 
-	public void setSuccessorStates(Map<String,TableRow> successorStates) {
-		this.successorStates = successorStates;
+	public void setSuccessorStates(Map<String, ArrayList<TableRow>> nextStates) {
+		this.successorStates = nextStates;
 	}
 }

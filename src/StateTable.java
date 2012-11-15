@@ -6,7 +6,7 @@ import java.util.Set;
 public class StateTable {
 
 	private static ArrayList<TableRow> stateTable;
-	private TableRow currState;
+	private ArrayList<TableRow> currState;
 	private ArrayList<TableRow> NFAState; 
 	private boolean accepted;
 	private TableRow acceptedState;
@@ -70,7 +70,7 @@ public class StateTable {
 	 * @param index - if table size is less than index, it will REPLACE the current table entry
 	 * @return boolean if a row is replaced true is returned an the replaced row is stored in a removedRow
 	 */
-	public boolean addState(Map<String, TableRow> map, String name, String type, int index){
+	public boolean addState(Map<String, ArrayList<TableRow>> map, String name, String type, int index){
 		TableRow newRow = new TableRow(map, name, type); //create
 		boolean replace = false;
 		
@@ -93,9 +93,9 @@ public class StateTable {
 	/**
 	 * @return a list of all the transition maps that are currently in the stateTable
 	 */
-	public ArrayList<Set<Entry<String, TableRow>>> getSuccessorStates(){
-		Set<Entry<String, TableRow>> rowvalues;
-		ArrayList<Set<Entry<String,TableRow>>> values = new ArrayList<Set<Entry<String,TableRow>>>(0);
+	public ArrayList<Set<Entry<String, ArrayList<TableRow>>>> getSuccessorStates(){
+		Set<Entry<String, ArrayList<TableRow>>> rowvalues;
+		ArrayList<Set<Entry<String,ArrayList<TableRow>>>> values = new ArrayList<Set<Entry<String,ArrayList<TableRow>>>>(0);
 		
 		for (TableRow row : stateTable){
 			rowvalues = row.getSuccessorStates().entrySet();
@@ -123,7 +123,7 @@ public class StateTable {
 	 */
 	public void NFAlookUp(String c){
 		ArrayList<TableRow> next = new ArrayList<TableRow>(0);
-		TableRow nextState;
+		ArrayList<TableRow> nextState;
 		
 		for (TableRow state : NFAState){//
 			nextState = stateTable.get(stateTable.indexOf(state)).getNextState(c);
@@ -150,7 +150,7 @@ public class StateTable {
 	
 	//this will tell us if the symbol has a valid translation from the currentState to another state in the table
 	public void DFAlookUp(String c){
-		TableRow nextState; //state table index
+		ArrayList<TableRow> nextState; //state table index
 		boolean val = false;
 		nextState = stateTable.get(stateTable.indexOf(currState)).getNextState(c);
 		if (nextState != null){
