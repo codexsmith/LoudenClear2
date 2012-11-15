@@ -62,7 +62,7 @@ public class StateTable {
 	 * @param index - if table size is less than index, it will REPLACE the current table entry
 	 * @return boolean if a row is replaced true is returned an the replaced row is stored in a removedRow
 	 */
-	public boolean addState(Map<String, Integer> map, String name,int index){
+	public boolean addState(Map<String, tableRow> map, String name,int index){
 		tableRow newRow = new tableRow(map, name); //create
 		boolean replace = false;
 		
@@ -83,9 +83,9 @@ public class StateTable {
 	/**
 	 * @return a list of all the transition maps that are currently in the stateTable
 	 */
-	public ArrayList<Set<Entry<String, Integer>>> getSuccessorStates(){
-		Set<Entry<String, Integer>> rowvalues;
-		ArrayList<Set<Entry<String,Integer>>> values = new ArrayList<Set<Entry<String,Integer>>>(0);
+	public ArrayList<Set<Entry<String, tableRow>>> getSuccessorStates(){
+		Set<Entry<String, tableRow>> rowvalues;
+		ArrayList<Set<Entry<String,tableRow>>> values = new ArrayList<Set<Entry<String,tableRow>>>(0);
 		
 		for (tableRow row : stateTable){
 			rowvalues = row.successorStates.entrySet();
