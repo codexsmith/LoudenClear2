@@ -55,8 +55,8 @@ public class StateTable {
 	}
 	
 	
+	
 	/**
-	 * 
 	 * @param map - transitions
 	 * @param name - the title of the state
 	 * @param index - if table size is less than index, it will REPLACE the current table entry
@@ -164,6 +164,7 @@ public class StateTable {
 		public tableRow(Map<String,tableRow> nextStates, String n){
 			successorStates = nextStates;
 			name = n;
+			accept = false;
 		}
 		
 		public tableRow getNextState(String c){
@@ -172,6 +173,10 @@ public class StateTable {
 		
 		public boolean accept(){
 			return accept;
+		}
+		
+		public void setAccept(boolean val){
+			accept = val;
 		}
 		
 		
