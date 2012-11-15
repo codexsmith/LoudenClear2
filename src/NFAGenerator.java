@@ -1,3 +1,6 @@
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 
  * @author andrew
@@ -12,22 +15,23 @@ public class NFAGenerator {
 	private String token;
 	private int entry_ind;
 	
-	public NFAGenerator(Lexical l){
-		lex = l;
+	public NFAGenerator(String s){
+		//lex = l;
 		index = 0;
 		entry_ind = 0;
 		nfa = new StateTable();
-		regex = new String();
+		regex = s; // new String();
 		token = new String();
 	}
 	
 	public StateTable genNFA(){
 		if(DEBUG)System.out.println("genNFA()");
-		for(TokenC t: lex.getTokens()){
+/*		for(TokenC t: lex.getTokens()){
 			regex = t.getLegal().get(0);
 			token = t.getTitle().substring(1);
 			regex();
-		}
+		}*/
+		regex();
 		return nfa;
 	}
 	
@@ -86,8 +90,11 @@ public class NFAGenerator {
 			}
 		}
 		if(isRE_CHAR(peekChar())){
-			if(match(peekChar())&&rexp2_tail())
+			char temp = peekChar();
+			if(match(peekChar())&&rexp2_tail()){
+				handleChar(String.valueOf(temp));
 				return true;
+			}
 		}
 		if(rexp3())
 			return true;
@@ -274,8 +281,11 @@ public class NFAGenerator {
 		return c>='A'&&c<='Z';
 	}
 	
-	private void handleChar(char c){
-		nfa.addState(map, name, entry_ind);
+	private void handleChar(String c){
+		Map<String,StateTable.tableRow> trans = new HashMap<String,StateTable.tableRow>();
+		nfa.addState(null, Integer.toString(entry_ind)+1,"Invalid Type", entry_ind+1);
+		trans.put(c, nfa.getTableRow(entry_ind+1));
+		nfa.addState(trans, Integer.toString(entry_ind), "Invalid Type", entry_ind);
 		entry_ind++;
 	}
 	

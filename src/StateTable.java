@@ -62,8 +62,8 @@ public class StateTable {
 	 * @param index - if table size is less than index, it will REPLACE the current table entry
 	 * @return boolean if a row is replaced true is returned an the replaced row is stored in a removedRow
 	 */
-	public boolean addState(Map<String, tableRow> map, String name,int index){
-		tableRow newRow = new tableRow(map, name); //create
+	public boolean addState(Map<String, tableRow> map, String name, String type, int index){
+		tableRow newRow = new tableRow(map, name, type); //create
 		boolean replace = false;
 		
 		if (stateTable.size() < index && index >=0){ //append at index
@@ -149,9 +149,13 @@ public class StateTable {
 		if (currState.accept()){
 			accepted = true;
 		}
-		
 	}
 	
+	public void printTable(){
+		for(tableRow t:stateTable){
+			System.out.println(t);
+		}
+	}
 	/**
 	 * represents a single state in the automaton 
 	 */
@@ -160,10 +164,12 @@ public class StateTable {
 		private Map<String,tableRow> successorStates;
 		private boolean accept;
 		private String name;
+		private String type;
 		
-		public tableRow(Map<String,tableRow> nextStates, String n){
+		public tableRow(Map<String,tableRow> nextStates, String n, String t){
 			successorStates = nextStates;
 			name = n;
+			type = t;
 		}
 		
 		public tableRow getNextState(String c){
@@ -174,6 +180,9 @@ public class StateTable {
 			return accept;
 		}
 		
+		public String toString(){
+			return "State: "+name+" :: Accept: "+accept;
+		}
 		
 	}
 }
