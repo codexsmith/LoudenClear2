@@ -29,6 +29,7 @@ public class NFAToDFA {
 		//A queue of next states to look at during the conversion
 		Queue<ArrayList<Integer>> nextToParse = new LinkedList<ArrayList<Integer>>();
 		
+
 		ArrayList<Integer> currState = new ArrayList<Integer>(); //Current State
 		ArrayList<String> alreadyProcessed = new ArrayList<String>(); //list of states already processed
 		currState.add(0); //Set up initial state
