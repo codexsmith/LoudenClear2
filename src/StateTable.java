@@ -106,9 +106,10 @@ public class StateTable {
 	public ArrayList<Set<Entry<String, ArrayList<TableRow>>>> getSuccessorStates(){
 		Set<Entry<String, ArrayList<TableRow>>> rowvalues;
 		ArrayList<Set<Entry<String,ArrayList<TableRow>>>> values = new ArrayList<Set<Entry<String,ArrayList<TableRow>>>>(0);
-		
+		System.out.println("Size: "+stateTable.size());
 		for (TableRow row : stateTable){
 			rowvalues = row.getSuccessorStates().entrySet();
+			System.out.println("Rowvalues: "+rowvalues);
 			values.add(rowvalues);
 		}
 		return values;

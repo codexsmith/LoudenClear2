@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -283,18 +284,19 @@ public class NFAGenerator {
 	}
 	
 	private void handleChar(String c){
-		Map<String,TableRow> trans = new HashMap<String,TableRow>();
+		Map<String,ArrayList<TableRow>> trans = new HashMap<String,ArrayList<TableRow>>();
 		TableRow nextRow = new TableRow(null, Integer.toString(entry_ind+1), "Invliad Type");
-		System.out.println(entry_ind);
+//		System.out.println(entry_ind);
 		nfa.add(null, entry_ind);
 		nfa.add(nextRow, entry_ind+1);
-		trans.put(c, nfa.getTableRow(entry_ind+1));
+		trans.put(c, nfa.getTableRowArray(entry_ind));
 		nfa.addState(trans, Integer.toString(entry_ind), "Invalid Type", entry_ind);
 		entry_ind+=2;
 	}
 	
 	private void handleToken(TokenC t){
-		
+		Map<String,ArrayList<TableRow>> trans = new HashMap<String,ArrayList<TableRow>>();
+		TableRow nextRow = new TableRow(null, Integer.toString(entry_ind+1),"Invalid Type");
 	}
 	
 	private void handleUnion(){
