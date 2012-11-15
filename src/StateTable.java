@@ -55,6 +55,17 @@ public class StateTable {
 	}
 	
 	
+	public void add(tableRow t, int index){
+		if (stateTable.size() < index){
+			stateTable.ensureCapacity(index+1);
+			stateTable.add(index, t);
+		}
+		else{
+			removedRow = stateTable.set(index, t);
+		}
+	}
+	
+	
 	
 	/**
 	 * @param map - transitions
