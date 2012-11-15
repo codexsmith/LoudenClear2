@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
 
+
 /**
  * Converts the NFA StateTable to a DFA StateTable
  *
@@ -27,46 +28,54 @@ public class NFAToDFA {
 		outputIndex = 0;
 		
 		//Contains a list of every index in the table that has every single transition from that state
-		ArrayList<Set<Entry<String, Integer>>> successorStates = inputStateTable.getSuccessorStates();
+		ArrayList<Set<Entry<String, StateTable.tableRow>>> successorStates = inputStateTable.getSuccessorStates();
 		
 		//A queue of next states to look at during the conversion
-		Queue<ArrayList<Integer>> nextToParse = new LinkedList<ArrayList<Integer>>();
+		Queue<ArrayList<StateTable.tableRow>> nextToParse = new LinkedList<ArrayList<StateTable.tableRow>>();
 		
-
-		ArrayList<Integer> currState = new ArrayList<Integer>(); //Current State
+		ArrayList<StateTable.tableRow> currState = new ArrayList<StateTable.tableRow>(); //Current State
 		ArrayList<String> alreadyProcessed = new ArrayList<String>(); //list of states already processed
-		currState.add(0); //Set up initial state
-		alreadyProcessed.add("0,"); //set up initial state
+		StateTable.tableRow tr = inputStateTable.getTableRow(0);
+		currState.add(tr); //Set up initial state
+		alreadyProcessed.add(tr.getName() + ","); //set up initial state
 		
 		
 		while(!currState.isEmpty()) //while still states to parse
 		{
-			Map<String, ArrayList<Integer>> nextStates = new HashMap<String, ArrayList<Integer>>();
-			for(int state : currState) //loops over state whether state is just state 1 or state is state 1,2,3
+			Map<String, ArrayList<StateTable.tableRow>> nextStates = new HashMap<String, ArrayList<StateTable.tableRow>>();
+			for(StateTable.tableRow state : currState) //loops over state whether state is just state 1 or state is state 1,2,3
 			{
-				nextStates = findNextState(successorStates, nextStates, state);
+				int stateIndex = inputStateTable.getIndexOf(state);
+				nextStates = findNextState(successorStates, nextStates, stateIndex);
 			}
 			
 			//Add all the new states to nextToParse if not already parsed.
 			for(String key : nextStates.keySet())
 			{
-				ArrayList<Integer> nextState = nextStates.get(key);
-				String stateStr = "";
-				for(int in : nextState) //create name for already processed.
-				{
-					stateStr += in + ",";
-				}
+				ArrayList<StateTable.tableRow> nextState = nextStates.get(key);
+				String stateStr = computeName(nextState);
+				
 				if(!alreadyProcessed.contains(stateStr)) //If not already processed, add
 				{
 					alreadyProcessed.add(stateStr);
 					nextToParse.add(nextStates.get(key));
 				}
 			}
-			outputStateTable.addState(nextStates, "something", outputIndex); //add to output table
+			outputStateTable.addState(nextStates, computeName(currState), outputIndex); //add to output table
 			currState = nextToParse.poll(); //get next state to parse
 		}
 		
 		return outputStateTable;
+	}
+	
+	private static String computeName(ArrayList<StateTable.tableRow> rows)
+	{
+		String name = "";
+		for(StateTable.tableRow row : rows)
+		{
+			name += row.getName() + ",";
+		}
+		return name;
 	}
 	
 	/**
@@ -77,15 +86,15 @@ public class NFAToDFA {
 	 * @param state current state
 	 * @return nextStates next states
 	 */
-	private static Map<String, ArrayList<Integer>> findNextState(ArrayList<Set<Entry<String, Integer>>> successorStates, 
-																Map<String, ArrayList<Integer>> nextStates, int state)
+	private static Map<String, ArrayList<StateTable.tableRow>> findNextState(ArrayList<Set<Entry<String, StateTable.tableRow>>> successorStates, 
+																Map<String, ArrayList<StateTable.tableRow>> nextStates, int state)
 	{
-		for(Entry<String, Integer> st : successorStates.get(state))
+		for(Entry<String, StateTable.tableRow> st : successorStates.get(state))
 		{
 			if(nextStates.containsKey(st.getKey()))
 			{
 				//get values for current key index and add this value before putting it back
-				ArrayList<Integer> vals = nextStates.get(st.getKey());
+				ArrayList<StateTable.tableRow> vals = nextStates.get(st.getKey());
 				vals.add(st.getValue());
 				nextStates.put(st.getKey(), vals);
 			}
@@ -93,10 +102,11 @@ public class NFAToDFA {
 			{	
 				if(st.getKey() == "@") //If epsilon, go deeper!
 				{
-					nextStates = findNextState(successorStates, nextStates, st.getValue());
+					int stateIndex = inputStateTable.getIndexOf(st.getValue());
+					nextStates = findNextState(successorStates, nextStates, stateIndex);
 				}
 				//add key index and value to next states.
-				ArrayList<Integer> vals = new ArrayList<Integer>();
+				ArrayList<StateTable.tableRow> vals = new ArrayList<StateTable.tableRow>();
 				vals.add(st.getValue());
 				nextStates.put(st.getKey(), vals);
 			}

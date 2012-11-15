@@ -166,6 +166,11 @@ public class StateTable {
 			name = n;
 		}
 		
+		public String getName()
+		{
+			return name;
+		}
+		
 		public tableRow getNextState(String c){
 			return successorStates.get(c);
 		}
