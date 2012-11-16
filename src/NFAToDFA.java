@@ -102,7 +102,14 @@ public class NFAToDFA {
 			{
 				//get values for current key index and add this value before putting it back
 				ArrayList<TableRow> vals = nextStates.get(st.getKey());
-				vals.addAll(st.getValue());
+				
+				for(TableRow tr : st.getValue())
+				{
+					if(!vals.contains(tr))
+					{
+						vals.add(tr);
+					}
+				}
 				nextStates.put(st.getKey(), vals);
 			}
 			else
