@@ -37,13 +37,20 @@ public class NFAToDFA {
 		alreadyProcessed.add(tr.getName() + ","); //set up initial state
 		
 		
-		while(!currState.isEmpty()) //while still states to parse
+		while(currState != null) //while still states to parse
 		{
 			Map<String, ArrayList<TableRow>> nextStates = new HashMap<String, ArrayList<TableRow>>();
+			String type = "";
+			boolean accepted = false;
 			for(TableRow state : currState) //loops over state whether state is just state 1 or state is state 1,2,3
 			{
 				int stateIndex = inputStateTable.getIndexOf(state);
 				nextStates = findNextState(successorStates, nextStates, stateIndex);
+				if(!state.getType().equals("Invalid Type"))
+				{
+					accepted = true;
+					type = state.getType();
+				}	
 			}
 			
 			//Add all the new states to nextToParse if not already parsed.
@@ -58,7 +65,10 @@ public class NFAToDFA {
 					nextToParse.add(nextStates.get(key));
 				}
 			}
-			outputStateTable.addState(nextStates, computeName(currState), "something", outputIndex); //add to output table
+			
+			
+			outputStateTable.addState(nextStates, computeName(currState), type, outputIndex, accepted); //add to output table
+			outputIndex++;
 			currState = nextToParse.poll(); //get next state to parse
 		}
 		
@@ -104,12 +114,16 @@ public class NFAToDFA {
 						int stateIndex = inputStateTable.getIndexOf(row);
 						nextStates = findNextState(successorStates, nextStates, stateIndex);
 					}
+					//TODO: maybe a problem with not adding the @ state itself
 					
 				}
-				//add key index and value to next states.
-				ArrayList<TableRow> vals = new ArrayList<TableRow>();
-				vals.addAll(st.getValue());
-				nextStates.put(st.getKey(), vals);
+				else
+				{
+					//add key index and value to next states.
+					ArrayList<TableRow> vals = new ArrayList<TableRow>();
+					vals.addAll(st.getValue());
+					nextStates.put(st.getKey(), vals);
+				}
 			}
 		}
 		return nextStates;

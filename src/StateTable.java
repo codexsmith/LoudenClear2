@@ -5,7 +5,7 @@ import java.util.Set;
 
 public class StateTable {
 
-	private static ArrayList<TableRow> stateTable;
+	private ArrayList<TableRow> stateTable;
 	private ArrayList<TableRow> currState;
 	private ArrayList<TableRow> NFAState; 
 	private boolean accepted;
@@ -80,11 +80,12 @@ public class StateTable {
 	 * @param index - if table size is less than index, it will REPLACE the current table entry
 	 * @return boolean if a row is replaced true is returned an the replaced row is stored in a removedRow
 	 */
-	public boolean addState(Map<String, ArrayList<TableRow>> map, String name, String type, int index){
+	public boolean addState(Map<String, ArrayList<TableRow>> map, String name, String type, int index, boolean accepted){
 		TableRow newRow = new TableRow(map, name, type); //create
+		newRow.setAccept(true);
 		boolean replace = false;
 		
-		if (stateTable.size() < index && index >=0){ //append at index
+		if (stateTable.size() <= index && index >=0){ //append at index
 			stateTable.ensureCapacity(index+1);
 			stateTable.add(index, newRow);
 		}

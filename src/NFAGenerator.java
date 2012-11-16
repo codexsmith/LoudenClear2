@@ -325,7 +325,7 @@ public class NFAGenerator {
 		nfa.add(null, entry_ind);
 		nfa.add(nextRow, entry_ind+1);
 		trans.put(c, nfa.getTableRowArray(entry_ind+1));
-		nfa.addState(trans, Integer.toString(entry_ind), "Invalid Type", entry_ind);
+		nfa.addState(trans, Integer.toString(entry_ind), "Invalid Type", entry_ind, false);
 		entry_ind+=2;
 	}
 	
