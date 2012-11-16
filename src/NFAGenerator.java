@@ -39,6 +39,7 @@ public class NFAGenerator {
 	
 	private boolean regex(){
 		if(DEBUG)System.out.println("regex()");
+		populate("@");
 		if(rexp()){
 			return true;
 		}
@@ -49,10 +50,27 @@ public class NFAGenerator {
 	
 	private boolean rexp(){
 		if(DEBUG)System.out.println("rexp()");
-		if(rexp1()&&rexpprime())
-			return true;
-		else
-			return false;
+		int ep_ind = entry_ind-1;
+		if(rexp1()){
+			int start_ind=entry_ind;
+			if(rexpprime()){
+				System.out.println(ep_ind);
+				System.out.println(start_ind);
+				ArrayList<TableRow> next = nfa.getTableRowArray(ep_ind+1);
+				if(nfa.getTableRowArray(ep_ind).get(0).getSuccessorStates().get("@")!=null){
+					nfa.getTableRowArray(ep_ind).get(0).getSuccessorStates().get("@").add(next.get(0));
+					next = nfa.getTableRowArray(start_ind);
+					nfa.getTableRowArray(ep_ind).get(0).getSuccessorStates().get("@").add(next.get(0));
+				}
+				else{
+					nfa.getTableRowArray(ep_ind).get(0).getSuccessorStates().put("@",next);
+					next = nfa.getTableRowArray(start_ind);
+					nfa.getTableRowArray(ep_ind).get(0).getSuccessorStates().get("@").add(next.get(0));
+				}
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	private boolean rexpprime(){
@@ -97,14 +115,14 @@ public class NFAGenerator {
 			char temp = peekChar();
 			if(match(peekChar())&&rexp2_tail()){
 				populate(String.valueOf(temp));
-				if(entry_ind>2){
+/*				if(entry_ind>2){
 					System.out.println("JOINING");
 					ArrayList<TableRow> curr = nfa.getTableRowArray(entry_ind-2);
 					ArrayList<TableRow> prev = nfa.getTableRowArray(entry_ind-3);
 					Map<String,ArrayList<TableRow>> nextStates = prev.get(0).getSuccessorStates();
 					nextStates.put("@", curr);
 					prev.get(0).setSuccessorStates(nextStates);
-				}
+				}*/
 				return true;
 			}
 		}
@@ -137,7 +155,7 @@ public class NFAGenerator {
 		if(char_class()){
 			return true;
 		}
-		return true;
+		return false;
 	}
 	
 	private boolean char_class(){
@@ -145,14 +163,14 @@ public class NFAGenerator {
 		if(peekChar()=='.'){
 			match('.');
 			populate(".");
-			if(entry_ind>2){
+/*			if(entry_ind>2){
 				System.out.println("JOINING");
 				ArrayList<TableRow> curr = nfa.getTableRowArray(entry_ind-2);
 				ArrayList<TableRow> prev = nfa.getTableRowArray(entry_ind-3);
 				Map<String,ArrayList<TableRow>> nextStates = prev.get(0).getSuccessorStates();
 				nextStates.put("@", curr);
 				prev.get(0).setSuccessorStates(nextStates);
-			}
+			}*/
 			return true;
 		}
 		if(peekChar()=='['){
@@ -162,13 +180,13 @@ public class NFAGenerator {
 		String temp = defined_class();
 		if(temp!=null){
 			populate(temp);
-			if(entry_ind>2){
+/*			if(entry_ind>2){
 				ArrayList<TableRow> curr = nfa.getTableRowArray(entry_ind-2);
 				ArrayList<TableRow> prev = nfa.getTableRowArray(entry_ind-3);
 				Map<String,ArrayList<TableRow>> nextStates = prev.get(0).getSuccessorStates();
 				nextStates.put("@", curr);
 				prev.get(0).setSuccessorStates(nextStates);
-			}
+			}*/
 			return true;
 		}
 		return false;
@@ -259,6 +277,7 @@ public class NFAGenerator {
 	private char peekChar(){
 		if(index>=regex.length())
 			return '\0';
+		System.out.println(regex.charAt(index));
 		return regex.charAt(index);
 	}
 	
