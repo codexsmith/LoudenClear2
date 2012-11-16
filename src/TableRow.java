@@ -43,6 +43,14 @@ public class TableRow{
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	public String getType() {
+		return type;
+	}
+	
+	public void setType(String type) {
+		this.type = type;
+	}
 
 	public Map<String,ArrayList<TableRow>> getSuccessorStates() {
 		return successorStates;
