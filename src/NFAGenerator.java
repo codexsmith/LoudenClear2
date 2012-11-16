@@ -9,7 +9,7 @@ import java.util.Map;
  *
  */
 public class NFAGenerator {
-	private final boolean DEBUG = false;
+	private final boolean DEBUG = true;
 	private StateTable nfa;
 	private int index;
 	private Lexical lex;
@@ -97,6 +97,14 @@ public class NFAGenerator {
 			char temp = peekChar();
 			if(match(peekChar())&&rexp2_tail()){
 				populate(String.valueOf(temp));
+				if(entry_ind>2){
+					System.out.println("JOINING");
+					ArrayList<TableRow> curr = nfa.getTableRowArray(entry_ind-2);
+					ArrayList<TableRow> prev = nfa.getTableRowArray(entry_ind-3);
+					Map<String,ArrayList<TableRow>> nextStates = prev.get(0).getSuccessorStates();
+					nextStates.put("@", curr);
+					prev.get(0).setSuccessorStates(nextStates);
+				}
 				return true;
 			}
 		}
@@ -137,6 +145,14 @@ public class NFAGenerator {
 		if(peekChar()=='.'){
 			match('.');
 			populate(".");
+			if(entry_ind>2){
+				System.out.println("JOINING");
+				ArrayList<TableRow> curr = nfa.getTableRowArray(entry_ind-2);
+				ArrayList<TableRow> prev = nfa.getTableRowArray(entry_ind-3);
+				Map<String,ArrayList<TableRow>> nextStates = prev.get(0).getSuccessorStates();
+				nextStates.put("@", curr);
+				prev.get(0).setSuccessorStates(nextStates);
+			}
 			return true;
 		}
 		if(peekChar()=='['){
@@ -146,6 +162,13 @@ public class NFAGenerator {
 		String temp = defined_class();
 		if(temp!=null){
 			populate(temp);
+			if(entry_ind>2){
+				ArrayList<TableRow> curr = nfa.getTableRowArray(entry_ind-2);
+				ArrayList<TableRow> prev = nfa.getTableRowArray(entry_ind-3);
+				Map<String,ArrayList<TableRow>> nextStates = prev.get(0).getSuccessorStates();
+				nextStates.put("@", curr);
+				prev.get(0).setSuccessorStates(nextStates);
+			}
 			return true;
 		}
 		return false;
@@ -236,7 +259,6 @@ public class NFAGenerator {
 	private char peekChar(){
 		if(index>=regex.length())
 			return '\0';
-		if(DEBUG)System.out.println(regex.charAt(index));
 		return regex.charAt(index);
 	}
 	
@@ -263,13 +285,13 @@ public class NFAGenerator {
 	
 	private boolean isRE_CHAR(char c){
 		if(c>=0x20&&c<=0x7E){
-			if(c!='\\'&&c!='*'&&c!='+'&&c!='?'&&c!='|'&&c!='['&&c!=']'&&c!='('&&c!=')'&&c!='.'&&c!='\''&&c!='\"'&&c!='$'){
+			if(c!='\\'&&c!='*'&&c!='+'&&c!='?'&&c!='|'&&c!='['&&c!=']'&&c!='('&&c!=')'&&c!='.'&&c!='\''&&c!='\"'&&c!='$'&&c!='@'){
 				return true;
 			}
 			else if(c=='\\'){
 				match('\\');
 				char t = peekChar();
-				if(t==' '||t=='\\'||t=='*'||t=='?'||t=='|'||t=='['||t==']'||t=='('||t==')'||t=='.'||t=='\''||t=='\"'||t=='$'){
+				if(t==' '||t=='\\'||t=='*'||t=='?'||t=='|'||t=='['||t==']'||t=='('||t==')'||t=='.'||t=='\''||t=='\"'||t=='$'||t=='@'){
 					return true;
 				}
 			}
@@ -279,13 +301,13 @@ public class NFAGenerator {
 	
 	private boolean isCLS_CHAR(char c){
 		if(c>=0x20&&c<=0x7E){
-			if(c!='\\'&&c!='^'&&c!='-'&&c!='['&&c!=']'){
+			if(c!='\\'&&c!='^'&&c!='-'&&c!='['&&c!=']'&&c!='@'){
 				return true;
 			}
 			else if(c=='\\'){
 				match('\\');
 				char t = peekChar();
-				if(t=='\\'||t=='^'||t=='-'||t=='['||t==']'){
+				if(t=='\\'||t=='^'||t=='-'||t=='['||t==']'||t=='@'){
 						return true;
 				}
 			}
@@ -299,7 +321,7 @@ public class NFAGenerator {
 	
 	private void populate(String c){
 		Map<String,ArrayList<TableRow>> trans = new HashMap<String,ArrayList<TableRow>>();
-		TableRow nextRow = new TableRow(null, Integer.toString(entry_ind+1), "Invliad Type");
+		TableRow nextRow = new TableRow(new HashMap<String,ArrayList<TableRow>>(), Integer.toString(entry_ind+1), "Invliad Type");
 		nfa.add(null, entry_ind);
 		nfa.add(nextRow, entry_ind+1);
 		trans.put(c, nfa.getTableRowArray(entry_ind+1));
