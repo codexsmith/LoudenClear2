@@ -183,8 +183,10 @@ public class NFAGenerator {
 					return true;
 				}
 				else if(togglePlus){
-					concat(entry_ind-1,state1);
+					concat(entry_ind-1,state1+1);
 					concat(state1,state1+1);
+					populate("@");
+					concat(entry_ind-2,entry_ind-1);
 					return true;
 				}
 				else{
@@ -219,8 +221,10 @@ public class NFAGenerator {
 					return true;
 				}
 				else if(togglePlus){
-					concat(entry_ind-1,state1);
+					concat(entry_ind-1,state1+1);
 					concat(state1,state1+1);
+					populate("@");
+					concat(entry_ind-2,entry_ind-1);
 					return true;
 				}
 			}
