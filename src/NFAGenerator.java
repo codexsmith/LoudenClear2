@@ -4,9 +4,9 @@ import java.util.Map;
 
 
 /**
- * 
- * @author andrew
- *
+ * NFAGenerator class is used to take in a Lexical which holds an ArrayList of TokenC.
+ * The generator creates an NFA based on these TokenC objects.
+ * @author Andrew Kim
  */
 public class NFAGenerator {
 	private final boolean DEBUG = false;
@@ -20,6 +20,11 @@ public class NFAGenerator {
 	private boolean togglePlus;
 	private boolean toggleEpsilon;
 	
+	
+	/**
+	 * Constructor for an NFAGenerator
+	 * @param l The lexical specification to base the NFA on.
+	 */
 	public NFAGenerator(Lexical l){
 		lex = l;
 		index = 0;
@@ -29,79 +34,77 @@ public class NFAGenerator {
 		token = new String();
 		toggleStar = false;
 		toggleEpsilon = false;
-	}
+	}//end NFAGenerator constructor
 	
-	public NFAGenerator(String r){
-		index = 0;
-		entry_ind = 0;
-		nfa = new StateTable();
-		regex = r;
-		token = new String();
-		toggleStar = false;
-		toggleEpsilon = false;
-	}
-	
+	/**
+	 * Generates an NFA based on all TokenC objects in the Lexical object.
+	 * @return Complete NFA table of the lexical specification
+	 */
 	public StateTable genNFA(){
 		if(DEBUG)System.out.println("genNFA()");
-		populate("@");
+		populate("@");//Dummy state to glue many sub-NFA's together
 		int subnfa;
-		for(TokenC t: lex.getTokens()){
+		for(TokenC t: lex.getTokens()){//read in TokenC information
 			subnfa = entry_ind;
 			regex = t.getLegal().get(0);
 			token = t.getTitle().substring(1);
 			index = 0;
 			if(DEBUG)System.out.println(token);
 			if(DEBUG)System.out.println(regex);
-			regex();
-			concat(1,subnfa);
-		}
-//		regex();
+			regex();//generate NFA
+			concat(1,subnfa);//concatenate the sub-NFA
+		}//end for loop
 		return nfa;
-	}
+	}//end genNFA method
 	
+	/**
+	 * Generates a single NFA based on the current regular expression
+	 * @return True if successful. False otherwise.
+	 */
 	private boolean regex(){
 		if(DEBUG)System.out.println("regex()");
 		boolean result = rexp();
 		nfa.getTableRowArray(entry_ind-1).get(0).setAccept(true);//set the very last entry to accept
 		nfa.getTableRowArray(entry_ind-1).get(0).setType(token);
 		return result;
-/*		if(rexp()){
-			return true;
-		}
-		else{
-			return false;
-		}*/
-	}
+	}//end regex method
 	
+	/**
+	 * Ensures that there is at least 1 rexp1
+	 * @return True if it successfully parsed rexp1. False otherwise.
+	 */
 	private boolean rexp(){
 		if(DEBUG)System.out.println("rexp()");
-		populate("@");
-		int epsilon = entry_ind-1;
+		populate("@");//Dummy state
+		int epsilon = entry_ind-1;//keep track of this state in case there is a union
 		int state1 = entry_ind;
 		if(rexp1()){//find rexp1
-			
 			int state2=entry_ind;
 			if(peekChar()=='|'){//if UNION
 				if(rexpprime()){
 					union(epsilon,state1,state2);
 					return true;
-				}
-			}
+				}//end if
+			}//end if
 			else
-			{
+			{//no UNION
 				concat(epsilon,state1);
 				return true;
-			}
-		}
+			}//end else
+		}//end if
 		return false;
-	}
+	}//end rexp method
 	
+	/**
+	 * Handles UNION cases
+	 * @return True if valid union is made or no union is found. False otherwise.
+	 */
 	private boolean rexpprime(){
 		if(DEBUG)System.out.println("rexpprime()");
 		populate("@");
 		if(index>=regex.length()||peekChar()==')'){//end of regex
 			return true;
-		}
+		}//end if
 		if(peekChar()=='|'){//if another UNION
 			if(match('|')){
 				int epsilon = entry_ind-1;
@@ -112,67 +115,76 @@ public class NFAGenerator {
 						rexpprime();//second subnfa;
 						union(epsilon,state1,state2);
 						return true;
-					}
-				}
-			}
+					}//end if
+				}//end if
+			}//end if
 			else
 				return false;
-		}
+		}//end if
 		toggleEpsilon=true;;
 		return true;
-	}
+	}//end rexpprime method
 	
+	/**
+	 * Ensures that there is at least 1 valid rexp2
+	 * @return True if valid rexp2 is found. False otherwise.
+	 */
 	private boolean rexp1(){
 		if(DEBUG)System.out.println("rexp1()");
 		if(rexp2()){
 			if(toggleStar){
 				toggleStar=false;
-//				concat(entry_ind-2,entry_ind-1);
-			}
+			}//end if
 			else{
 				concat(entry_ind-3,entry_ind-2);
-			}
+			}//end else
 			if(rexp1prime()){
 				return true;
-			}
-		}
+			}//end if
+		}//end else
 		return false;
-	}
-	
+	}//end rexp1 method
+
+	/**
+	 * Allows multiple rexp2 to be concatenated.
+	 * @return True if another valid rexp2 is found or there is nothing. False otherwise.
+	 */
 	private boolean rexp1prime(){
 		if(DEBUG)System.out.println("rexp1prime()");
-		if(index>=regex.length()||peekChar()==')'){
+		if(index>=regex.length()||peekChar()==')'){//check if end of expression
 			return true;
-		}
+		}//end if
 		if(rexp2()){
-			if(toggleStar){
+			if(toggleStar){//if there was a star
 				toggleStar=false;
-				//concat(entry_ind-3,entry_ind-2);
-			}
-			else if(togglePlus){
+			}//end if
+			else if(togglePlus){//if there was a plus
 				togglePlus=false;
 				concat(entry_ind-3,entry_ind-2);
-			}
+			}//end else if
 			else{
 				concat(entry_ind-3,entry_ind-2);
-			}
-			if(!toggleEpsilon&&rexp1prime()){
+			}//end else
+			if(!toggleEpsilon&&rexp1prime()){//blocks infinite loop
 				toggleEpsilon = false;
 				return true;
-			}
-		}
+			}//end if
+		}//end if
 		toggleEpsilon=true;
 		return true;
-	}
+	}//end rexp1prime method
 	
+	/**
+	 * Parses valid character or character class.
+	 * @return True if a valid character or character class is found. False otherwise.
+	 */
 	private boolean rexp2(){
 		if(DEBUG)System.out.println("rexp2()");
 		int state1 = entry_ind-1;
 		if(peekChar()=='('){
-			if(match('(')&&rexp()&&match(')')){
-				int state2 = entry_ind-2;
+			if(match('(')&&rexp()&&match(')')){//if another regex inside parentheses
 				rexp2_tail();
-				if(toggleStar){
+				if(toggleStar){//handle star
 					TableRow nextRow = new TableRow(new HashMap<String,ArrayList<TableRow>>(), Integer.toString(entry_ind), "Invalid Type");
 					nfa.add(nextRow, entry_ind);
 					entry_ind++;
@@ -181,32 +193,31 @@ public class NFAGenerator {
 					concat(entry_ind-2,state1);
 					concat(state1,state1+1);
 					return true;
-				}
-				else if(togglePlus){
+				}//end if
+				else if(togglePlus){//handle plus
 					concat(entry_ind-1,state1+1);
 					concat(state1,state1+1);
 					populate("@");
 					concat(entry_ind-2,entry_ind-1);
 					return true;
-				}
+				}//end else if
 				else{
 					concat(state1,state1+1);
 					toggleEpsilon=false;
 					return true;
-				}
-			}
-		}
-		if(isRE_CHAR(peekChar())){
+				}//end else
+			}//end if
+		}//end if
+		if(isRE_CHAR(peekChar())){//found a regular character
 			char temp = peekChar();
 			if(match(peekChar())){
 				populate(String.valueOf(temp));
-				int state2 = entry_ind-2;
 				rexp2_tail();
 				if(toggleEpsilon){
 					toggleEpsilon = false;
 					return true;
-				}
-				else if(toggleStar){
+				}//end if
+				else if(toggleStar){//handle star
 					TableRow nextRow = new TableRow(new HashMap<String,ArrayList<TableRow>>(), Integer.toString(entry_ind), "Invalid Type");
 					nfa.add(nextRow, entry_ind);
 					entry_ind++;
@@ -219,21 +230,21 @@ public class NFAGenerator {
 					concat(entry_ind-3,entry_ind-2);
 //					toggleStar = false;
 					return true;
-				}
-				else if(togglePlus){
+				}//end else if
+				else if(togglePlus){//handle plus
 					concat(entry_ind-1,state1+1);
 					concat(state1,state1+1);
 					populate("@");
 					concat(entry_ind-2,entry_ind-1);
 					return true;
-				}
-			}
-		}
-		if(rexp3()){
+				}//end else if
+			}//end if
+		}//end if
+		if(rexp3()){//look for rexp3
 			return true;
-		}
+		}//end if
 		return false;
-	}
+	}//end rexp2 method
 	
 	private boolean rexp2_tail(){
 		if(DEBUG)System.out.println("rexp2_tail()");
