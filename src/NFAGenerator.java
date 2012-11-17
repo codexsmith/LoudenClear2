@@ -17,6 +17,7 @@ public class NFAGenerator {
 	private String token;
 	private int entry_ind;
 	private boolean toggleStar;
+	private boolean togglePlus;
 	private boolean toggleEpsilon;
 	
 	public NFAGenerator(Lexical l){
@@ -162,18 +163,39 @@ public class NFAGenerator {
 	
 	private boolean rexp2(){
 		if(DEBUG)System.out.println("rexp2()");
+		int state1 = entry_ind-1;
 		if(peekChar()=='('){
 			if(match('(')&&rexp()&&match(')')){
+				int state2 = entry_ind-2;
 				rexp2_tail();
-				return true;
+				if(toggleStar){
+					return true;
+				}
+				else if(togglePlus){
+					concat(entry_ind-1,state1);
+					togglePlus = false;
+					return true;
+				}
 			}
 		}
 		if(isRE_CHAR(peekChar())){
 			char temp = peekChar();
 			if(match(peekChar())){
 				populate(String.valueOf(temp));
-				if(rexp2_tail()){
+				int state2 = entry_ind-2;
+				rexp2_tail();
+				if(toggleEpsilon){
 					toggleEpsilon = false;
+					return true;
+				}
+				else if(toggleStar){
+					concat(state1,state2);
+					toggleStar = false;
+					return true;
+				}
+				else if(togglePlus){
+					concat(entry_ind-1,state1);
+					togglePlus = false;
 					return true;
 				}
 			}
@@ -192,18 +214,19 @@ public class NFAGenerator {
 		if(peekChar()=='*'){
 			//System.out.println("Index at Star: "+entry_ind);
 			match('*');
-			TableRow nextRow = new TableRow(new HashMap<String,ArrayList<TableRow>>(), Integer.toString(entry_ind), "Invalid Type");
+/*			TableRow nextRow = new TableRow(new HashMap<String,ArrayList<TableRow>>(), Integer.toString(entry_ind), "Invalid Type");
 			nfa.add(nextRow, entry_ind);
 			entry_ind++;
 			concat(entry_ind-3,entry_ind-1);
 			concat(entry_ind-2,entry_ind-3);
 			concat(entry_ind-2,entry_ind-1);
-			toggleStar=true;
+*/			toggleStar=true;
 			return true;
 		}
 		if(peekChar()=='+'){
 			match('+');
-			concat(entry_ind-1,entry_ind-2);
+//			concat(entry_ind-1,entry_ind-2);
+			togglePlus=true;
 			return true;
 		}
 		else{
@@ -419,9 +442,26 @@ public class NFAGenerator {
 	
 	private void union(int epsilon, int state1, int state2){
 		if(DEBUG)System.out.println("United: "+state1+" & "+ state2);
+		populate("@");
 		ArrayList<TableRow> first_next = nfa.getTableRowArray(state1);
 		ArrayList<TableRow> second_next = nfa.getTableRowArray(state2);
+		//glue to epsilon
 		nfa.getTableRowArray(epsilon).get(0).getSuccessorStates().put("@",first_next);
 		nfa.getTableRowArray(epsilon).get(0).getSuccessorStates().get("@").add(second_next.get(0));
+		//merge to epsilon
+		concat(state2-1,entry_ind-2);
+		concat(entry_ind-3,entry_ind-2);
+//		if(first_next.get(0).getSuccessorStates().get("@")==null){
+//			first_next.get(0).getSuccessorStates().put("@",nfa.getTableRowArray(entry_ind-2));
+//		}
+//		else{
+//			first_next.get(0).getSuccessorStates().get("@").add(nfa.getTableRowArray(entry_ind-2).get(0));
+//		}
+//		if(second_next.get(0).getSuccessorStates().get("@")==null){
+//			second_next.get(0).getSuccessorStates().put("@",nfa.getTableRowArray(entry_ind-2));
+//		}
+//		else{
+//			second_next.get(0).getSuccessorStates().get("@").add(nfa.getTableRowArray(entry_ind-2).get(0));
+//		}
 	}
 }

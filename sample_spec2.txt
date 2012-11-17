@@ -4,11 +4,12 @@ $CHAR [a-zA-Z]
 $UPPER [^a-z] IN $CHAR
 $LOWER [^A-Z] IN $CHAR
 
+$ABPLUS (a|b|c)+
 %%$IDENTIFIER $LOWER ($LOWER|$DIGIT)*
 %%$INT ($DIGIT)+
 %%$FLOAT ($DIGIT)+ \. ($DIGIT)+
 %%$ASSIGN =
-$PLUS \+
-$MINUS -
-$MULTIPLY \*
-$PRINT PRINT
+%%$PLUS \+
+%%$MINUS -
+%%$MULTIPLY \*
+%%$PRINT PRINT
