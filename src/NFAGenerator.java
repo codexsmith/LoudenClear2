@@ -246,11 +246,15 @@ public class NFAGenerator {
 		return false;
 	}//end rexp2 method
 	
+	/**
+	 * Toggles star or plus
+	 * @return True by default
+	 */
 	private boolean rexp2_tail(){
 		if(DEBUG)System.out.println("rexp2_tail()");
 		if(index>=regex.length()||peekChar()==')'){
 			return true;
-		}
+		}//end if
 		if(peekChar()=='*'){
 			//System.out.println("Index at Star: "+entry_ind);
 			match('*');
@@ -262,51 +266,63 @@ public class NFAGenerator {
 			concat(entry_ind-2,entry_ind-1);
 */			toggleStar=true;
 			return true;
-		}
+		}//end if
 		if(peekChar()=='+'){
 			match('+');
 //			concat(entry_ind-1,entry_ind-2);
 			togglePlus=true;
 			return true;
-		}
+		}//end if
 		else{
 			toggleEpsilon = true;
 			return true;
-		}
-	}
+		}//end else
+	}//end rexp2_tail method
 	
+	/**
+	 * Validates character classes
+	 * @return True if a valid character set or a character class is found. False otherwise
+	 */
 	private boolean rexp3(){
 		if(DEBUG)System.out.println("rexp3()");
 		if(index>=regex.length()||peekChar()==')'){
 			return true;
-		}
+		}//end if
 		if(char_class()){
 			return true;
-		}
+		}//end if
 		toggleEpsilon = true;
 		if(DEBUG)System.out.println(toggleEpsilon);
 		return true;
-	}
+	}//end rexp3 method
 	
+	/**
+	 * Validates character classes
+	 * @return True if a valid character set or a character class is found. False otherwise
+	 */
 	private boolean char_class(){
 		if(DEBUG)System.out.println("char_class()");
 		if(peekChar()=='.'){
 			match('.');
 			populate(".");
 			return true;
-		}
+		}//end if
 		if(peekChar()=='['){
 			if(match('[')&&char_class1())
 				return true;
-		}
+		}//end if
 		String temp = defined_class();
 		if(temp!=null){
 			populate(temp);
 			return true;
-		}
+		}//end if
 		return false;
-	}
+	}//end char_class method
 	
+	/**
+	 * Validates character sets
+	 * @return True if a valid character set. False otherwise
+	 */
 	private boolean char_class1(){
 		if(DEBUG)System.out.println("char_class1()");
 		if(char_set_list())
@@ -314,8 +330,12 @@ public class NFAGenerator {
 		if(exclude_set())
 			return true;
 		return false;
-	}
+	}//end char_class method
 	
+	/**
+	 * Validates non-exclusive character sets
+	 * @return True if a valid character set. False otherwise
+	 */
 	private boolean char_set_list(){
 		if(DEBUG)System.out.println("char_set_list()");
 		if(char_set()&&char_set_list()){
