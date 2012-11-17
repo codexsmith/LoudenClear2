@@ -17,7 +17,7 @@ public class Driver {
 	 */
 	public static void main(String[] args) {
 		
-		Lexical lexSpec = PScanner.scanLexicon("sample_spec.txt");
+		Lexical lexSpec = PScanner.scanLexicon("sample_spec2.txt");
 //		PScanner readInput = new PScanner("test_input.txt");
 //		String nextToken;
 //		ArrayList<String> tokenList = new ArrayList<String>();

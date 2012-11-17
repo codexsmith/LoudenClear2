@@ -211,7 +211,10 @@ public class NFAGenerator {
 		if(isRE_CHAR(peekChar())){//found a regular character
 			char temp = peekChar();
 			if(match(peekChar())){
-				populate(String.valueOf(temp));
+				if(temp!='@'){
+					populate(String.valueOf(temp));
+				}
+				else populate("\\@");
 				rexp2_tail();
 				if(toggleEpsilon){
 					toggleEpsilon = false;
