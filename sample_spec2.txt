@@ -6,9 +6,8 @@ $LOWER [^A-Z] IN $CHAR
 
 %%$OR (LOWER)*
 %%$ABPLUS (a|b|c)+
-$AB a(a|b)b(a|b)baba(a|b)
-%%$APLUS (a)+
-%%$TEST $LOWER($LOWER|$DIGIT)
+%%$AB a(a|b)b(a|b)baba(a|b)
+%%$ASTAR a*
 %%$IDENTIFIER $LOWER ($LOWER|$DIGIT)*
 %%$INT ($DIGIT)+
 %%$FLOAT ($DIGIT)+ \. ($DIGIT)+

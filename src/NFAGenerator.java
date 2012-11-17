@@ -9,7 +9,7 @@ import java.util.Map;
  *
  */
 public class NFAGenerator {
-	private final boolean DEBUG = true;
+	private final boolean DEBUG = false;
 	private StateTable nfa;
 	private int index;
 	private Lexical lex;
@@ -127,7 +127,7 @@ public class NFAGenerator {
 		if(rexp2()){
 			if(toggleStar){
 				toggleStar=false;
-				concat(entry_ind-4,entry_ind-3);
+//				concat(entry_ind-3,entry_ind-2);
 			}
 			else{
 				concat(entry_ind-3,entry_ind-2);
@@ -176,9 +176,10 @@ public class NFAGenerator {
 					TableRow nextRow = new TableRow(new HashMap<String,ArrayList<TableRow>>(), Integer.toString(entry_ind), "Invalid Type");
 					nfa.add(nextRow, entry_ind);
 					entry_ind++;
-					concat(entry_ind-3,entry_ind-1);
-					concat(entry_ind-2,entry_ind-3);
+					System.out.println(state1);
 					concat(entry_ind-2,entry_ind-1);
+					concat(state1+1,entry_ind-1);
+					concat(entry_ind-2,state1);
 					return true;
 				}
 				else if(togglePlus){
@@ -204,13 +205,19 @@ public class NFAGenerator {
 					return true;
 				}
 				else if(toggleStar){
-					concat(state1,state2);
-					toggleStar = false;
+					TableRow nextRow = new TableRow(new HashMap<String,ArrayList<TableRow>>(), Integer.toString(entry_ind), "Invalid Type");
+					nfa.add(nextRow, entry_ind);
+					entry_ind++;
+					System.out.println(state1);
+					concat(entry_ind-2,entry_ind-1);
+					concat(state1+1,entry_ind-1);
+					concat(entry_ind-2,state1);
+//					toggleStar = false;
 					return true;
 				}
 				else if(togglePlus){
 					concat(entry_ind-1,state1);
-					togglePlus = false;
+					concat(state1,state1+1);
 					return true;
 				}
 			}
