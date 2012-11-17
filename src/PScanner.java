@@ -52,7 +52,7 @@ public class PScanner {
 	public String getToken(){
 		String tok;
 		if(buff.isEmpty()){
-			buff = iScan.nextLine();
+			buff = this.getLine();
 		}
 		sanitize(buff);
 		
@@ -128,7 +128,10 @@ public class PScanner {
 	}
 	
 	public boolean endOfFile(){
-		return !iScan.hasNext();
+		if(iScan.nextLine() != null){
+			return true;
+		}
+		return false;
 	}
 	
 	
