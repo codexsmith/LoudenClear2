@@ -1,0 +1,8 @@
+all: compile
+	
+compile:
+	javac *.java
+run: compile
+	java Driver
+clean:
+	rm -f *
