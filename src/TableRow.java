@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 
-public class TableRow{
+public class TableRow implements Comparable {
 	//Map of strings to tableRows, transitions
 	private Map<String,ArrayList<TableRow>> successorStates;
 	private boolean accept;
@@ -58,5 +58,10 @@ public class TableRow{
 
 	public void setSuccessorStates(Map<String, ArrayList<TableRow>> nextStates) {
 		this.successorStates = nextStates;
+	}
+
+	@Override
+	public int compareTo(Object obj) {
+		return this.name.compareTo(((TableRow)obj).name);
 	}
 }
