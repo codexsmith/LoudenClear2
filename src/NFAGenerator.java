@@ -9,7 +9,7 @@ import java.util.Map;
  *
  */
 public class NFAGenerator {
-	private final boolean DEBUG = true;
+	private final boolean DEBUG = false;
 	private StateTable nfa;
 	private int index;
 	private Lexical lex;
@@ -127,7 +127,6 @@ public class NFAGenerator {
 		if(rexp2()){
 			if(toggleStar){
 				toggleStar=false;
-//				System.out.println(entry_ind);
 //				concat(entry_ind-2,entry_ind-1);
 			}
 			else{
@@ -177,7 +176,6 @@ public class NFAGenerator {
 					TableRow nextRow = new TableRow(new HashMap<String,ArrayList<TableRow>>(), Integer.toString(entry_ind), "Invalid Type");
 					nfa.add(nextRow, entry_ind);
 					entry_ind++;
-					System.out.println(state1);
 					concat(entry_ind-2,entry_ind-1);
 					concat(state1+1,entry_ind-1);
 					concat(entry_ind-2,state1);
@@ -210,11 +208,13 @@ public class NFAGenerator {
 					TableRow nextRow = new TableRow(new HashMap<String,ArrayList<TableRow>>(), Integer.toString(entry_ind), "Invalid Type");
 					nfa.add(nextRow, entry_ind);
 					entry_ind++;
-					System.out.println(state1);
+					//System.out.println(state1);
 					concat(entry_ind-2,entry_ind-1);
 					concat(state1+1,entry_ind-1);
 					concat(entry_ind-2,state1);
 					concat(state1,state1+1);
+					populate("@");
+					concat(entry_ind-2,entry_ind-1);
 //					toggleStar = false;
 					return true;
 				}
