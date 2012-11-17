@@ -61,7 +61,10 @@ public class NFAGenerator {
 	
 	private boolean regex(){
 		if(DEBUG)System.out.println("regex()");
-		return rexp();
+		boolean result = rexp();
+		nfa.getTableRowArray(entry_ind-1).get(0).setAccept(true);//set the very last entry to accept
+		nfa.getTableRowArray(entry_ind-1).get(0).setType(token);
+		return result;
 /*		if(rexp()){
 			return true;
 		}
@@ -76,8 +79,7 @@ public class NFAGenerator {
 		int epsilon = entry_ind-1;
 		int state1 = entry_ind;
 		if(rexp1()){//find rexp1
-			nfa.getTableRowArray(entry_ind-1).get(0).setAccept(true);//set the very last entry to accept
-			nfa.getTableRowArray(entry_ind-1).get(0).setType(token);
+			
 			int state2=entry_ind;
 			if(peekChar()=='|'){//if UNION
 				if(rexpprime()){
@@ -149,6 +151,9 @@ public class NFAGenerator {
 				toggleStar=false;
 				concat(entry_ind-4,entry_ind-3);
 			}
+			else if(togglePlus){
+				togglePlus=false;
+			}
 			else{
 				concat(entry_ind-3,entry_ind-2);
 			}
@@ -173,7 +178,11 @@ public class NFAGenerator {
 				}
 				else if(togglePlus){
 					concat(entry_ind-1,state1);
-					togglePlus = false;
+					return true;
+				}
+				else{
+					concat(state1,state1+1);
+					toggleEpsilon=false;
 					return true;
 				}
 			}
