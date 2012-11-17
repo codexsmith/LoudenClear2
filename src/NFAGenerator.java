@@ -9,7 +9,7 @@ import java.util.Map;
  *
  */
 public class NFAGenerator {
-	private final boolean DEBUG = false;
+	private final boolean DEBUG = true;
 	private StateTable nfa;
 	private int index;
 	private Lexical lex;
@@ -127,7 +127,8 @@ public class NFAGenerator {
 		if(rexp2()){
 			if(toggleStar){
 				toggleStar=false;
-//				concat(entry_ind-3,entry_ind-2);
+//				System.out.println(entry_ind);
+//				concat(entry_ind-2,entry_ind-1);
 			}
 			else{
 				concat(entry_ind-3,entry_ind-2);
@@ -147,7 +148,7 @@ public class NFAGenerator {
 		if(rexp2()){
 			if(toggleStar){
 				toggleStar=false;
-				concat(entry_ind-4,entry_ind-3);
+				//concat(entry_ind-3,entry_ind-2);
 			}
 			else if(togglePlus){
 				togglePlus=false;
@@ -180,6 +181,7 @@ public class NFAGenerator {
 					concat(entry_ind-2,entry_ind-1);
 					concat(state1+1,entry_ind-1);
 					concat(entry_ind-2,state1);
+					concat(state1,state1+1);
 					return true;
 				}
 				else if(togglePlus){
@@ -212,6 +214,7 @@ public class NFAGenerator {
 					concat(entry_ind-2,entry_ind-1);
 					concat(state1+1,entry_ind-1);
 					concat(entry_ind-2,state1);
+					concat(state1,state1+1);
 //					toggleStar = false;
 					return true;
 				}
