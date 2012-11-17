@@ -10,6 +10,7 @@ import java.util.ArrayList;
  */
 public class Driver {
 	public static String errCode = "Error ";
+	
 	/**
 	 * @param args
 	 */
@@ -52,12 +53,22 @@ public class Driver {
 			nextToken = dfa.DFAlookUp(readInput.getToken());
 			if (nextToken.startsWith(errCode)){//Err on Token
 				System.out.println(nextToken);
+				System.out.println("Accepted Tokens");
+				for(String s : tokenList){
+					System.out.println(s);
+				}
 				break;
 			}
 			else{
 				tokenList.add(nextToken);
 			}
 		}
+		
+		System.out.println("Accepted Tokens");
+		for(String s : tokenList){
+			System.out.println(s);
+		}
+		
 	}
 
 }
