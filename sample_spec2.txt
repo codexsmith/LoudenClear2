@@ -8,7 +8,7 @@ $LOWER [^A-Z] IN $CHAR
 %%$TEST $LOWER($LOWER|$DIGIT)
 %%$IDENTIFIER $LOWER ($LOWER|$DIGIT)*
 %%$INT ($DIGIT)+
-$FLOAT ($DIGIT)+ \. ($DIGIT)+
+%%$FLOAT ($DIGIT)+ \. ($DIGIT)+
 %%$ASSIGN =
 %%$PLUS \+
 %%$MINUS -

@@ -173,6 +173,12 @@ public class NFAGenerator {
 				int state2 = entry_ind-2;
 				rexp2_tail();
 				if(toggleStar){
+					TableRow nextRow = new TableRow(new HashMap<String,ArrayList<TableRow>>(), Integer.toString(entry_ind), "Invalid Type");
+					nfa.add(nextRow, entry_ind);
+					entry_ind++;
+					concat(entry_ind-3,entry_ind-1);
+					concat(entry_ind-2,entry_ind-3);
+					concat(entry_ind-2,entry_ind-1);
 					return true;
 				}
 				else if(togglePlus){
