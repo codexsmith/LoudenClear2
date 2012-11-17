@@ -53,20 +53,36 @@ public class NFAToDFA {
 					accepted = true;
 					type = state.getType();
 				}
-				
 			}
 			
+			if(acceptBase)
+			{
+				accepted = true;
+				type = acceptBaseType;
+				
+			}
 			//Add all the new states to nextToParse if not already parsed.
 			for(String key : nextStates.keySet())
 			{
 				ArrayList<TableRow> nextState = nextStates.get(key);
 				String stateStr = computeName(nextState);
-				
 				if(!alreadyProcessed.contains(stateStr)) //If not already processed, add
 				{
 					alreadyProcessed.add(stateStr);
 					nextToParse.add(nextStates.get(key));
 				}
+				
+//				boolean inAlreadyProcessed = false;
+//				for(String ap : alreadyProcessed)
+//				{
+//					if(ap.contains(stateStr))
+//						inAlreadyProcessed = true;
+//				}
+//				if(inAlreadyProcessed)
+//				{
+//					alreadyProcessed.add(stateStr);
+//					nextToParse.add(nextStates.get(key));
+//				}
 			}
 			
 			print_already_processed(alreadyProcessed);
@@ -103,6 +119,9 @@ public class NFAToDFA {
 			System.out.println(ap);
 	}
 	
+	
+	static boolean acceptBase = false;
+	static String acceptBaseType = "";
 	/**
 	 * Computes nextStates
 	 * 
@@ -116,14 +135,15 @@ public class NFAToDFA {
 																Map<String, ArrayList<TableRow>> nextStates, int state, ArrayList<TableRow> prevStates)
 	{
 		
-//		if(successorStates.get(state).isEmpty())
-//		{
-//			nextStates.put(key, value)
-//			ArrayList<TableRow> vals = new ArrayList<TableRow>();
-//			vals.add(prevState);
-//			if(prevState != null)
-//				
-//		}
+		if(successorStates.get(state).isEmpty())
+		{
+			TableRow finalState = inputStateTable.getTableRow(state);
+			if(finalState.accept())
+			{
+				acceptBase = true;	
+				acceptBaseType = finalState.getType();
+			}
+		}
 		
 		for(Entry<String, ArrayList<TableRow>> st : successorStates.get(state))
 		{
@@ -140,12 +160,12 @@ public class NFAToDFA {
 					}
 				}
 				
-				if(prevStates != null)
-					for(TableRow prev : prevStates)
-					{
-						if(!vals.contains(prev))
-							vals.add(prev);
-					}
+//				if(prevStates != null)
+//					for(TableRow prev : prevStates)
+//					{
+//						if(!vals.contains(prev))
+//							vals.add(prev);
+//					}
 
 				nextStates.put(st.getKey(), vals);
 			}
@@ -165,8 +185,8 @@ public class NFAToDFA {
 					//add key index and value to next states.
 					ArrayList<TableRow> vals = new ArrayList<TableRow>();
 					vals.addAll(st.getValue());
-					if(prevStates != null)
-						vals.addAll(prevStates);
+//					if(prevStates != null)
+//						vals.addAll(prevStates);
 					nextStates.put(st.getKey(), vals);
 				}
 			}

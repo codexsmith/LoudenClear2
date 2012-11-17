@@ -17,36 +17,56 @@ public class NFAGenerator {
 	private String token;
 	private int entry_ind;
 	private boolean toggleStar;
+	private boolean toggleEpsilon;
 	
-	public NFAGenerator(String s){
-		//lex = l;
+	public NFAGenerator(Lexical l){
+		lex = l;
 		index = 0;
 		entry_ind = 0;
 		nfa = new StateTable();
-		regex = s; // new String();
+		regex = new String();
 		token = new String();
 		toggleStar = false;
+		toggleEpsilon = false;
+	}
+	
+	public NFAGenerator(String r){
+		index = 0;
+		entry_ind = 0;
+		nfa = new StateTable();
+		regex = r;
+		token = new String();
+		toggleStar = false;
+		toggleEpsilon = false;
 	}
 	
 	public StateTable genNFA(){
 		if(DEBUG)System.out.println("genNFA()");
-/*		for(TokenC t: lex.getTokens()){
+		populate("@");
+		int subnfa;
+		for(TokenC t: lex.getTokens()){
+			subnfa = entry_ind;
 			regex = t.getLegal().get(0);
 			token = t.getTitle().substring(1);
+			index = 0;
+			if(DEBUG)System.out.println(token);
+			if(DEBUG)System.out.println(regex);
 			regex();
-		}*/
-		regex();
+			concat(1,subnfa);
+		}
+//		regex();
 		return nfa;
 	}
 	
 	private boolean regex(){
 		if(DEBUG)System.out.println("regex()");
-		if(rexp()){
+		return rexp();
+/*		if(rexp()){
 			return true;
 		}
 		else{
 			return false;
-		}
+		}*/
 	}
 	
 	private boolean rexp(){
@@ -54,14 +74,19 @@ public class NFAGenerator {
 		populate("@");
 		int epsilon = entry_ind-1;
 		int state1 = entry_ind;
-		if(rexp1()){
-			nfa.getTableRowArray(entry_ind-1).get(0).setAccept(true);
+		if(rexp1()){//find rexp1
+			nfa.getTableRowArray(entry_ind-1).get(0).setAccept(true);//set the very last entry to accept
 			nfa.getTableRowArray(entry_ind-1).get(0).setType(token);
 			int state2=entry_ind;
-			//if(rexpprime()){
-			if(peekChar()=='|'){
-				rexpprime();
-				union(epsilon,state1,state2);
+			if(peekChar()=='|'){//if UNION
+				if(rexpprime()){
+					union(epsilon,state1,state2);
+					return true;
+				}
+			}
+			else
+			{
+				concat(epsilon,state1);
 				return true;
 			}
 		}
@@ -71,19 +96,19 @@ public class NFAGenerator {
 	private boolean rexpprime(){
 		if(DEBUG)System.out.println("rexpprime()");
 		populate("@");
-		if(index>=regex.length()){
+		if(index>=regex.length()||peekChar()==')'){//end of regex
 			return true;
 		}
-		if(peekChar()=='|'){
+		if(peekChar()=='|'){//if another UNION
 			if(match('|')){
 				int epsilon = entry_ind-1;
 				int state1 = entry_ind;
-				if(rexp1()){
+				if(rexp1()){//first subnfa
 					nfa.getTableRowArray(entry_ind-1).get(0).setAccept(true);
 					nfa.getTableRowArray(entry_ind-1).get(0).setType(token);
 					int state2 = entry_ind;
-					if(peekChar()=='|'){
-						rexpprime();
+					if(peekChar()=='|'){//yet another UNION
+						rexpprime();//second subnfa;
 						union(epsilon,state1,state2);
 						return true;
 					}
@@ -92,15 +117,15 @@ public class NFAGenerator {
 			else
 				return false;
 		}
-		return false;
+		toggleEpsilon=true;;
+		return true;
 	}
 	
 	private boolean rexp1(){
 		if(DEBUG)System.out.println("rexp1()");
-		if(rexp2())
+		if(rexp2()){
 			if(toggleStar){
 				toggleStar=false;
-				System.out.println("STAR POWER");
 				concat(entry_ind-4,entry_ind-3);
 			}
 			else{
@@ -109,27 +134,29 @@ public class NFAGenerator {
 			if(rexp1prime()){
 				return true;
 			}
+		}
 		return false;
 	}
 	
 	private boolean rexp1prime(){
 		if(DEBUG)System.out.println("rexp1prime()");
-		if(index>=regex.length()){
+		if(index>=regex.length()||peekChar()==')'){
 			return true;
 		}
 		if(rexp2()){
 			if(toggleStar){
 				toggleStar=false;
-				System.out.println("STAR POWER");
 				concat(entry_ind-4,entry_ind-3);
 			}
 			else{
 				concat(entry_ind-3,entry_ind-2);
 			}
-			if(rexp1prime()){
+			if(!toggleEpsilon&&rexp1prime()){
+				toggleEpsilon = false;
 				return true;
 			}
 		}
+		toggleEpsilon=true;
 		return true;
 	}
 	
@@ -137,6 +164,7 @@ public class NFAGenerator {
 		if(DEBUG)System.out.println("rexp2()");
 		if(peekChar()=='('){
 			if(match('(')&&rexp()&&match(')')){
+				rexp2_tail();
 				return true;
 			}
 		}
@@ -145,18 +173,20 @@ public class NFAGenerator {
 			if(match(peekChar())){
 				populate(String.valueOf(temp));
 				if(rexp2_tail()){
+					toggleEpsilon = false;
 					return true;
 				}
 			}
 		}
-		if(rexp3())
+		if(rexp3()){
 			return true;
+		}
 		return false;
 	}
 	
 	private boolean rexp2_tail(){
 		if(DEBUG)System.out.println("rexp2_tail()");
-		if(index>=regex.length()){
+		if(index>=regex.length()||peekChar()==')'){
 			return true;
 		}
 		if(peekChar()=='*'){
@@ -177,19 +207,22 @@ public class NFAGenerator {
 			return true;
 		}
 		else{
+			toggleEpsilon = true;
 			return true;
 		}
 	}
 	
 	private boolean rexp3(){
 		if(DEBUG)System.out.println("rexp3()");
-		if(index>=regex.length()){
+		if(index>=regex.length()||peekChar()==')'){
 			return true;
 		}
 		if(char_class()){
 			return true;
 		}
-		return false;
+		toggleEpsilon = true;
+		if(DEBUG)System.out.println(toggleEpsilon);
+		return true;
 	}
 	
 	private boolean char_class(){
@@ -243,7 +276,7 @@ public class NFAGenerator {
 	
 	private boolean char_set_tail(){
 		if(DEBUG)System.out.println("char_set_tail()");
-		if(index>=regex.length()){
+		if(index>=regex.length()||peekChar()==')'){
 			return true;
 		}
 		if(peekChar()=='-'){
@@ -252,6 +285,7 @@ public class NFAGenerator {
 				return true;
 			}
 		}
+		toggleEpsilon = true;
 		return true;
 	}
 	
@@ -287,7 +321,7 @@ public class NFAGenerator {
 				token+=peekChar();
 				match(peekChar());
 			}
-			System.out.println(token);
+			if(DEBUG)System.out.println(token);
 			return token;
 		}
 		return null;
@@ -329,7 +363,7 @@ public class NFAGenerator {
 			else if(c=='\\'){
 				match('\\');
 				char t = peekChar();
-				if(t==' '||t=='\\'||t=='*'||t=='?'||t=='|'||t=='['||t==']'||t=='('||t==')'||t=='.'||t=='\''||t=='\"'||t=='$'||t=='@'){
+				if(t==' '||t=='\\'||t=='*'||t=='+'||t=='?'||t=='|'||t=='['||t==']'||t=='('||t==')'||t=='.'||t=='\''||t=='\"'||t=='$'||t=='@'){
 					return true;
 				}
 			}
