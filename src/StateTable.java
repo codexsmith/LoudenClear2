@@ -8,7 +8,7 @@ public class StateTable {
 	private ArrayList<TableRow> stateTable;
 	private ArrayList<TableRow> currState;
 	private ArrayList<TableRow> NFAState; 
-	private boolean accepted;
+	private boolean accepted,wasAccepted;
 	private TableRow acceptedState;
 	private String tokenGenerated;
 	
@@ -135,9 +135,10 @@ public class StateTable {
 	 * 
 	 * @param string to lookup
 	 */
-	public void NFAlookUp(String c){//redo
+	public String NFAlookUp(String c){//redo
 		ArrayList<TableRow> next = new ArrayList<TableRow>(0);
-		ArrayList<TableRow> nextState;
+		ArrayList<TableRow> nextState = null;
+		tokenGenerated.concat(c);
 		
 		for (TableRow state : NFAState){//
 			nextState = stateTable.get(stateTable.indexOf(state)).getNextState(c);
@@ -158,30 +159,39 @@ public class StateTable {
 				acceptedState = state;
 			}
 		}
-		NFAState = next;
+		if (!next.isEmpty()){
+			NFAState = next;
+		}
+		else{
+			return returnAccepted(accepted);
+		}
+		return Driver.errCode + " C" + tokenGenerated;
 		
 	}
 	
 	//this will tell us if the symbol has a valid translation from the currentState to another state in the table
 	public String DFAlookUp(String c){
-		ArrayList<TableRow> nextState; //state table index
-		boolean val = false;
+		ArrayList<TableRow> nextState; //curr state table
+
 		tokenGenerated.concat(c);
 		nextState = stateTable.get(stateTable.indexOf(currState)).getNextState(c);
-		if (nextState != null){
-			currState = nextState;
-		}
-		else{
-			return returnAccepted(false);
-		}
-		for (TableRow state : currState){
-			if (state.accept()){
-				accepted = true;
-				return returnAccepted(accepted);
+		
+		if(nextState != null){
+			currState = nextState; //find the accept state
+			
+			for (TableRow state : currState){
+				if(state.accept()){
+					accepted = true;
+				}
 			}
 		}
-		return Driver.errCode + "B";
+		else{
+			return returnAccepted(accepted);//error!
+		}
+		
+		return Driver.errCode + "B " + tokenGenerated;
 	}
+	
 	
 	public String returnAccepted(boolean state){
 		if (state){

@@ -51,6 +51,10 @@ public class Driver {
 		//Consult the StateTable with the input of the user file
 		while(!readInput.endOfFile()){
 			nextToken = dfa.DFAlookUp(readInput.getToken());
+			String tokenReturned = nextToken.substring(0,nextToken.length()-1);
+			String extraChar = nextToken.substring(nextToken.length()-1);
+			readInput.pushToken(extraChar);
+			
 			if (nextToken.startsWith(errCode)){//Err on Token
 				System.out.println(nextToken);
 				System.out.println("Accepted Tokens");
@@ -60,7 +64,7 @@ public class Driver {
 				break;
 			}
 			else{
-				tokenList.add(nextToken);
+				tokenList.add(tokenReturned);
 			}
 		}
 		
