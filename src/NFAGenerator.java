@@ -107,8 +107,6 @@ public class NFAGenerator {
 				int epsilon = entry_ind-1;
 				int state1 = entry_ind;
 				if(rexp1()){//first subnfa
-					nfa.getTableRowArray(entry_ind-1).get(0).setAccept(true);
-					nfa.getTableRowArray(entry_ind-1).get(0).setType(token);
 					int state2 = entry_ind;
 					if(peekChar()=='|'){//yet another UNION
 						rexpprime();//second subnfa;
@@ -153,6 +151,7 @@ public class NFAGenerator {
 			}
 			else if(togglePlus){
 				togglePlus=false;
+				concat(entry_ind-3,entry_ind-2);
 			}
 			else{
 				concat(entry_ind-3,entry_ind-2);
@@ -178,6 +177,7 @@ public class NFAGenerator {
 				}
 				else if(togglePlus){
 					concat(entry_ind-1,state1);
+					concat(state1,state1+1);
 					return true;
 				}
 				else{
