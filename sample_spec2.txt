@@ -10,11 +10,11 @@ $LOWER [^A-Z] IN $CHAR
 $ABPLUS (a|b|c)+(d|e|f)+
 %%$AB a(a|b)b(a|b)baba(a|b)
 %%$ASTAR (a*)b*(c)*
-%%$IDENTIFIER $LOWER ($LOWER|$DIGIT)*
-%%$INT ($DIGIT)+
-%%$FLOAT ($DIGIT)+ \. ($DIGIT)+
-%%$ASSIGN =
-%%$PLUS \+
-%%$MINUS -
-%%$MULTIPLY \*
-%%$PRINT PRINT
+$IDENTIFIER $LOWER ($LOWER|$DIGIT)*
+$INT ($DIGIT)+
+$FLOAT ($DIGIT)+ \. ($DIGIT)+
+$ASSIGN =
+$PLUS \+
+$MINUS -
+$MULTIPLY \*
+$PRINT PRINT

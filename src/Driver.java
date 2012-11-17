@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 /**
  * 
  * @author nick
@@ -16,6 +18,10 @@ public class Driver {
 	public static void main(String[] args) {
 		
 		Lexical lexSpec = PScanner.scanLexicon("sample_spec.txt");
+//		PScanner readInput = new PScanner("test_input.txt");
+//		String nextToken;
+//		ArrayList<String> tokenList = new ArrayList<String>();
+		
 		NFAGenerator gen = new NFAGenerator(lexSpec);
 //		String regex = "\\**";
 //		NFAGenerator gen = new NFAGenerator(regex);
@@ -38,9 +44,13 @@ public class Driver {
 		System.out.println("************************");
 		dfa.printTable();
 		
-		//Consult the StateTable with the input of the user file
+//		//Consult the StateTable with the input of the user file
 //		while(!readInput.endOfFile()){
 //			nextToken = dfa.DFAlookUp(readInput.getToken());
+//			String tokenReturned = nextToken.substring(0,nextToken.length()-1);
+//			String extraChar = nextToken.substring(nextToken.length()-1);
+//			readInput.pushToken(extraChar);
+//			
 //			if (nextToken.startsWith(errCode)){//Err on Token
 //				System.out.println(nextToken);
 //				System.out.println("Accepted Tokens");
@@ -50,7 +60,7 @@ public class Driver {
 //				break;
 //			}
 //			else{
-//				tokenList.add(nextToken);
+//				tokenList.add(tokenReturned);
 //			}
 //		}
 //		
@@ -58,7 +68,7 @@ public class Driver {
 //		for(String s : tokenList){
 //			System.out.println(s);
 //		}
-		
+	
 	}
 
 }
