@@ -163,17 +163,32 @@ public class StateTable {
 	}
 	
 	//this will tell us if the symbol has a valid translation from the currentState to another state in the table
-	public void DFAlookUp(String c){
+	public String DFAlookUp(String c){
 		ArrayList<TableRow> nextState; //state table index
 		boolean val = false;
+		tokenGenerated.concat(c);
 		nextState = stateTable.get(stateTable.indexOf(currState)).getNextState(c);
 		if (nextState != null){
 			currState = nextState;
 		}
+		else{
+			return returnAccepted(false);
+		}
 		for (TableRow state : currState){
 			if (state.accept()){
 				accepted = true;
+				return returnAccepted(accepted);
 			}
+		}
+		return Driver.errCode + "B";
+	}
+	
+	public String returnAccepted(boolean state){
+		if (state){
+			return tokenGenerated;
+		}
+		else{
+			return Driver.errCode + "A " + tokenGenerated;
 		}
 	}
 	

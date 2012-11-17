@@ -4,7 +4,8 @@ $CHAR [a-zA-Z]
 $UPPER [^a-z] IN $CHAR
 $LOWER [^A-Z] IN $CHAR
 
-$OR (LOWER)*
+%%$OR (LOWER)*
+%%$ABPLUS (a|b|c)+
 %%$IDENTIFIER $LOWER ($LOWER|$DIGIT)*
 %%$INT ($DIGIT)+
 %%$FLOAT ($DIGIT)+ \. ($DIGIT)+
@@ -13,3 +14,6 @@ $OR (LOWER)*
 %%$MINUS -
 %%$MULTIPLY \*
 %%$PRINT PRINT
+
+%%$OR (a|b)
+$LONG a(a|b)b(a|b)baba(a|b)
