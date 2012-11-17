@@ -59,6 +59,8 @@ public class NFAToDFA {
 			{
 				accepted = true;
 				type = acceptBaseType;
+				acceptBase = false;
+				acceptBaseType = "";
 				
 			}
 			//Add all the new states to nextToParse if not already parsed.

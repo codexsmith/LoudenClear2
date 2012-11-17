@@ -15,7 +15,7 @@ public class Driver {
 	 */
 	public static void main(String[] args) {
 		
-		Lexical lexSpec = PScanner.scanLexicon("sample_spec2.txt");
+		Lexical lexSpec = PScanner.scanLexicon("sample_spec.txt");
 		NFAGenerator gen = new NFAGenerator(lexSpec);
 //		String regex = "\\**";
 //		NFAGenerator gen = new NFAGenerator(regex);
