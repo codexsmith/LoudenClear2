@@ -6,6 +6,9 @@ $LOWER [^A-Z] IN $CHAR
 
 %%$OR (LOWER)*
 %%$ABPLUS (a|b|c)+
+%%$AB a(a|b)b(a|b)baba(a|b)
+$APLUS (a)+
+%%$TEST $LOWER($LOWER|$DIGIT)
 %%$IDENTIFIER $LOWER ($LOWER|$DIGIT)*
 %%$INT ($DIGIT)+
 %%$FLOAT ($DIGIT)+ \. ($DIGIT)+
@@ -14,6 +17,3 @@ $LOWER [^A-Z] IN $CHAR
 %%$MINUS -
 %%$MULTIPLY \*
 %%$PRINT PRINT
-
-%%$OR (a|b)
-$LONG a(a|b)b(a|b)baba(a|b)

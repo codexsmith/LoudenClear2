@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 /**
  * 
  * @author nick
@@ -9,27 +7,19 @@ import java.util.ArrayList;
 		store tokens from walker
  */
 public class Driver {
-	public static String errCode = "Error ";
 	
+	public static String errCode = "error ";
+
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		
-		PScanner readInput = new PScanner("test_input.txt");
-//		Lexical lexSpec = PScanner.scanLexicon("sample_spec.txt");
-//		String regex = "a*";
-//		NFAGenerator gen = new NFAGenerator(regex);
-
 		Lexical lexSpec = PScanner.scanLexicon("sample_spec2.txt");
 		NFAGenerator gen = new NFAGenerator(lexSpec);
 //		String regex = "\\**";
 //		NFAGenerator gen = new NFAGenerator(regex);
-
 		StateTable table = gen.genNFA();
-		ArrayList<String> tokenList = new ArrayList<String>();
-		String nextToken = null;
-		
 		
 		System.out.println("");
 		System.out.println("");
