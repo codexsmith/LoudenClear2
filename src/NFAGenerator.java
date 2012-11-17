@@ -214,7 +214,7 @@ public class NFAGenerator {
 					concat(entry_ind-2,state1);
 					concat(state1,state1+1);
 					populate("@");
-					concat(entry_ind-2,entry_ind-1);
+					concat(entry_ind-3,entry_ind-2);
 //					toggleStar = false;
 					return true;
 				}
