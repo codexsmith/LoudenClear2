@@ -4,7 +4,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 public class StateTable {
-
+	private final boolean DEBUG = false;
 	private ArrayList<TableRow> stateTable;
 	private ArrayList<TableRow> currState;
 	private ArrayList<TableRow> NFAState; 
@@ -82,7 +82,7 @@ public class StateTable {
 	 */
 	public boolean addState(Map<String, ArrayList<TableRow>> map, String name, String type, int index, boolean accepted){
 		TableRow newRow = new TableRow(map, name, type); //create
-		newRow.setAccept(true);
+		newRow.setAccept(accepted);
 		boolean replace = false;
 		
 		if (stateTable.size() <= index && index >=0){ //append at index
@@ -111,7 +111,7 @@ public class StateTable {
 		for (TableRow row : stateTable){
 			if (row.getSuccessorStates() != null){
 				rowvalues = row.getSuccessorStates().entrySet();
-				System.out.println(rowvalues);
+				if(DEBUG)System.out.println(rowvalues);
 				values.add(rowvalues);
 			}
 		}

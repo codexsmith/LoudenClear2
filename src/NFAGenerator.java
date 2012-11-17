@@ -39,7 +39,6 @@ public class NFAGenerator {
 	
 	private boolean regex(){
 		if(DEBUG)System.out.println("regex()");
-		populate("@");
 		if(rexp()){
 			return true;
 		}
@@ -50,23 +49,15 @@ public class NFAGenerator {
 	
 	private boolean rexp(){
 		if(DEBUG)System.out.println("rexp()");
-		int ep_ind = entry_ind-1;
+		populate("@");
+		int epsilon = entry_ind-1;
+		int state1 = entry_ind;
 		if(rexp1()){
-			int start_ind=entry_ind;
-			if(rexpprime()){
-				System.out.println(ep_ind);
-				System.out.println(start_ind);
-				ArrayList<TableRow> next = nfa.getTableRowArray(ep_ind+1);
-				if(nfa.getTableRowArray(ep_ind).get(0).getSuccessorStates().get("@")!=null){
-					nfa.getTableRowArray(ep_ind).get(0).getSuccessorStates().get("@").add(next.get(0));
-					next = nfa.getTableRowArray(start_ind);
-					nfa.getTableRowArray(ep_ind).get(0).getSuccessorStates().get("@").add(next.get(0));
-				}
-				else{
-					nfa.getTableRowArray(ep_ind).get(0).getSuccessorStates().put("@",next);
-					next = nfa.getTableRowArray(start_ind);
-					nfa.getTableRowArray(ep_ind).get(0).getSuccessorStates().get("@").add(next.get(0));
-				}
+			int state2=entry_ind;
+			//if(rexpprime()){
+			if(peekChar()=='|'){
+				rexpprime();
+				union(epsilon,state1,state2);
 				return true;
 			}
 		}
@@ -75,22 +66,36 @@ public class NFAGenerator {
 	
 	private boolean rexpprime(){
 		if(DEBUG)System.out.println("rexpprime()");
+		populate("@");
 		if(index>=regex.length()){
 			return true;
 		}
 		if(peekChar()=='|'){
-			if(match('|')&&rexp1()&&rexpprime())
-				return true;
+			if(match('|')){
+				int epsilon = entry_ind-1;
+				int state1 = entry_ind;
+				if(rexp1()){
+					int state2 = entry_ind;
+					if(peekChar()=='|'){
+						rexpprime();
+						union(epsilon,state1,state2);
+						return true;
+					}
+				}
+			}
 			else
 				return false;
 		}
-		return true;
+		return false;
 	}
 	
 	private boolean rexp1(){
 		if(DEBUG)System.out.println("rexp1()");
-		if(rexp2()&&rexp1prime())
-			return true;
+		if(rexp2())
+			concat(entry_ind-3,entry_ind-2);
+			if(rexp1prime()){
+				return true;
+			}
 		return false;
 	}
 	
@@ -99,8 +104,12 @@ public class NFAGenerator {
 		if(index>=regex.length()){
 			return true;
 		}
-		if(rexp2()&&rexp1prime())
-			return true;
+		if(rexp2()){
+			concat(entry_ind-3,entry_ind-2);
+			if(rexp1prime()){
+				return true;
+			}
+		}
 		return true;
 	}
 	
@@ -113,17 +122,11 @@ public class NFAGenerator {
 		}
 		if(isRE_CHAR(peekChar())){
 			char temp = peekChar();
-			if(match(peekChar())&&rexp2_tail()){
+			if(match(peekChar())){
 				populate(String.valueOf(temp));
-/*				if(entry_ind>2){
-					System.out.println("JOINING");
-					ArrayList<TableRow> curr = nfa.getTableRowArray(entry_ind-2);
-					ArrayList<TableRow> prev = nfa.getTableRowArray(entry_ind-3);
-					Map<String,ArrayList<TableRow>> nextStates = prev.get(0).getSuccessorStates();
-					nextStates.put("@", curr);
-					prev.get(0).setSuccessorStates(nextStates);
-				}*/
-				return true;
+				if(rexp2_tail()){
+					return true;
+				}
 			}
 		}
 		if(rexp3())
@@ -137,9 +140,13 @@ public class NFAGenerator {
 			return true;
 		}
 		if(peekChar()=='*'){
+			System.out.println("Index at Star: "+entry_ind);
+			match('*');
+			concat(entry_ind-1,entry_ind-2);
 			return true;
 		}
 		if(peekChar()=='+'){
+			match('+');
 			return true;
 		}
 		else{
@@ -163,14 +170,6 @@ public class NFAGenerator {
 		if(peekChar()=='.'){
 			match('.');
 			populate(".");
-/*			if(entry_ind>2){
-				System.out.println("JOINING");
-				ArrayList<TableRow> curr = nfa.getTableRowArray(entry_ind-2);
-				ArrayList<TableRow> prev = nfa.getTableRowArray(entry_ind-3);
-				Map<String,ArrayList<TableRow>> nextStates = prev.get(0).getSuccessorStates();
-				nextStates.put("@", curr);
-				prev.get(0).setSuccessorStates(nextStates);
-			}*/
 			return true;
 		}
 		if(peekChar()=='['){
@@ -180,13 +179,6 @@ public class NFAGenerator {
 		String temp = defined_class();
 		if(temp!=null){
 			populate(temp);
-/*			if(entry_ind>2){
-				ArrayList<TableRow> curr = nfa.getTableRowArray(entry_ind-2);
-				ArrayList<TableRow> prev = nfa.getTableRowArray(entry_ind-3);
-				Map<String,ArrayList<TableRow>> nextStates = prev.get(0).getSuccessorStates();
-				nextStates.put("@", curr);
-				prev.get(0).setSuccessorStates(nextStates);
-			}*/
 			return true;
 		}
 		return false;
@@ -277,7 +269,7 @@ public class NFAGenerator {
 	private char peekChar(){
 		if(index>=regex.length())
 			return '\0';
-		System.out.println(regex.charAt(index));
+		if(DEBUG)System.out.println(regex.charAt(index));
 		return regex.charAt(index);
 	}
 	
@@ -340,7 +332,7 @@ public class NFAGenerator {
 	
 	private void populate(String c){
 		Map<String,ArrayList<TableRow>> trans = new HashMap<String,ArrayList<TableRow>>();
-		TableRow nextRow = new TableRow(new HashMap<String,ArrayList<TableRow>>(), Integer.toString(entry_ind+1), "Invliad Type");
+		TableRow nextRow = new TableRow(new HashMap<String,ArrayList<TableRow>>(), Integer.toString(entry_ind+1), "Invalid Type");
 		nfa.add(null, entry_ind);
 		nfa.add(nextRow, entry_ind+1);
 		trans.put(c, nfa.getTableRowArray(entry_ind+1));
@@ -348,15 +340,27 @@ public class NFAGenerator {
 		entry_ind+=2;
 	}
 	
-	private void handleUnion(){
-		
+	private void concat(int x, int y){
+//		if(entry_ind>2){
+			if(DEBUG)System.out.println("Concated: "+x+" & "+y);
+			ArrayList<TableRow> curr = nfa.getTableRowArray(x);
+			ArrayList<TableRow> next = nfa.getTableRowArray(y);
+			Map<String,ArrayList<TableRow>> nextStates = curr.get(0).getSuccessorStates();
+			if(nextStates.get("@")!=null){
+				nextStates.get("@").add(next.get(0));
+			}
+			else{
+				nextStates.put("@", next);
+			}
+			curr.get(0).setSuccessorStates(nextStates);
+//		}
 	}
 	
-	private void handleStar(){
-		
-	}
-	
-	private void handlePlus(){
-		
+	private void union(int epsilon, int state1, int state2){
+		if(DEBUG)System.out.println("United: "+state1+" & "+ state2);
+		ArrayList<TableRow> first_next = nfa.getTableRowArray(state1);
+		ArrayList<TableRow> second_next = nfa.getTableRowArray(state2);
+		nfa.getTableRowArray(epsilon).get(0).getSuccessorStates().put("@",first_next);
+		nfa.getTableRowArray(epsilon).get(0).getSuccessorStates().get("@").add(second_next.get(0));
 	}
 }
