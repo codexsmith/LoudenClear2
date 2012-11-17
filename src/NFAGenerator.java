@@ -16,6 +16,7 @@ public class NFAGenerator {
 	private String regex;
 	private String token;
 	private int entry_ind;
+	private boolean toggleStar;
 	
 	public NFAGenerator(String s){
 		//lex = l;
@@ -24,6 +25,7 @@ public class NFAGenerator {
 		nfa = new StateTable();
 		regex = s; // new String();
 		token = new String();
+		toggleStar = false;
 	}
 	
 	public StateTable genNFA(){
@@ -53,6 +55,8 @@ public class NFAGenerator {
 		int epsilon = entry_ind-1;
 		int state1 = entry_ind;
 		if(rexp1()){
+			nfa.getTableRowArray(entry_ind-1).get(0).setAccept(true);
+			nfa.getTableRowArray(entry_ind-1).get(0).setType(token);
 			int state2=entry_ind;
 			//if(rexpprime()){
 			if(peekChar()=='|'){
@@ -75,6 +79,8 @@ public class NFAGenerator {
 				int epsilon = entry_ind-1;
 				int state1 = entry_ind;
 				if(rexp1()){
+					nfa.getTableRowArray(entry_ind-1).get(0).setAccept(true);
+					nfa.getTableRowArray(entry_ind-1).get(0).setType(token);
 					int state2 = entry_ind;
 					if(peekChar()=='|'){
 						rexpprime();
@@ -92,7 +98,14 @@ public class NFAGenerator {
 	private boolean rexp1(){
 		if(DEBUG)System.out.println("rexp1()");
 		if(rexp2())
-			concat(entry_ind-3,entry_ind-2);
+			if(toggleStar){
+				toggleStar=false;
+				System.out.println("STAR POWER");
+				concat(entry_ind-4,entry_ind-3);
+			}
+			else{
+				concat(entry_ind-3,entry_ind-2);
+			}
 			if(rexp1prime()){
 				return true;
 			}
@@ -105,7 +118,14 @@ public class NFAGenerator {
 			return true;
 		}
 		if(rexp2()){
-			concat(entry_ind-3,entry_ind-2);
+			if(toggleStar){
+				toggleStar=false;
+				System.out.println("STAR POWER");
+				concat(entry_ind-4,entry_ind-3);
+			}
+			else{
+				concat(entry_ind-3,entry_ind-2);
+			}
 			if(rexp1prime()){
 				return true;
 			}
@@ -140,13 +160,20 @@ public class NFAGenerator {
 			return true;
 		}
 		if(peekChar()=='*'){
-			System.out.println("Index at Star: "+entry_ind);
+			//System.out.println("Index at Star: "+entry_ind);
 			match('*');
-			concat(entry_ind-1,entry_ind-2);
+			TableRow nextRow = new TableRow(new HashMap<String,ArrayList<TableRow>>(), Integer.toString(entry_ind), "Invalid Type");
+			nfa.add(nextRow, entry_ind);
+			entry_ind++;
+			concat(entry_ind-3,entry_ind-1);
+			concat(entry_ind-2,entry_ind-3);
+			concat(entry_ind-2,entry_ind-1);
+			toggleStar=true;
 			return true;
 		}
 		if(peekChar()=='+'){
 			match('+');
+			concat(entry_ind-1,entry_ind-2);
 			return true;
 		}
 		else{

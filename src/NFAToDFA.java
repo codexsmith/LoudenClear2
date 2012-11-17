@@ -44,13 +44,15 @@ public class NFAToDFA {
 			boolean accepted = false;
 			for(TableRow state : currState) //loops over state whether state is just state 1 or state is state 1,2,3
 			{
+				System.out.println("looking at : " + state.getName() + " : " + state.accept());
 				int stateIndex = inputStateTable.getIndexOf(state);
 				nextStates = findNextState(successorStates, nextStates, stateIndex);
-				if(!state.getType().equals("Invalid Type"))
+				if(state.accept())
 				{
 					accepted = true;
 					type = state.getType();
-				}	
+				}
+				
 			}
 			
 			//Add all the new states to nextToParse if not already parsed.

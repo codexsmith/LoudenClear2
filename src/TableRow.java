@@ -25,7 +25,7 @@ public class TableRow implements Comparable {
 	}
 	
 	public String toString(){
-		return "State: "+getName()+" :: Accept: "+accept;
+		return "State: "+getName()+" :: Accept: "+accept+ " :: Type: "+type;
 	}
 	
 	/**
