@@ -4,11 +4,11 @@ $CHAR [a-zA-Z]
 $UPPER [^a-z] IN $CHAR
 $LOWER [^A-Z] IN $CHAR
 
-$AB a(a|b)b(a|b)baba(a|b)
+%%$AB a(a|b)b(a|b)baba(a|b)
 %%$TEST $LOWER($LOWER|$DIGIT)
 %%$IDENTIFIER $LOWER ($LOWER|$DIGIT)*
 %%$INT ($DIGIT)+
-%%$FLOAT ($DIGIT)+ \. ($DIGIT)+
+$FLOAT ($DIGIT)+ \. ($DIGIT)+
 %%$ASSIGN =
 %%$PLUS \+
 %%$MINUS -

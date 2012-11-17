@@ -153,6 +153,7 @@ public class NFAGenerator {
 			}
 			else if(togglePlus){
 				togglePlus=false;
+				concat(entry_ind-3,entry_ind-2);
 			}
 			else{
 				concat(entry_ind-3,entry_ind-2);
@@ -178,6 +179,7 @@ public class NFAGenerator {
 				}
 				else if(togglePlus){
 					concat(entry_ind-1,state1);
+					concat(state1,state1+1);
 					return true;
 				}
 				else{
