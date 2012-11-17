@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -39,14 +40,14 @@ public class NFAToDFA {
 		
 		while(currState != null) //while still states to parse
 		{
+			
 			Map<String, ArrayList<TableRow>> nextStates = new HashMap<String, ArrayList<TableRow>>();
 			String type = "";
 			boolean accepted = false;
 			for(TableRow state : currState) //loops over state whether state is just state 1 or state is state 1,2,3
 			{
-				System.out.println("looking at : " + state.getName() + " : " + state.accept());
 				int stateIndex = inputStateTable.getIndexOf(state);
-				nextStates = findNextState(successorStates, nextStates, stateIndex);
+				nextStates = findNextState(successorStates, nextStates, stateIndex, new ArrayList<TableRow>());
 				if(state.accept())
 				{
 					accepted = true;
@@ -68,7 +69,10 @@ public class NFAToDFA {
 				}
 			}
 			
+			print_already_processed(alreadyProcessed);
 			
+			System.out.println("");
+			System.out.println("looking at: " + computeName(currState));
 			outputStateTable.addState(nextStates, computeName(currState), type, outputIndex, accepted); //add to output table
 			outputIndex++;
 			currState = nextToParse.poll(); //get next state to parse
@@ -80,11 +84,23 @@ public class NFAToDFA {
 	private static String computeName(ArrayList<TableRow> rows)
 	{
 		String name = "";
+		Collections.sort(rows);
 		for(TableRow row : rows)
 		{
 			name += row.getName() + ",";
 		}
 		return name;
+	}
+	
+	private static void print_already_processed(ArrayList<String> alreadyProcessed)
+	{
+		System.out.println("");
+		System.out.println("");
+		System.out.println("************************");
+		System.out.println("**Printing already processed **");
+		System.out.println("************************");
+		for(String ap : alreadyProcessed)
+			System.out.println(ap);
 	}
 	
 	/**
@@ -93,11 +109,22 @@ public class NFAToDFA {
 	 * @param successorStates successor states 
 	 * @param nextStates next states
 	 * @param state current state
+	 * @param prevIndex index of the previous state
 	 * @return nextStates next states
 	 */
 	private static Map<String, ArrayList<TableRow>> findNextState(ArrayList<Set<Entry<String, ArrayList<TableRow>>>> successorStates, 
-																Map<String, ArrayList<TableRow>> nextStates, int state)
+																Map<String, ArrayList<TableRow>> nextStates, int state, ArrayList<TableRow> prevStates)
 	{
+		
+//		if(successorStates.get(state).isEmpty())
+//		{
+//			nextStates.put(key, value)
+//			ArrayList<TableRow> vals = new ArrayList<TableRow>();
+//			vals.add(prevState);
+//			if(prevState != null)
+//				
+//		}
+		
 		for(Entry<String, ArrayList<TableRow>> st : successorStates.get(state))
 		{
 			if(nextStates.containsKey(st.getKey()))
@@ -112,6 +139,14 @@ public class NFAToDFA {
 						vals.add(tr);
 					}
 				}
+				
+				if(prevStates != null)
+					for(TableRow prev : prevStates)
+					{
+						if(!vals.contains(prev))
+							vals.add(prev);
+					}
+
 				nextStates.put(st.getKey(), vals);
 			}
 			else
@@ -121,16 +156,17 @@ public class NFAToDFA {
 					for(TableRow row : st.getValue())
 					{
 						int stateIndex = inputStateTable.getIndexOf(row);
-						nextStates = findNextState(successorStates, nextStates, stateIndex);
+						prevStates.add(row);
+						nextStates = findNextState(successorStates, nextStates, stateIndex, prevStates);
 					}
-					//TODO: maybe a problem with not adding the @ state itself
-					
 				}
 				else
 				{
 					//add key index and value to next states.
 					ArrayList<TableRow> vals = new ArrayList<TableRow>();
 					vals.addAll(st.getValue());
+					if(prevStates != null)
+						vals.addAll(prevStates);
 					nextStates.put(st.getKey(), vals);
 				}
 			}
