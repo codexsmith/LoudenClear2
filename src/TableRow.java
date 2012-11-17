@@ -3,33 +3,33 @@ import java.util.Map;
 
 
 public class TableRow implements Comparable {
-	//Map of strings to tableRows, transitions
+//Map of strings to tableRows, transitions
 	private Map<String,ArrayList<TableRow>> successorStates;
 	private boolean accept;
 	private String name;
 	private String type;
-	
+
 	public TableRow(Map<String,ArrayList<TableRow>> nextStates, String n, String t){
 		setSuccessorStates(nextStates);
 		setName(n);
 		type = t;
 		accept = false;
 	}
-	
+
 	public ArrayList<TableRow> getNextState(String c){
 		return getSuccessorStates().get(c);
 	}
-	
+
 	public boolean accept(){
 		return accept;
 	}
-	
+
 	public String toString(){
 		return "State: "+getName()+" :: Accept: "+accept+ " :: Type: "+type;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param val
 	 */
 	public void setAccept(boolean val){
@@ -43,11 +43,11 @@ public class TableRow implements Comparable {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	public String getType() {
 		return type;
 	}
-	
+
 	public void setType(String type) {
 		this.type = type;
 	}

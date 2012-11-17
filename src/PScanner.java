@@ -30,19 +30,35 @@ public class PScanner {
 		}
 	}
 	
+	public void sanitize(String str){
+		char[] arr = str.toCharArray();
+		int type;
+		String a, b;
+		for (int i = 0; i < arr.length; ++i){
+			type = Character.getType(arr[i]);
+			if (type != Character.LINE_SEPARATOR || type == Character.SPACE_SEPARATOR || type == Character.CONTROL || type == Character.PARAGRAPH_SEPARATOR){
+				a = arr.toString(); //remove back character
+				b = a.substring(0, i).concat(a.substring(i+1));
+				arr = b.toCharArray();
+			}
+		}
+	}
+	
 	/**MAIN RESPONSIBILITY 
 	 * gets the next character from input file
 	 * this is called by the tablewalker to get the next input to the DFA
 	 * @return String token
 	 */
-	public String scanToken(){
+	public String getToken(){
 		String tok;
 		if(buff.isEmpty()){
 			buff = iScan.nextLine();
 		}
-		tok = buff.substring(0,1);//sets first element
+		sanitize(buff);
+		
+		tok = buff.substring(0,1);//gets first element
 		buff = buff.substring(1); //removes the first element
-
+		
 		if(DEBUG){System.out.printf("Token %s", tok);}
 
 		return tok;
