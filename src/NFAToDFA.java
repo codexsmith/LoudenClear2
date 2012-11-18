@@ -59,6 +59,8 @@ public class NFAToDFA {
 			{
 				accepted = true;
 				type = acceptBaseType;
+				acceptBase = false;
+				acceptBaseType = "";
 				
 			}
 			//Add all the new states to nextToParse if not already parsed.
@@ -110,13 +112,13 @@ public class NFAToDFA {
 	
 	private static void print_already_processed(ArrayList<String> alreadyProcessed)
 	{
-		System.out.println("");
-		System.out.println("");
-		System.out.println("************************");
-		System.out.println("**Printing already processed **");
-		System.out.println("************************");
-		for(String ap : alreadyProcessed)
-			System.out.println(ap);
+//		System.out.println("");
+//		System.out.println("");
+//		System.out.println("************************");
+//		System.out.println("**Printing already processed **");
+//		System.out.println("************************");
+//		for(String ap : alreadyProcessed)
+//			System.out.println(ap);
 	}
 	
 	
