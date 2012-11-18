@@ -7,9 +7,6 @@ import java.util.Scanner;
 import java.util.StringTokenizer;
 
 /**
- * 
- * @author nick
- * 
  */
 
 public class PScanner {
@@ -17,12 +14,11 @@ public class PScanner {
 	public static final boolean DEBUG = true;
 	
 	private File in;
-	private Scanner iScan;
 	private String buff;
-	
+	private Scanner iScan; 
 	
 	public PScanner(String path){
-		in = new File(path);
+		this.in = new File(path);
 		try {
 			iScan = new Scanner(in);
 		} catch (FileNotFoundException e) {
@@ -128,7 +124,10 @@ public class PScanner {
 	}
 	
 	public boolean endOfFile(){
-		return !iScan.hasNext();
+		if (iScan.nextLine() != null){
+			return true;
+		}
+		return false;
 	}
 	
 	
