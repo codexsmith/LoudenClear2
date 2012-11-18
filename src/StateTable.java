@@ -1,27 +1,34 @@
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 public class StateTable {
-	private final boolean DEBUG = false;
 	private ArrayList<TableRow> stateTable;
 	private ArrayList<TableRow> currState;
 	private ArrayList<TableRow> NFAState; 
-	private boolean accepted,wasAccepted;
+	private boolean accepted = false;
 	private TableRow acceptedState;
 	private String tokenGenerated;
+	private boolean returned = false;
+	private Lexical lex;
+	Iterator <CharacterC> classChar;
+	
 	
 	private enum TableType {NFA,DFA};
 	private TableRow removedRow; //storage for addState's remove state
 	
-	public StateTable(){
+	public StateTable(Lexical l){
 		stateTable = new ArrayList<TableRow>(0);
-		currState = null;
+		currState = new ArrayList<TableRow>(0);
 		NFAState = new ArrayList<TableRow>(0); 
 		accepted = false;
 		acceptedState = null;
 		tokenGenerated = "";
+		lex = l;
+		classChar = lex.getCharacters().values().iterator();
 	}
 	
 	/**
@@ -111,7 +118,7 @@ public class StateTable {
 		for (TableRow row : stateTable){
 			if (row.getSuccessorStates() != null){
 				rowvalues = row.getSuccessorStates().entrySet();
-				if(DEBUG)System.out.println(rowvalues);
+				if(Driver.DEBUG)System.out.println(rowvalues);
 				values.add(rowvalues);
 			}
 		}
@@ -131,77 +138,51 @@ public class StateTable {
 		return values;
 	}
 	
-	/**performs the NFA state walking, checking for epsilon transitions and accepting states
-	 * 
-	 * @param string to lookup
-	 */
-	public String NFAlookUp(String c){//redo
-		ArrayList<TableRow> next = new ArrayList<TableRow>(0);
-		ArrayList<TableRow> nextState = null;
-		tokenGenerated.concat(c);
-		
-		for (TableRow state : NFAState){//
-			nextState = stateTable.get(stateTable.indexOf(state)).getNextState(c);
-			if (nextState != null){
-				next.addAll(nextState);
-			}
-		}
-		for (TableRow state : next){//follows epsilon transitions
-			nextState = stateTable.get(stateTable.indexOf(state)).getNextState("@");
-			if(nextState != null){
-				next.addAll(nextState);
-			}
-		}
-		
-		for(TableRow state : next){//checks for accepting state
-			if(stateTable.get(stateTable.indexOf(state)).accept()){
-				accepted = true;
-				acceptedState = state;
-			}
-		}
-		if (!next.isEmpty()){
-			NFAState = next;
-		}
-		else{
-			return returnAccepted(accepted);
-		}
-		return Driver.errCode + " C" + tokenGenerated;
-		
-	}
-	
 	//this will tell us if the symbol has a valid translation from the currentState to another state in the table
-	public String DFAlookUp(String c){
-		ArrayList<TableRow> nextState; //curr state table
-
-		tokenGenerated.concat(c);
-		nextState = stateTable.get(stateTable.indexOf(currState)).getNextState(c);
+	public ArrayList<String> DFAlookUp(PScanner input){
+		currState.add(stateTable.get(0));
+		ArrayList<String> tokOut = new ArrayList<String>(0);
+		ArrayList<String> tokClass = new ArrayList<String>(0);
+		String c;
+		ArrayList<TableRow> nextState;
 		
-		if(nextState != null){
-			currState = nextState; //find the accept state
+		CharacterC temp;
+		
+		int count = 0;
+		while(!input.endOfFile()){
+			c = input.getToken();
+			tokOut.add("");
+			tokOut.get(count).concat(c);
 			
-			for (TableRow state : currState){
-				if(state.accept()){
-					accepted = true;
+			if (currState.get(0).accept()){
+				return tokOut;
+			}
+			
+			while(classChar.hasNext()){
+				 temp = classChar.next();
+				if(temp.isLegal(c)){
+					tokClass.add(temp.getTitle());
+					if(Driver.DEBUG){System.out.println("Found Token Class "+ tokClass+" for token "+ c);}
 				}
 			}
-		}
-		else{
-			return returnAccepted(accepted);//error!
+			
+			for (String toc : tokClass){//each possible identifier that matches a token
+				nextState = currState.get(0).getNextState(toc);
+				
+				
+					
+			}
+			
+			
+			
+			count++;
 		}
 		
-		return Driver.errCode + "B " + tokenGenerated;
+		return tokOut;
+	
+		
 	}
-	
-	
-	public String returnAccepted(boolean state){
-		if (state){
-			return tokenGenerated;
-		}
-		else{
-			return Driver.errCode + "A " + tokenGenerated;
-		}
-	}
-	
+
 	public void printTable(){
 		for(TableRow t:stateTable){
 			System.out.println(t);

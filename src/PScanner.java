@@ -14,11 +14,11 @@ import java.util.StringTokenizer;
 
 public class PScanner {
 	
-	public static final boolean DEBUG = true;
+	public static final boolean DEBUG = false;
 	
 	private File in;
 	private Scanner iScan;
-	private String buff;
+	private String buff = "";
 	
 	
 	public PScanner(String path){
@@ -38,7 +38,7 @@ public class PScanner {
 			type = Character.getType(arr[i]);
 			if (type != Character.LINE_SEPARATOR || type == Character.SPACE_SEPARATOR || type == Character.CONTROL || type == Character.PARAGRAPH_SEPARATOR){
 				a = arr.toString(); //remove back character
-				b = a.substring(0, i).concat(a.substring(i+1));
+				b = a.substring(0, i).concat(a.substring(i));
 				arr = b.toCharArray();
 			}
 		}
@@ -51,13 +51,18 @@ public class PScanner {
 	 */
 	public String getToken(){
 		String tok;
-		if(buff.isEmpty()){
-			buff = this.getLine();
+		if (buff.isEmpty()){
+			buff = iScan.nextLine();
 		}
 		sanitize(buff);
 		
+//		System.out.println(buff);
+		
 		tok = buff.substring(0,1);//gets first element
 		buff = buff.substring(1); //removes the first element
+		
+//		System.out.println(tok);
+//		System.out.println(buff);
 		
 		if(DEBUG){System.out.printf("Token %s", tok);}
 
@@ -128,7 +133,7 @@ public class PScanner {
 	}
 	
 	public boolean endOfFile(){
-		if(iScan.nextLine() != null){
+		if(buff.length() == 0 && iScan.hasNextLine()){
 			return true;
 		}
 		return false;

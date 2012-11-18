@@ -29,7 +29,7 @@ public class NFAGenerator {
 		lex = l;
 		index = 0;
 		entry_ind = 0;
-		nfa = new StateTable();
+		nfa = new StateTable(l);
 		regex = new String();
 		token = new String();
 		toggleStar = false;

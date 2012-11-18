@@ -1,3 +1,6 @@
+spec=sample_spec.txt
+file=sample_input.txt
+
 all: compile
 	
 compile:
