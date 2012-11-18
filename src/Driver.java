@@ -17,11 +17,11 @@ public class Driver {
 	 */
 	public static void main(String[] args) {
 		
-		PScanner readInput = new PScanner("test_input.txt");
-		String nextToken;
-		ArrayList<String> tokenList = new ArrayList<String>();
-		
 		Lexical lexSpec = PScanner.scanLexicon("sample_spec2.txt");
+//		PScanner readInput = new PScanner("test_input.txt");
+//		String nextToken;
+//		ArrayList<String> tokenList = new ArrayList<String>();
+		
 		NFAGenerator gen = new NFAGenerator(lexSpec);
 //		String regex = "\\**";
 //		NFAGenerator gen = new NFAGenerator(regex);
