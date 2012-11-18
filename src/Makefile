@@ -3,6 +3,6 @@ all: compile
 compile:
 	javac *.java
 run: compile
-	java Driver $spec $input
+	java Driver $(spec) $(file)
 clean:
 	rm -f *.class
