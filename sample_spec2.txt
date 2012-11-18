@@ -7,14 +7,15 @@ $LOWER [^A-Z] IN $CHAR
 %%$ABPLUS (a|b)+
 %%$ABSTAR (a|b)*
 %%$OR (LOWER)*
-$ABPLUS (a|b|c)+(d|e|f)+
+%%$ABPLUS (a|b|c)+(d|e|f)+
+$TEST \@*
 %%$AB a(a|b)b(a|b)baba(a|b)
 %%$ASTAR (a*)b*(c)*
-$IDENTIFIER $LOWER ($LOWER|$DIGIT)*
-$INT ($DIGIT)+
-$FLOAT ($DIGIT)+ \. ($DIGIT)+
-$ASSIGN =
-$PLUS \+
-$MINUS -
-$MULTIPLY \*
-$PRINT PRINT
+%%$IDENTIFIER $LOWER ($LOWER|$DIGIT)*
+%%$INT ($DIGIT)+
+%%$FLOAT ($DIGIT)+ \. ($DIGIT)+
+%%$ASSIGN =
+%%$PLUS \+
+%%$MINUS -
+%%$MULTIPLY \*
+%%$PRINT PRINT

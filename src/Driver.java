@@ -25,6 +25,11 @@ public class Driver {
 		PScanner readInput = new PScanner(input_file);
 		String nextToken;
 		ArrayList<String> tokenList = new ArrayList<String>();
+
+		//Lexical lexSpec = PScanner.scanLexicon("sample_spec2.txt");
+//		PScanner readInput = new PScanner("test_input.txt");
+//		String nextToken;
+//		ArrayList<String> tokenList = new ArrayList<String>();
 		
 		NFAGenerator gen = new NFAGenerator(lexSpec);
 //		String regex = "\\**";
