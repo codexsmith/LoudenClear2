@@ -7,28 +7,114 @@ import java.util.Set;
 
 public class StateTable {
 	private ArrayList<TableRow> stateTable;
-	private ArrayList<TableRow> currState;
-	private ArrayList<TableRow> NFAState; 
-	private boolean accepted = false;
-	private TableRow acceptedState;
-	private String tokenGenerated;
-	private boolean returned = false;
-	private Lexical lex;
+	
+	ArrayList<TableRow> currState;
+	ArrayList<CharacterC> classCharList = new ArrayList<CharacterC>();
 	Iterator <CharacterC> classChar;
 	
 	
-	private enum TableType {NFA,DFA};
 	private TableRow removedRow; //storage for addState's remove state
 	
+//	if(Driver.DEBUG){System.out.println("");};
+	
+	public ArrayList<String> DFALookup(PScanner input){
+		currState = new ArrayList<TableRow>();
+		ArrayList<TableRow> nextState;
+		ArrayList<TableRow> temp;
+		ArrayList<String> tokClass;
+		
+		currState.add(stateTable.get(0));
+		
+		ArrayList<String> tokenOut = new ArrayList<String>(0);
+		
+		tokenOut.add(new String());
+		int tokCount = 0;
+		int acceptTokPtr = 0;
+		boolean accept = false, error = false;
+		
+		while(!input.endOfFile()){
+			nextState = new ArrayList<TableRow>();
+			String str = input.getToken();
+			if(Driver.DEBUG){System.out.println("Not end of file. Got '"+str+"'");};
+			if(Driver.DEBUG){System.out.println("Char Type "+Character.getType(str.toCharArray()[0]));};
+
+			tokenOut.set(tokCount, tokenOut.get(tokCount).concat(str));
+			
+			if(Driver.DEBUG){
+				System.out.println("tokenCount "+tokCount);
+				for(String s : tokenOut){
+					System.out.println("token "+s);
+				}
+			}
+
+			
+			for(TableRow aState : currState){
+				if (aState.accept()){
+					accept = true;
+					acceptTokPtr = tokenOut.get(tokCount).length()-1; //we've put the next str on there, so this points to the string we need to return to the input buffer
+				}													  // minus one b/c length does not count from zero, like arrays do
+			}
+			tokClass = new ArrayList<String>();
+			//find the token classes that c fits into
+			for(CharacterC potClass : classCharList){
+				if(potClass.isLegal(str)){
+					tokClass.add(potClass.getTitle());//fill tokClass
+					if(Driver.DEBUG){System.out.println("Found Token Class "+ tokClass+" for token "+ str);}
+				}
+			}
+			
+			for(int stateI = 0; stateI < currState.size(); stateI++){
+				for (String tokC : tokClass){
+					 temp = currState.get(stateI).getNextState(tokC);
+					if (temp != null){
+						if(Driver.DEBUG){System.out.println("nextStates " + temp);};
+						nextState.addAll(temp);
+					}
+				}
+			}
+			
+			if(nextState.isEmpty()){
+				if(Driver.DEBUG){System.out.println("nextState is null");};
+				error = true;
+			}
+			else{
+				if(Driver.DEBUG){System.out.println("setting currState to nextState");};
+				currState = nextState;
+			}
+			
+			if(error && !accept){
+				error = false;
+				if(Driver.DEBUG){System.out.println("Error Return");};
+				tokenOut.set(tokCount, tokenOut.get(tokCount).concat(" Token Error"));
+				return tokenOut;
+			}
+			
+			if(error && accept){
+				error = false;
+				accept = false;
+				if(Driver.DEBUG){System.out.println("Accepted Token" + tokenOut.get(tokCount));};
+				String tempStr = tokenOut.get(tokCount).substring(acceptTokPtr);
+				tokenOut.set(tokCount,tokenOut.get(tokCount).substring(0,acceptTokPtr));
+				
+				input.pushToken(tempStr);
+				tokCount++;
+				tokenOut.add(new String());
+			}
+			
+		}
+		return tokenOut;
+	}
+
+	
+	
+
 	public StateTable(Lexical l){
 		stateTable = new ArrayList<TableRow>(0);
-		currState = new ArrayList<TableRow>(0);
-		NFAState = new ArrayList<TableRow>(0); 
-		accepted = false;
-		acceptedState = null;
-		tokenGenerated = "";
-		lex = l;
-		classChar = lex.getCharacters().values().iterator();
+		classChar = l.getCharacters().values().iterator();
+		
+		while(classChar.hasNext()){
+			classCharList.add(classChar.next());
+		}
 	}
 	
 	/**
@@ -138,50 +224,6 @@ public class StateTable {
 		return values;
 	}
 	
-	//this will tell us if the symbol has a valid translation from the currentState to another state in the table
-	public ArrayList<String> DFAlookUp(PScanner input){
-		currState.add(stateTable.get(0));
-		ArrayList<String> tokOut = new ArrayList<String>(0);
-		ArrayList<String> tokClass = new ArrayList<String>(0);
-		String c;
-		ArrayList<TableRow> nextState;
-		
-		CharacterC temp;
-		
-		int count = 0;
-		while(!input.endOfFile()){
-			c = input.getToken();
-			tokOut.add("");
-			tokOut.get(count).concat(c);
-			
-			if (currState.get(0).accept()){
-				return tokOut;
-			}
-			
-			while(classChar.hasNext()){
-				 temp = classChar.next();
-				if(temp.isLegal(c)){
-					tokClass.add(temp.getTitle());
-					if(Driver.DEBUG){System.out.println("Found Token Class "+ tokClass+" for token "+ c);}
-				}
-			}
-			
-			for (String toc : tokClass){//each possible identifier that matches a token
-				nextState = currState.get(0).getNextState(toc);
-				
-				
-					
-			}
-			
-			
-			
-			count++;
-		}
-		
-		return tokOut;
-	
-		
-	}
 
 	public void printTable(){
 		for(TableRow t:stateTable){

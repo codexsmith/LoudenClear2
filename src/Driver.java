@@ -55,9 +55,9 @@ public class Driver {
 		System.out.println("**    Printing DFA    **");
 		System.out.println("************************");
 		dfa.printTable();
-		System.out.println(readInput);
+		
 		//Consult the StateTable with the input of the user file
-		tokenList = dfa.DFAlookUp(readInput);
+		tokenList = dfa.DFALookup(readInput);
 		
 		System.out.println("Accepted Tokens (Complete)");
 		for(String s : tokenList){

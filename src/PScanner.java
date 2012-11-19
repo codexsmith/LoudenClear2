@@ -18,10 +18,14 @@ public class PScanner {
 	
 	private File in;
 	private Scanner iScan;
-	private String buff = "";
+
+	private String buff;
+	
 	
 	
 	public PScanner(String path){
+		this.buff = "";
+		
 		in = new File(path);
 		try {
 			iScan = new Scanner(in);
@@ -30,18 +34,23 @@ public class PScanner {
 		}
 	}
 	
-	public void sanitize(String str){
-		char[] arr = str.toCharArray();
+//	if(Driver.DEBUG){System.out.println("");;};
+	
+	public void sanitize(){
+		String str = new String(this.buff);
 		int type;
-		String a, b;
-		for (int i = 0; i < arr.length; ++i){
-			type = Character.getType(arr[i]);
-			if (type != Character.LINE_SEPARATOR || type == Character.SPACE_SEPARATOR || type == Character.CONTROL || type == Character.PARAGRAPH_SEPARATOR){
-				a = arr.toString(); //remove back character
-				b = a.substring(0, i).concat(a.substring(i));
-				arr = b.toCharArray();
+		String out = new String();
+		for (int i = 0; i < str.length(); i++){
+			type = Character.getType(str.charAt(i));
+			if (type == Character.DIRECTIONALITY_WHITESPACE || type == Character.LINE_SEPARATOR || type == Character.SPACE_SEPARATOR || type == Character.CONTROL || type == Character.PARAGRAPH_SEPARATOR){
+				continue;
+			}
+			else{
+				out = out.concat(String.valueOf(str.charAt(i)));
 			}
 		}
+//		if(Driver.DEBUG){System.out.println("San out buff "+ out);};
+		this.buff = out;
 	}
 	
 	/**MAIN RESPONSIBILITY 
@@ -50,19 +59,16 @@ public class PScanner {
 	 * @return String token
 	 */
 	public String getToken(){
-		String tok;
-		if (buff.isEmpty()){
-			buff = iScan.nextLine();
+		String tok = "";
+		if (this.buff.isEmpty()){
+			this.buff = iScan.nextLine();
+			sanitize();
+			if(Driver.DEBUG){System.out.println("post san buff "+ this.buff);};
 		}
-		sanitize(buff);
 		
-//		System.out.println(buff);
 		
-		tok = buff.substring(0,1);//gets first element
-		buff = buff.substring(1); //removes the first element
-		
-//		System.out.println(tok);
-//		System.out.println(buff);
+		tok = this.buff.substring(0,1);//gets first element
+		this.buff = this.buff.substring(1); //removes the first element
 		
 		if(DEBUG){System.out.printf("Token %s", tok);}
 
@@ -70,7 +76,7 @@ public class PScanner {
 	}
 	
 	public void pushToken(String tok){
-		buff = tok.concat(buff);
+		this.buff = tok.concat(this.buff);
 	}
 	
 	/**
@@ -133,7 +139,7 @@ public class PScanner {
 	}
 	
 	public boolean endOfFile(){
-		if(buff.length() == 0 && iScan.hasNextLine()){
+		if(this.buff.length() == 0 && !iScan.hasNextLine()){
 			return true;
 		}
 		return false;
