@@ -36,9 +36,8 @@ public class Lexical {
 	 * Returns CharacterCs
 	 * @return characters CharacterCs to return
 	 */
-	public Map<String, CharacterC> getCharacters()
+	public HashMap<String, CharacterC> getCharacters()
 	{
-//		if(Driver.DEBUG)System.out.println("Lexical Chars "+characters);
 		return characters;
 	}
 }

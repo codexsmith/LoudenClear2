@@ -1,23 +1,16 @@
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashMap;
 import java.util.StringTokenizer;
 /** 
  *	Contains the representations of the Regex Characters from the lexical spec
  *  Example: $DIGIT [0-9]
  *	
  */
-public class CharacterC extends iIdentifier{
+public class CharacterC{
 
 	private ArrayList<String> legal;
 	private String title;
 	
-	/**
-	 * Constructor
-	 * 
-	 * @param line String to parse
-	 * @param map map to reference for other CharacterC's
-	 */
 	public CharacterC(String line, HashMap<String, CharacterC> map){
 		String title = "", symbols;
 		legal = new ArrayList<String>();
@@ -26,8 +19,8 @@ public class CharacterC extends iIdentifier{
 		
 		//Split into tokens for easy references
 		StringTokenizer tokenizer = new StringTokenizer(line, " ", false);
-		this.title = tokenizer.nextToken(); // Set title
-		System.out.println("CharacterC TITLE "+this.title);
+		if(!line.startsWith("["))
+			this.title = tokenizer.nextToken(); // Set title
 		String token = "";
 		String regex = "";
 		ArrayList<String> otherCharLegal = null;
@@ -57,18 +50,10 @@ public class CharacterC extends iIdentifier{
 		parseRegex(regex);
 	}
 
-	/* (non-Javadoc)
-	 * @see iIdentifier#getLegal()
-	 */
-	@Override
 	public ArrayList<String> getLegal() {
 		return legal;
 	}
 
-	/* (non-Javadoc)
-	 * @see iIdentifier#isLegal(java.lang.String)
-	 */
-	@Override
 	public boolean isLegal(String c) {
 		for (String s : legal){
 			if (s.compareTo(c) == 0){
@@ -78,10 +63,6 @@ public class CharacterC extends iIdentifier{
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see iIdentifier#getTitle()
-	 */
-	@Override
 	public String getTitle() {
 		return title;
 	}
@@ -94,7 +75,13 @@ public class CharacterC extends iIdentifier{
 	private void parseRegex(String regex) //a-z, ^0, A-Z
 	{
 		int strLen = regex.length();
-		if(regex.startsWith("^")) //is a not
+		if(regex.equals(".")){
+			for(int j = 32; j <= 126; j++) //ignore - char
+			{
+				legal.add(String.valueOf((char)j));
+			}
+		}
+		else if(regex.startsWith("^")) //is a not
 		{
 			
 			for(int i = 1; i < strLen; i++)

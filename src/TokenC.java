@@ -1,14 +1,14 @@
 import java.util.ArrayList;
 
 
-public class TokenC extends iIdentifier{
-	private ArrayList<String> legal; //array list of length 1, containing the regex as a string. this must be of compatible type with the regex parser
+public class TokenC {
+	private String legal; //array list of length 1, containing the regex as a string. this must be of compatible type with the regex parser
 	//the regex parser that we build must provide some way to operate on strings as both inputs: (regexp, str)
 	private String title;
 	
 	public TokenC(String line){
 		String symbols;
-		legal = new ArrayList<String>();
+		legal = "";
 		
 		line = line.trim();//removes leading & trailing whitespaces
 		
@@ -19,23 +19,19 @@ public class TokenC extends iIdentifier{
 			
 			symbols = symbols.replace(" ", "");
 			
-			this.legal.add(symbols);
+			this.legal = (symbols);
 		}
 	}
 	
-	@Override
-	public ArrayList<String> getLegal() {
+	public String getLegal() {
 		return legal;
 	}
 
-	@Override
 	public boolean isLegal(String c) {
-		String regexp = legal.get(0); 
-		
+		String regexp = legal; 
 		return false;
 	}
 
-	@Override
 	public String getTitle() {
 		return title;	
 	}

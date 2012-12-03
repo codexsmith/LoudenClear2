@@ -1,418 +1,438 @@
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 
-/**
- * NFAGenerator class is used to take in a Lexical which holds an ArrayList of TokenC.
- * The generator creates an NFA based on these TokenC objects.
- * @author Andrew Kim
- */
 public class NFAGenerator {
 	private final boolean DEBUG = false;
 	private StateTable nfa;
-	private int index;
-	private Lexical lex;
+	private Lexical lexspec;
 	private String regex;
+	private int index;
 	private String token;
-	private int entry_ind;
-	private boolean toggleStar;
-	private boolean togglePlus;
-	private boolean toggleEpsilon;
+	private boolean epsilon;
+	private boolean star;
+	private boolean plus;
+	private String charset_regex;
 	
-	
-	/**
-	 * Constructor for an NFAGenerator
-	 * @param l The lexical specification to base the NFA on.
-	 */
 	public NFAGenerator(Lexical l){
-		lex = l;
+		lexspec = l;
+		nfa = new StateTable();
+		regex = "";
+		token = "";
 		index = 0;
-		entry_ind = 0;
-		nfa = new StateTable(l);
-		regex = new String();
-		token = new String();
-		toggleStar = false;
-		toggleEpsilon = false;
-	}//end NFAGenerator constructor
+		epsilon = false;
+		star = false;
+		plus = false;
+	}
 	
-	/**
-	 * Generates an NFA based on all TokenC objects in the Lexical object.
-	 * @return Complete NFA table of the lexical specification
-	 */
-	public StateTable genNFA(){
-		if(DEBUG)System.out.println("genNFA()");
-		populate("@");//Dummy state to glue many sub-NFA's together
-		int subnfa;
-		for(TokenC t: lex.getTokens()){//read in TokenC information
-			subnfa = entry_ind;
-			regex = t.getLegal().get(0);
-			token = t.getTitle().substring(1);
-			index = 0;
-			if(DEBUG)System.out.println(token);
-			if(DEBUG)System.out.println(regex);
-			regex();//generate NFA
-			concat(1,subnfa);//concatenate the sub-NFA
-		}//end for loop
+	public StateTable generateNFA(){
+		int i = 0;
+		nfa = regex();
+		for(State s: nfa.getTable()){
+			s.setName(Integer.toString(i));
+			i++;
+		}
 		return nfa;
-	}//end genNFA method
+	}
 	
-	/**
-	 * Generates a single NFA based on the current regular expression
-	 * @return True if successful. False otherwise.
-	 */
-	private boolean regex(){
-		if(DEBUG)System.out.println("regex()");
-		boolean result = rexp();
-		nfa.getTableRowArray(entry_ind-1).get(0).setAccept(true);//set the very last entry to accept
-		nfa.getTableRowArray(entry_ind-1).get(0).setType(token);
+	public StateTable regex(){
+		StateTable result = new StateTable();
+		StateTable temp;
+		
+		populate(result,"\\@");
+		for(TokenC t:lexspec.getTokens()){
+			regex = t.getLegal();
+			index = 0;
+			token = t.getTitle().substring(1);
+			temp = rexp();
+			branch(result,temp);
+			result.getTable().getLast().accept(token);
+		}
 		return result;
-	}//end regex method
+	}
 	
-	/**
-	 * Ensures that there is at least 1 rexp1
-	 * @return True if it successfully parsed rexp1. False otherwise.
-	 */
-	private boolean rexp(){
+	public StateTable rexp(){
 		if(DEBUG)System.out.println("rexp()");
-		populate("@");//Dummy state
-		int epsilon = entry_ind-1;//keep track of this state in case there is a union
-		int state1 = entry_ind;
-		if(rexp1()){//find rexp1
-			int state2=entry_ind;
-			if(peekChar()=='|'){//if UNION
-				if(rexpprime()){
-					union(epsilon,state1,state2);
-					return true;
-				}//end if
-			}//end if
-			else
-			{//no UNION
-				concat(epsilon,state1);
-				return true;
-			}//end else
-		}//end if
-		return false;
-	}//end rexp method
-	
-	/**
-	 * Handles UNION cases
-	 * @return True if valid union is made or no union is found. False otherwise.
-	 */
-	private boolean rexpprime(){
-		if(DEBUG)System.out.println("rexpprime()");
-		populate("@");
-		if(index>=regex.length()||peekChar()==')'){//end of regex
-			return true;
-		}//end if
-		if(peekChar()=='|'){//if another UNION
-			if(match('|')){
-				int epsilon = entry_ind-1;
-				int state1 = entry_ind;
-				if(rexp1()){//first subnfa
-					int state2 = entry_ind;
-					if(peekChar()=='|'){//yet another UNION
-						rexpprime();//second subnfa;
-						union(epsilon,state1,state2);
-						return true;
-					}//end if
-				}//end if
-			}//end if
-			else
-				return false;
-		}//end if
-		toggleEpsilon=true;;
-		return true;
-	}//end rexpprime method
-	
-	/**
-	 * Ensures that there is at least 1 valid rexp2
-	 * @return True if valid rexp2 is found. False otherwise.
-	 */
-	private boolean rexp1(){
-		if(DEBUG)System.out.println("rexp1()");
-		if(rexp2()){
-			if(toggleStar){
-				toggleStar=false;
-			}//end if
-			else{
-				concat(entry_ind-3,entry_ind-2);
-			}//end else
-			if(rexp1prime()){
-				return true;
-			}//end if
-		}//end else
-		return false;
-	}//end rexp1 method
-
-	/**
-	 * Allows multiple rexp2 to be concatenated.
-	 * @return True if another valid rexp2 is found or there is nothing. False otherwise.
-	 */
-	private boolean rexp1prime(){
-		if(DEBUG)System.out.println("rexp1prime()");
-		if(index>=regex.length()||peekChar()==')'){//check if end of expression
-			return true;
-		}//end if
-		if(rexp2()){
-			if(toggleStar){//if there was a star
-				toggleStar=false;
-			}//end if
-			else if(togglePlus){//if there was a plus
-				togglePlus=false;
-				concat(entry_ind-3,entry_ind-2);
-			}//end else if
-			else{
-				concat(entry_ind-3,entry_ind-2);
-			}//end else
-			if(!toggleEpsilon&&rexp1prime()){//blocks infinite loop
-				toggleEpsilon = false;
-				return true;
-			}//end if
-		}//end if
-		toggleEpsilon=true;
-		return true;
-	}//end rexp1prime method
-	
-	/**
-	 * Parses valid character or character class.
-	 * @return True if a valid character or character class is found. False otherwise.
-	 */
-	private boolean rexp2(){
-		if(DEBUG)System.out.println("rexp2()");
-		int state1 = entry_ind-1;
-		if(peekChar()=='('){
-			if(match('(')&&rexp()&&match(')')){//if another regex inside parentheses
-				rexp2_tail();
-				if(toggleStar){//handle star
-					TableRow nextRow = new TableRow(new HashMap<String,ArrayList<TableRow>>(), Integer.toString(entry_ind), "Invalid Type");
-					nfa.add(nextRow, entry_ind);
-					entry_ind++;
-					concat(entry_ind-2,entry_ind-1);
-					concat(state1+1,entry_ind-1);
-					concat(entry_ind-2,state1);
-					concat(state1,state1+1);
-					return true;
-				}//end if
-				else if(togglePlus){//handle plus
-					concat(entry_ind-1,state1+1);
-					concat(state1,state1+1);
-					populate("@");
-					concat(entry_ind-2,entry_ind-1);
-					return true;
-				}//end else if
-				else{
-					concat(state1,state1+1);
-					toggleEpsilon=false;
-					return true;
-				}//end else
-			}//end if
-		}//end if
-		if(isRE_CHAR(peekChar())){//found a regular character
-			char temp = peekChar();
-			if(match(peekChar())){
-				if(temp!='@'){
-					populate(String.valueOf(temp));
-				}
-				else populate("\\@");
-				rexp2_tail();
-				if(toggleEpsilon){
-					toggleEpsilon = false;
-					return true;
-				}//end if
-				else if(toggleStar){//handle star
-					TableRow nextRow = new TableRow(new HashMap<String,ArrayList<TableRow>>(), Integer.toString(entry_ind), "Invalid Type");
-					nfa.add(nextRow, entry_ind);
-					entry_ind++;
-					//System.out.println(state1);
-					concat(entry_ind-2,entry_ind-1);
-					concat(state1+1,entry_ind-1);
-					concat(entry_ind-2,state1);
-					concat(state1,state1+1);
-					populate("@");
-					concat(entry_ind-3,entry_ind-2);
-//					toggleStar = false;
-					return true;
-				}//end else if
-				else if(togglePlus){//handle plus
-					concat(entry_ind-1,state1+1);
-					concat(state1,state1+1);
-					populate("@");
-					concat(entry_ind-2,entry_ind-1);
-					return true;
-				}//end else if
-			}//end if
-		}//end if
-		if(rexp3()){//look for rexp3
-			return true;
-		}//end if
-		return false;
-	}//end rexp2 method
-	
-	/**
-	 * Toggles star or plus
-	 * @return True by default
-	 */
-	private boolean rexp2_tail(){
-		if(DEBUG)System.out.println("rexp2_tail()");
-		if(index>=regex.length()||peekChar()==')'){
-			return true;
-		}//end if
-		if(peekChar()=='*'){
-			//System.out.println("Index at Star: "+entry_ind);
-			match('*');
-/*			TableRow nextRow = new TableRow(new HashMap<String,ArrayList<TableRow>>(), Integer.toString(entry_ind), "Invalid Type");
-			nfa.add(nextRow, entry_ind);
-			entry_ind++;
-			concat(entry_ind-3,entry_ind-1);
-			concat(entry_ind-2,entry_ind-3);
-			concat(entry_ind-2,entry_ind-1);
-*/			toggleStar=true;
-			return true;
-		}//end if
-		if(peekChar()=='+'){
-			match('+');
-//			concat(entry_ind-1,entry_ind-2);
-			togglePlus=true;
-			return true;
-		}//end if
+		if(isDone()){
+			return null;
+		}
+		StateTable result;
+		StateTable temp1 = rexp1();
+		StateTable temp2 = null;
+		if(peekChar()=='|'){
+			result = new StateTable();
+			result.getTable().add(new State());
+			temp2 = rexp_();
+			unionTables(result,temp1,temp2);
+			return result;
+		}
 		else{
-			toggleEpsilon = true;
-			return true;
-		}//end else
-	}//end rexp2_tail method
+			result = temp1;
+		}
+		return result;
+	}
 	
-	/**
-	 * Validates character classes
-	 * @return True if a valid character set or a character class is found. False otherwise
-	 */
-	private boolean rexp3(){
+	public StateTable rexp_(){
+		if(isDone()){
+			return null;
+		}
+		if(DEBUG)System.out.println("rexp_()");
+		StateTable result = new StateTable();
+		if(peekChar()=='|'){
+			match('|');
+			result = rexp1();
+			StateTable temp = null;
+			if(result!=null){
+				temp = rexp_();
+			}
+			concatTables(result,temp);
+		}
+		else{
+			populate(result,"\\@");
+			epsilon = false;
+		}
+		return result;
+	}
+	
+	public StateTable rexp1(){
+		if(isDone()){
+			return null;
+		}
+		if(DEBUG)System.out.println("rexp1()");
+		StateTable result;
+		StateTable temp;
+		result = rexp2();
+		temp = rexp1_();
+		if(result==null){
+			return null;
+		}
+		concatTables(result,temp);
+		epsilon = false;
+		return result;
+	}
+	
+	public StateTable rexp1_(){
+		if(isDone()){
+			return null;
+		}
+		if(DEBUG)System.out.println("rexp1_()");
+		StateTable result;
+		StateTable temp;
+		result = rexp2();
+		if(result==null){
+			result = new StateTable();
+			populate(result,"\\@");
+		}
+		else{
+			if(!epsilon){
+				temp = rexp1_();
+				concatTables(result,temp);
+				epsilon = true;
+			}
+		}
+		return result;
+	}
+	
+	public StateTable rexp2(){
+		if(isDone()){
+			return null;
+		}
+		if(DEBUG)System.out.println("rexp2()");
+		StateTable result = null;
+		StateTable temp;
+		if(peekChar()=='('){
+			match('(');
+			temp = rexp();
+			match(')');
+			rexp2_tail();
+			if(star){
+				result = new StateTable();
+				result.getTable().add(new State());
+				concatTables(result,temp);
+				concatStates(result.getTable().getFirst(),temp.getTable().getLast(),"\\@");
+				concatStates(temp.getTable().getLast(),temp.getTable().getFirst(),"\\@");
+				temp = new StateTable();
+				temp.getTable().add(new State());
+				concatTables(result,temp);
+				star = false;
+			}
+			else if(plus){
+				result = temp;
+				temp = new StateTable();
+				temp.getTable().add(new State());
+				concatStates(result.getTable().getLast(),result.getTable().getFirst(),"\\@");
+				concatTables(result,temp);
+				plus = false;
+			}
+			else{
+				result = temp;
+			}
+		}
+		else if(isRE_CHAR(peekChar())){
+			char c = peekChar();
+			match(peekChar());
+			rexp2_tail();
+			temp = new StateTable();
+			populate(temp,String.valueOf(c));
+			if(star){
+				result = new StateTable();
+				result.getTable().add(new State());
+				concatTables(result,temp);
+				concatStates(result.getTable().getFirst(),temp.getTable().getLast(),"\\@");
+				concatStates(temp.getTable().getLast(),temp.getTable().getFirst(),"\\@");
+				temp = new StateTable();
+				temp.getTable().add(new State());
+				concatTables(result,temp);
+				star = false;
+			}
+			else if(plus){
+				result = temp;
+				concatStates(result.getTable().getLast(),result.getTable().getFirst(),"\\@");
+				plus = false;
+			}
+			else{
+				result = temp;
+			}
+		}
+		else{
+			if(!epsilon)
+				result = rexp3();
+			else{
+				result = null;
+			}
+		}
+		return result;
+	}
+	
+	public StateTable rexp2_tail(){
+		if(isDone()){
+			return null;
+		}
+		if(DEBUG)System.out.println("rexp2_tail()");
+		StateTable result = null;
+		if(peekChar()=='*'){
+			star = true;
+			match('*');
+		}
+		else if(peekChar()=='+'){
+			plus = true;
+			match('+');
+		}
+		else{
+			
+		}
+		return result;
+	}
+	
+	public StateTable rexp3(){
+		if(isDone()){
+			return null;
+		}
 		if(DEBUG)System.out.println("rexp3()");
-		if(index>=regex.length()||peekChar()==')'){
-			return true;
-		}//end if
-		if(char_class()){
-			return true;
-		}//end if
-		toggleEpsilon = true;
-		if(DEBUG)System.out.println(toggleEpsilon);
-		return true;
-	}//end rexp3 method
+		StateTable result;
+		result = char_class();
+		if(result==null){
+			result = new StateTable();
+			populate(result,"\\@");
+			epsilon = true;
+		}
+		return result;
+	}
 	
-	/**
-	 * Validates character classes
-	 * @return True if a valid character set or a character class is found. False otherwise
-	 */
-	private boolean char_class(){
+	public StateTable char_class(){
+		if(isDone()){
+			return null;
+		}
 		if(DEBUG)System.out.println("char_class()");
+		StateTable result;
 		if(peekChar()=='.'){
 			match('.');
-			populate(".");
-			return true;
-		}//end if
-		if(peekChar()=='['){
-			if(match('[')&&char_class1())
-				return true;
-		}//end if
-		String temp = defined_class();
-		if(temp!=null){
-			populate(temp);
-			return true;
-		}//end if
-		return false;
-	}//end char_class method
+			CharacterC period = new CharacterC("[.]", lexspec.getCharacters());
+			result = new StateTable();
+			result.getTable().add(new State());
+			ArrayList<String> legals = period.getLegal();
+			State rendev = new State();
+			for(String s: legals){
+				StateTable temp = new StateTable();
+				temp.getTable().add(new State());
+				concatStates(result.getTable().getFirst(), rendev,s);
+			}
+			StateTable temp = new StateTable();
+			result.getTable().add(rendev);
+			temp.getTable().add(new State());
+			concatTables(result,temp);
+		}
+		else if(peekChar()=='['){
+			match('[');
+			charset_regex = "[";
+			result = char_class1();
+			System.out.println(charset_regex);
+			CharacterC period = new CharacterC(charset_regex, lexspec.getCharacters());
+			result = new StateTable();
+			result.getTable().add(new State());
+			ArrayList<String> legals = period.getLegal();
+			State rendev = new State();
+			for(String s: legals){
+				StateTable temp = new StateTable();
+				temp.getTable().add(new State());
+				concatStates(result.getTable().getFirst(), rendev,s);
+			}
+			StateTable temp = new StateTable();
+			result.getTable().add(rendev);
+			temp.getTable().add(new State());
+			concatTables(result,temp);
+		}
+		else{
+			String cn = defined_class();
+			if(cn==null)
+				return null;
+			result = new StateTable();
+			result.getTable().add(new State());
+			ArrayList<String> legals = lexspec.getCharacters().get(cn).getLegal();
+			State rendev = new State();
+			for(String s: legals){
+				StateTable temp = new StateTable();
+				temp.getTable().add(new State());
+				concatStates(result.getTable().getFirst(), rendev,s);
+			}
+			StateTable temp = new StateTable();
+			result.getTable().add(rendev);
+			temp.getTable().add(new State());
+			concatTables(result,temp);
+		}
+		return result;
+	}
 	
-	/**
-	 * Validates character sets
-	 * @return True if a valid character set. False otherwise
-	 */
-	private boolean char_class1(){
+	public StateTable char_class1(){
+		if(isDone()){
+			return null;
+		}
 		if(DEBUG)System.out.println("char_class1()");
-		if(char_set_list())
-			return true;
-		if(exclude_set())
-			return true;
-		return false;
-	}//end char_class method
+		StateTable result;
+		result = char_set_list();
+		result = exclude_set();
+		return result;
+	}
 	
-	/**
-	 * Validates non-exclusive character sets
-	 * @return True if a valid character set. False otherwise
-	 */
-	private boolean char_set_list(){
+	public StateTable char_set_list(){
+		if(isDone()){
+			return null;
+		}
 		if(DEBUG)System.out.println("char_set_list()");
-		if(char_set()&&char_set_list()){
-			return true;
-		}//end if
 		if(peekChar()==']'){
-			if(match(']'))
-				return true;
-		}//end if
-		return false;
-	}//end char_set_list
+			charset_regex+=getChar();
+		}
+		else{
+			char_set();
+			System.out.println(epsilon);
+			if(!epsilon){
+				char_set_list();
+			}
+		}
+		return null;
+	}
 	
-	/**
-	 * Validates a character in a character set
-	 * @return True if a valid character. False otherwise
-	 */
-	private boolean char_set(){
+	public StateTable char_set(){
+		if(isDone()){
+			return null;
+		}
 		if(DEBUG)System.out.println("char_set()");
 		if(isCLS_CHAR(peekChar())){
-			if(match(peekChar())&&char_set_tail())
-				return true;
-		}//end if
-		return false;
-	}//end char_set
+			charset_regex += getChar();
+			char_set_tail();
+		}
+		return null;
+	}
 	
-	/**
-	 * Allows a chararacter set to have multiple characters
-	 * @return True by default
-	 */
-	private boolean char_set_tail(){
+	public StateTable char_set_tail(){
+		if(isDone()){
+			return null;
+		}
 		if(DEBUG)System.out.println("char_set_tail()");
-		if(index>=regex.length()||peekChar()==')'){
-			return true;
-		}//end if
 		if(peekChar()=='-'){
-			if(match('-')&&isCLS_CHAR(peekChar())){
-				match(peekChar());
-				return true;
-			}//end if
-		}//end if
-		toggleEpsilon = true;
-		return true;
-	}//end char_set_tail method
+			charset_regex += getChar();
+			if(isCLS_CHAR(peekChar())){
+				charset_regex += getChar();
+			}
+		}
+		else{
+			epsilon = true;
+		}
+		return null;
+	}
 	
-	/**
-	 * Handles the exclude set case
-	 * @return True if a valid exclude set syntax if found. False otherwise
-	 */
-	private boolean exclude_set(){
+	public StateTable exclude_set(){
+		if(isDone()){
+			return null;
+		}
 		if(DEBUG)System.out.println("exclude_set()");
 		if(peekChar()=='^'){
-			if(match('^')&&char_set()&&match(']')&&match('I')&&match('N')&&exclude_set_tail())
-				return true;
-		}//end if
-		return false;
-	}//end exclude_set
+			charset_regex += getChar();
+			char_set();
+			if(match(']')&&match('I')&&match('N')){
+				charset_regex += "]";
+				charset_regex += "I";
+				charset_regex += "N";
+			}
+			exclude_set_tail();
+		}
+		return null;
+	}
 	
-	/**
-	 * The tail part of an exclusive set
-	 * @return True if valid syntax if found. False otherwise.
-	 */
-	private boolean exclude_set_tail(){
-		if(DEBUG)System.out.println("exclude_set_tail()");
-		if(peekChar()=='['){
-			if(match('[')&&char_set()&&match(']'))
-				return true;
-		}//end if
-		String temp = defined_class();
-		if(temp!=null){
-			return true;
-		}//end if
-		return false;
-	}//end exclude_set_tail method
-
+	public StateTable exclude_set_tail(){
+		if(match('[')){
+			charset_regex += "[";
+			char_set();
+			if(match(']')){
+				charset_regex += "]";
+			}
+		}
+		else{
+			charset_regex += defined_class();
+		}
+		return null;
+	}
+	
+	private void concatTables(StateTable s1,StateTable s2){
+		if(s1==null || s2==null){
+			return;
+		}
+		State state1 = s1.getTable().getLast();
+		State state2 = s2.getTable().getFirst();
+		concatStates(state1,state2,"\\@");
+		for(State s: s2.getTable()){
+			s1.getTable().add(s);
+		}
+	}
+	
+	private void concatStates(State s1, State s2, String key){
+		s1.addTrans(key, s2);
+	}
+	
+	private void unionTables(StateTable ep, StateTable s1, StateTable s2){
+		State rendev = new State();
+		concatStates(s1.getTable().getLast(),rendev,"\\@");
+		concatStates(s2.getTable().getLast(),rendev,"\\@");
+		concatStates(ep.getTable().getLast(),s1.getTable().getFirst(),"\\@");
+		concatStates(ep.getTable().getLast(),s2.getTable().getFirst(),"\\@");
+		for(State s: s1.getTable()){
+			ep.getTable().add(s);
+		}
+		for(State s: s2.getTable()){
+			ep.getTable().add(s);
+		}
+		ep.getTable().add(rendev);
+	}
+	
+	private void branch(StateTable stem, StateTable branch){
+		if(branch==null){
+			return;
+		}
+		concatStates(stem.getTable().get(1),branch.getTable().getFirst(),"\\@");
+		for(State s: branch.getTable()){
+			stem.getTable().add(s);
+		}
+	}
+	
 	/**
 	 * Parses a defined class given after a '$' character
 	 * @return name of the CharacterC object
@@ -440,7 +460,8 @@ public class NFAGenerator {
 	private char peekChar(){
 		if(index>=regex.length())
 			return '\0';
-		if(DEBUG)System.out.println(regex.charAt(index));
+//		if(DEBUG)System.out.println(regex.charAt(index));
+//		System.out.println(regex.charAt(index));
 		return regex.charAt(index);
 	}//end peekChar method
 	
@@ -450,6 +471,7 @@ public class NFAGenerator {
 	 */
 	private char getChar(){
 		char result = regex.charAt(index);
+//		System.out.println(result);
 		index++;
 		return result;
 	}//end getChar method
@@ -481,13 +503,13 @@ public class NFAGenerator {
 	 */
 	private boolean isRE_CHAR(char c){
 		if(c>=0x20&&c<=0x7E){
-			if(c!='\\'&&c!='*'&&c!='+'&&c!='?'&&c!='|'&&c!='['&&c!=']'&&c!='('&&c!=')'&&c!='.'&&c!='\''&&c!='\"'&&c!='$'&&c!='@'){
+			if(c!='\\'&&c!='*'&&c!='+'&&c!='?'&&c!='|'&&c!='['&&c!=']'&&c!='('&&c!=')'&&c!='.'&&c!='\''&&c!='\"'&&c!='$'){
 				return true;
 			}//end if
 			else if(c=='\\'){//character is escaped
 				match('\\');
 				char t = peekChar();
-				if(t==' '||t=='\\'||t=='*'||t=='+'||t=='?'||t=='|'||t=='['||t==']'||t=='('||t==')'||t=='.'||t=='\''||t=='\"'||t=='$'||t=='@'){
+				if(t==' '||t=='\\'||t=='*'||t=='+'||t=='?'||t=='|'||t=='['||t==']'||t=='('||t==')'||t=='.'||t=='\''||t=='\"'||t=='$'){
 					return true;
 				}//end else if
 			}//end if
@@ -502,13 +524,13 @@ public class NFAGenerator {
 	 */
 	private boolean isCLS_CHAR(char c){
 		if(c>=0x20&&c<=0x7E){
-			if(c!='\\'&&c!='^'&&c!='-'&&c!='['&&c!=']'&&c!='@'){
+			if(c!='\\'&&c!='^'&&c!='-'&&c!='['&&c!=']'){
 				return true;
 			}//end if
 			else if(c=='\\'){
 				match('\\');
 				char t = peekChar();
-				if(t=='\\'||t=='^'||t=='-'||t=='['||t==']'||t=='@'){
+				if(t=='\\'||t=='^'||t=='-'||t=='['||t==']'){
 						return true;
 				}//end if
 			}//end else if
@@ -525,55 +547,18 @@ public class NFAGenerator {
 		return c>='A'&&c<='Z';
 	}//end isUpper method
 	
-	/**
-	 * Creates 2 new states in the state table transitioning on a particular key
-	 * @param c Key to transition on.
-	 */
-	private void populate(String c){
-		Map<String,ArrayList<TableRow>> trans = new HashMap<String,ArrayList<TableRow>>();
-		TableRow nextRow = new TableRow(new HashMap<String,ArrayList<TableRow>>(), Integer.toString(entry_ind+1), "Invalid Type");
-		nfa.add(null, entry_ind);
-		nfa.add(nextRow, entry_ind+1);
-		trans.put(c, nfa.getTableRowArray(entry_ind+1));
-		nfa.addState(trans, Integer.toString(entry_ind), "Invalid Type", entry_ind, false);
-		entry_ind+=2;
-	}//end populate
-
-	/**
-	 * Concatenates two states with an epsilon
-	 * @param x Source state index
-	 * @param y Destination state index
-	 */
-	private void concat(int x, int y){
-			if(DEBUG)System.out.println("Concated: "+x+" & "+y);
-			ArrayList<TableRow> curr = nfa.getTableRowArray(x);
-			ArrayList<TableRow> next = nfa.getTableRowArray(y);
-			Map<String,ArrayList<TableRow>> nextStates = curr.get(0).getSuccessorStates();
-			if(nextStates.get("@")!=null){//check if map is null for @
-				nextStates.get("@").add(next.get(0));
-			}//end if
-			else{
-				nextStates.put("@", next);
-			}//end else
-			curr.get(0).setSuccessorStates(nextStates);
-	}//end concat method
+	private void populate(StateTable st, String key){
+		State s1 = new State();
+		State s2  = new State();
+		s1.addTrans(key, s2);
+		st.getTable().add(s1);
+		st.getTable().add(s2);
+	}
 	
-	/**
-	 * Unions two states pivoted at a particular state.
-	 * @param epsilon Pivot state
-	 * @param state1 State to get unioned
-	 * @param state2 State to get unioned
-	 */
-	private void union(int epsilon, int state1, int state2){
-		if(DEBUG)System.out.println("United: "+state1+" & "+ state2);
-		populate("@");
-		ArrayList<TableRow> first_next = nfa.getTableRowArray(state1);
-		ArrayList<TableRow> second_next = nfa.getTableRowArray(state2);
-		//glue to epsilon
-		nfa.getTableRowArray(epsilon).get(0).getSuccessorStates().put("@",first_next);
-		nfa.getTableRowArray(epsilon).get(0).getSuccessorStates().get("@").add(second_next.get(0));
-		//merge to epsilon
-		concat(state2-1,entry_ind-2);
-		concat(entry_ind-3,entry_ind-2);
-	}//end union method
-}//end NFAGenerator class
+	private boolean isDone(){
+		if(peekChar()=='\0'||peekChar()==')'){
+			return true;
+		}
+		else return false;
+	}
+}
