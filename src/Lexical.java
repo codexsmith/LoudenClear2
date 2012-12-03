@@ -38,6 +38,7 @@ public class Lexical {
 	 */
 	public Map<String, CharacterC> getCharacters()
 	{
+//		if(Driver.DEBUG)System.out.println("Lexical Chars "+characters);
 		return characters;
 	}
 }

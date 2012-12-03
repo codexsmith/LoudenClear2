@@ -1,5 +1,7 @@
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * 
@@ -12,7 +14,8 @@ import java.util.ArrayList;
 public class Driver {
 	
 	public static String errCode = "error ";
-
+	public static boolean DEBUG = true;
+	
 	/**
 	 * @param args
 	 */
@@ -24,7 +27,7 @@ public class Driver {
 		
 //		Lexical lexSpec = PScanner.scanLexicon(spec_file);
 		PScanner readInput = new PScanner(input_file);
-		String nextToken;
+		
 		ArrayList<String> tokenList = new ArrayList<String>();
 
 		//Lexical lexSpec = PScanner.scanLexicon("sample_spec2.txt");
@@ -45,7 +48,7 @@ public class Driver {
 		table.printTable();
 		
 		
-		StateTable dfa = NFAToDFA.convert(table);
+		StateTable dfa = NFAToDFA.convert(table, lexSpec);
 		
 		System.out.println("");
 		System.out.println("");
@@ -55,26 +58,9 @@ public class Driver {
 		dfa.printTable();
 		
 		//Consult the StateTable with the input of the user file
-		while(!readInput.endOfFile()){
-			nextToken = dfa.DFAlookUp(readInput.getToken());
-			String tokenReturned = nextToken.substring(0,nextToken.length()-1);
-			String extraChar = nextToken.substring(nextToken.length()-1);
-			readInput.pushToken(extraChar);
-			
-			if (nextToken.startsWith(errCode)){//Err on Token
-				System.out.println(nextToken);
-				System.out.println("Accepted Tokens");
-				for(String s : tokenList){
-					System.out.println(s);
-				}
-				break;
-			}
-			else{
-				tokenList.add(tokenReturned);
-			}
-		}
+		tokenList = dfa.DFALookup(readInput);
 		
-		System.out.println("Accepted Tokens");
+		System.out.println("Accepted Tokens (Complete)");
 		for(String s : tokenList){
 			System.out.println(s);
 		}

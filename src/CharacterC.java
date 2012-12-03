@@ -27,6 +27,7 @@ public class CharacterC extends iIdentifier{
 		//Split into tokens for easy references
 		StringTokenizer tokenizer = new StringTokenizer(line, " ", false);
 		this.title = tokenizer.nextToken(); // Set title
+		System.out.println("CharacterC TITLE "+this.title);
 		String token = "";
 		String regex = "";
 		ArrayList<String> otherCharLegal = null;

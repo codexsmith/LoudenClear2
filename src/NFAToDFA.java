@@ -19,10 +19,10 @@ public class NFAToDFA {
 	private static StateTable outputStateTable;
 	private static int outputIndex;
 	
-	public static StateTable convert(StateTable table)
+	public static StateTable convert(StateTable table, Lexical lex)
 	{
 		inputStateTable = table;
-		outputStateTable = new StateTable();
+		outputStateTable = new StateTable(lex);
 		outputIndex = 0;
 		
 		//Contains a list of every index in the table that has every single transition from that state
