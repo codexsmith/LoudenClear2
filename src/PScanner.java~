@@ -14,23 +14,15 @@ public class PScanner {
 	public static final boolean DEBUG = false;
 	
 	private File in;
-<<<<<<< HEAD
-=======
-	private Scanner iScan;
-
->>>>>>> 104e874ce45f5c8d085542b3360def7866f02a54
 	private String buff;
 	private Scanner iScan; 
 	
 	
 	public PScanner(String path){
-<<<<<<< HEAD
 		this.in = new File(path);
-=======
 		this.buff = "";
 		
 		in = new File(path);
->>>>>>> 104e874ce45f5c8d085542b3360def7866f02a54
 		try {
 			iScan = new Scanner(in);
 		} catch (FileNotFoundException e) {
