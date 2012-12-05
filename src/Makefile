@@ -4,7 +4,7 @@ file=sample_input.txt
 all: compile
 	
 compile:
-	javac *.java
+	javac *.java -Xlint
 run: compile
 	java Driver $(spec) $(file)
 clean:
