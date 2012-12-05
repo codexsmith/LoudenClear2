@@ -4,7 +4,6 @@ public class Driver {
 	/**
 	 * @param args
 	 */
-  public boolean DEBUG = true;
 	public static void main(String[] args) {
 		for(int i = 1; i<=7; i++){
 			String test_case = Integer.toString(i);
