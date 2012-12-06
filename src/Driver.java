@@ -7,7 +7,7 @@ public class Driver {
 	public static boolean DEBUG = true;
 	
 	public static void main(String[] args) {
-		Tokenizer t = new Tokenizer("sample_input.txt","miniRE_spec.txt");
+		Tokenizer t = new Tokenizer("sample_input.txt","miniRE_spec2.txt");
 		String output = t.parse();
 		System.out.println(output);
 //		for(int i = 1; i<=7; i++){

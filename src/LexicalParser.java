@@ -65,8 +65,14 @@ public class LexicalParser {
 					state = 1;
 				else if(state == 1)
 					state = 2;
+				else if (state == 2)//start symbol
+					state =3;
+				else if (state == 3)//rules
+					state =4;
+				
 			}
 			else
+			{
 				if(state == 1 || state == 0) // characters
 				{
 					if(state == 0) state = 1;
@@ -80,7 +86,21 @@ public class LexicalParser {
 					//create new token and parse line
 					TokenC token = new TokenC(line);
 					tokens.add(token);
-				}			
+				}
+				else if (state == 3){
+					if (line.startsWith("<")){//start symbol
+						TokenC token = new TokenC(line);
+						tokens.add(token);
+					}
+				}
+				else if (state == 4){
+					if (line.startsWith("<")){//rules
+						TokenC token = new TokenC(line);
+						tokens.add(token);
+					}
+				}
+			}
+
 		}
 		//Create epsilon using @ symbol
 		String epsilonStr = "$Epsilon [@]";

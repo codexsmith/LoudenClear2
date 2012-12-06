@@ -21,6 +21,24 @@ public class TokenC {
 			
 			this.legal = (symbols);
 		}
+		
+		if(line.startsWith("<")){
+			this.title = line.substring(0,line.indexOf(">")+1);
+			System.out.println(title);
+			if (line.indexOf("-->") != -1)
+			{//normal rule of miniRE grammar
+				symbols = line.replace(" ", "").substring(line.replace(" ", "").indexOf("-->")+3);
+			
+				System.out.println(symbols);
+				this.legal = (symbols);
+			}
+			else
+			{//start symbol of miniRE grammar
+				symbols = "$";
+				System.out.println(symbols);
+				this.legal = (symbols);
+			}
+		}
 	}
 	
 	public String getLegal() {
