@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Tokenizer {
@@ -25,6 +26,10 @@ public class Tokenizer {
 		LexicalParser lp = new LexicalParser(lex);
 		Lexical lexspec = lp.scanLexicon();
 		NFAGenerator ngen = new NFAGenerator(lexspec);
+		
+		LLoneGenerator LLone = new LLoneGenerator(lexspec);
+		ArrayList<TokenC> temp = LLone.firstSet();
+		
 		StateTable nfa = ngen.generateNFA();
 		DFAConverter conv = new DFAConverter(nfa);
 		dfa = conv.convert();
