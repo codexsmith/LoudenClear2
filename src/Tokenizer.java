@@ -65,7 +65,9 @@ public class Tokenizer {
 				}
 				name = c;
 				state = dfa.getTable().get(0);
+				System.out.println(state.toString()); //test
 				state = state.getTable().get(c).get(0);
+				System.out.println(state.toString()); //test
 				accept = false;
 				if(state.getAccept()){
 					accept = true;
