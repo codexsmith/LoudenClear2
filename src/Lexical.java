@@ -12,6 +12,10 @@ public class Lexical {
 	private ArrayList<TokenC> tokens;
 	private HashMap<String, CharacterC> characters;
 	
+	public Lexical(){
+		tokens = new ArrayList<TokenC>();
+		characters = new HashMap<String,CharacterC>();
+	}
 	/**
 	 * Constructor
 	 * @param toks TokenCs to set

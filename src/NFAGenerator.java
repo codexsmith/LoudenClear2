@@ -34,6 +34,18 @@ public class NFAGenerator {
 		return nfa;
 	}
 	
+	public StateTable generateNFA(String st){
+		regex = st;
+		nfa = regex_single();
+		int i = 0;
+		for(State s: nfa.getTable()){
+			s.setName(Integer.toString(i));
+			i++;
+		}
+
+		return nfa;
+	}
+	
 	public StateTable regex(){
 		StateTable result = new StateTable();
 		StateTable temp;
@@ -47,6 +59,14 @@ public class NFAGenerator {
 			branch(result,temp);
 			result.getTable().getLast().accept(token);
 		}
+		return result;
+	}
+	
+	public StateTable regex_single(){
+		StateTable result = new StateTable();
+		result.getTable().add(new State());
+		result = rexp();
+		result.getTable().getLast().accept("accept");
 		return result;
 	}
 	
@@ -265,7 +285,7 @@ public class NFAGenerator {
 			match('[');
 			charset_regex = "[";
 			result = char_class1();
-			System.out.println(charset_regex);
+//			System.out.println(charset_regex);
 			CharacterC period = new CharacterC(charset_regex, lexspec.getCharacters());
 			result = new StateTable();
 			result.getTable().add(new State());
@@ -323,7 +343,7 @@ public class NFAGenerator {
 		}
 		else{
 			char_set();
-			System.out.println(epsilon);
+//			System.out.println(epsilon);
 			if(!epsilon){
 				char_set_list();
 			}
@@ -339,6 +359,7 @@ public class NFAGenerator {
 		if(isCLS_CHAR(peekChar())){
 			charset_regex += getChar();
 			char_set_tail();
+			epsilon = false;
 		}
 		return null;
 	}
