@@ -14,22 +14,22 @@ public class Driver {
 		
 //		inter.replace("d", "xxx", "sanghun_test_input1.txt", "sanghun_test_output1.txt");
 //		inter.recursivereplace("a", "ax", "sanghun_test_input1.txt", "sanghun_test_output2.txt");
-		inter.maxfreqstring("testset", "testget");
-		inter.setID("ID1", inter.getID("testget"));
+//		inter.maxfreqstring("testset", "testget");
+//		inter.setID("ID1", inter.getID("testget"));
 
-		ArrayList<String> testIDs = new ArrayList<String> ();
-		testIDs.add("testget");
-		testIDs.add("testset");
-		testIDs.add("IDtest");
-		inter.print(testIDs,null,null);
+//		ArrayList<String> testIDs = new ArrayList<String> ();
+//		testIDs.add("testget");
+//		testIDs.add("testset");
+//		testIDs.add("IDtest");
+//		inter.print(testIDs,null,null);
 		
-		System.out.println("get ID length : " + inter.getIDLength("testget"));
+//		System.out.println("get ID length : " + inter.getIDLength("testget"));
 		
-		System.out.println("find regex [a-z]+ : " + inter.findRegex("[a-z]+", "sanghun_test_input1.txt"));
+//		System.out.println("find regex [a-z]+ : " + inter.findRegex("[a-z]+", "sanghun_test_input1.txt"));
 		
-		System.out.println("diff(testget,testset) : " + inter.diff(inter.getID("testget"), inter.getID("testset")));
-		System.out.println("union(testget,testset) : " + inter.union(inter.getID("testget"), inter.getID("testset")));
-		System.out.println("inters(testget,testset) : " + inter.inters(inter.getID("testget"), inter.getID("testset")));
+//		System.out.println("diff(testget,testset) : " + inter.diff(inter.getID("testget"), inter.getID("testset")));
+//		System.out.println("union(testget,testset) : " + inter.union(inter.getID("testget"), inter.getID("testset")));
+//		System.out.println("inters(testget,testset) : " + inter.inters(inter.getID("testget"), inter.getID("testset")));
 // Interpretor Test END		
 		
 		

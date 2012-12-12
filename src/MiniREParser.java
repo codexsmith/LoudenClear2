@@ -5,493 +5,522 @@ public class MiniREParser {
 	private int exp_ind;
 	private boolean epsilon;
 	private int line;
-	
+	private TreeNode root;
+
 	public MiniREParser(){
 		line = 1;
 		expression = "";
 		exp_ind = 0;
-	}
+		root = null;
+	}//end MiniREParser constructor
 	
 	public void parse(String exp){
 		expression = exp;
 		exp_ind = 0;
-		miniREprogram();
-	}
+		root = miniREprogram();
+	}//end parse
 	
-	private void miniREprogram(){
-		if(!match("begin")){
+	private TreeNode miniREprogram(){
+		TreeNode root = new TreeNode("MiniRE-program");
+		
+		if(!match("begin")){//failed to match begin
 			System.out.println("Error(Line"+line+"): Expected token \"begin\" not found.");
-			return;
-		}
-		if(!statement_list()){
-			System.out.println("Error(Line"+line+"): Invalid \"statement-list\" found.");
-			return;
-		}
-		if(!match("end")){
+			return null;
+		}//end if
+		
+		TreeNode statement_list = statement_list();
+		if(statement_list==null){//invalid statement-list
+			return null;
+		}//end if
+		root.addChild(statement_list);
+
+		if(!match("end")){//failed to match end
 			System.out.println("Error(Line"+line+"): Expected token \"end\" not found.");
-			return;
-		}
-	}
+			return null;
+		}//end if
+		return root;
+	}//end miniREprogram
 	
-	private boolean statement_list(){
+	private TreeNode statement_list(){
 		if(DEBUG)System.out.println("statement_list()");
 		int temp_ind = exp_ind;
-		if(!statement()){
-			System.out.println("Error(Line"+line+"): Invalid \"statement\" found.");
+		int temp_line = line;
+		TreeNode statement_list = new TreeNode("statement-list");
+		TreeNode statement = statement();
+		if(statement==null){
 			exp_ind = temp_ind;
-			return false;
+			line = temp_line;
+			return null;
 		}
-		if(!epsilon){
-			statement_list_tail();
+		statement_list.addChild(statement);
+		
+		TreeNode statement_list_tail =  statement_list_tail();
+		if(statement_list_tail!=null){
+			statement_list.addChild(statement_list_tail);
 		}
-		epsilon = false;
-		return true;
+		return statement_list;
 	}
 	
-	private boolean statement_list_tail(){
+	private TreeNode statement_list_tail(){
 		if(DEBUG)System.out.println("statment_list_tail");
 		int temp_ind = exp_ind;
-		if(!statement()){
-			epsilon = true;
+		int temp_line = line;
+		TreeNode statement_list_tail = new TreeNode("statement-list-tail");
+		
+		TreeNode statement = statement();
+		if(statement == null){
 			exp_ind = temp_ind;
-			return true;
+			line = temp_line;
+			return null;
 		}
-		else{
-			return statement_list_tail();
+		statement_list_tail.addChild(statement);
+		
+		TreeNode statement_list_tail2 = statement_list_tail();
+		if(statement_list_tail2==null){
+			return statement_list_tail;
 		}
+		statement_list_tail.addChild(statement_list_tail2);
+		return statement_list_tail;
 	}
 	
-	private boolean statement(){
+	private TreeNode statement(){
 		if(DEBUG)System.out.println("statement()");
 		int temp_ind = exp_ind;
 		int temp_line = line;
-
+		TreeNode statement = new TreeNode("statement");
+				
 		if(match("replace")){
-			String regex = "";
-			boolean escaped = false;
-			if(!match("\'")){
+			statement.setName("replace");
+			String regex = regex();
+			if(regex==null){
 				exp_ind = temp_ind;
-				return false;
+				line = temp_line;
+				return null;
 			}
-			while(true){
-				if(peekChar()=='\\'){
-					escaped = true;
-				}
-				if(match("\'")&&!escaped){
-					System.out.println("REGEX:"+regex);
-					break;
-				}
-				else{
-					escaped = false;
-					regex+=getChar();
-				}
-			}
+			statement.addArg(regex);
 			if(!match("with")){
-				System.out.println("Error(Line"+line+"): Expected \"with\" token not found.");
+				System.out.println("Error(Line"+line+"): Expected token \"with\" not found.");
 				exp_ind = temp_ind;
 				line = temp_line;
+				return null;
 			}
-			String replacement = "";
-			replacement = source_file();
-			if(replacement == null){
-				System.out.println("Error(Line"+line+"): Expected \"replacement\" token not found.");
+			
+			String ascii = ascii_str();
+			if(ascii==null){
 				exp_ind = temp_ind;
 				line = temp_line;
-				return false;
+				return null;
 			}
+			statement.addArg(ascii);
+			
 			if(!match("in")){
-				System.out.println("Error(Line"+line+"): Expected \"in\" token not found.");
+				System.out.println("Error(Line"+line+"): Expected token \"in\" not found.");
 				exp_ind = temp_ind;
 				line = temp_line;
-				return false;
+				return null;
 			}
-			String file = "";
-			file = file_names();
-			if(file == null){
-				System.out.println("Error(Line"+line+"): Invalid \"file-names\" found.");
+
+			TreeNode file_names = file_names();
+			if(file_names==null){
 				exp_ind = temp_ind;
 				line = temp_line;
-				return false;
+				return null;
 			}
+			statement.addChild(file_names);
 			if(!match(";")){
-				System.out.println("Error(Line"+line+"): Expected \";\" token not found");
+				System.out.println("Error(Line"+line+"): Expected token \";\" not found.");
 				exp_ind = temp_ind;
 				line = temp_line;
-				return false;
+				return null;
 			}
-			return true;
+			return statement;
 		}
 		else if(match("recursivereplace")){
-			String regex = "";
-			boolean escaped = false;
-			if(!match("\'")){
+			statement.setName("recursivereplace");
+			String regex = regex();
+			if(regex==null){
 				exp_ind = temp_ind;
-				return false;
+				line = temp_line;
+				return null;
 			}
-			while(true){
-				if(peekChar()=='\\'){
-					escaped = true;
-				}
-				if(match("\'")&&!escaped){
-					System.out.println("REGEX:"+regex);
-					break;
-				}
-				else{
-					escaped = false;
-					regex+=getChar();
-				}
-			}
+			statement.addArg(regex);
 			if(!match("with")){
-				System.out.println("Error(Line"+line+"): Expected \"with\" token not found.");
+				System.out.println("Error(Line"+line+"): Expected token \"with\" not found.");
 				exp_ind = temp_ind;
 				line = temp_line;
+				return null;
 			}
-			String replacement = "";
-			replacement = source_file();
-			if(replacement == null){
-				System.out.println("Error(Line"+line+"): Expected \"replacement\" token not found.");
+			String ascii = ascii_str();
+			if(ascii==null){
 				exp_ind = temp_ind;
 				line = temp_line;
-				return false;
+				return null;
 			}
+			statement.addArg(ascii);
 			if(!match("in")){
-				System.out.println("Error(Line"+line+"): Expected \"in\" token not found.");
+				System.out.println("Error(Line"+line+"): Expected token \"in\" not found.");
 				exp_ind = temp_ind;
 				line = temp_line;
-				return false;
+				return null;
 			}
-			String file = "";
-			file = file_names();
-			if(file == null){
-				System.out.println("Error(Line"+line+"): Invalid \"file-names\" found.");
+			TreeNode file_names = file_names();
+			if(file_names==null){
 				exp_ind = temp_ind;
 				line = temp_line;
-				return false;
+				return null;
 			}
+			statement.addChild(file_names);
 			if(!match(";")){
-				System.out.println("Error(Line"+line+"): Expected \";\" token not found");
+				System.out.println("Error(Line"+line+"): Expected token \";\" not found.");
 				exp_ind = temp_ind;
 				line = temp_line;
-				return false;
+				return null;
 			}
-			return true;
+			return statement;
 		}
 		else if(match("print")){
+			statement.setName("print");
 			if(!match("(")){
-				System.out.println("Error(Line"+line+"): Expected \"(\" token not found");
+				System.out.println("Error(Line"+line+"): Expected token \")\" not found.");
 				exp_ind = temp_ind;
 				line = temp_line;
-				return false;
+				return null;
 			}
-			if(!exp_list()){
-				System.out.println("Error(Line"+line+"): Invalid \"exp-list\" found");
+			TreeNode exp_list = exp_list();
+			if(exp_list==null){
 				exp_ind = temp_ind;
 				line = temp_line;
-				return false;
+				return null;
 			}
+			statement.addChild(exp_list);
 			if(!match(")")){
-				System.out.println("Error(Line"+line+"): Expected \")\" token not found");
+				System.out.println("Error(Line"+line+"): Expected token \")\" not found.");
 				exp_ind = temp_ind;
 				line = temp_line;
-				return false;
+				return null;
 			}
 			if(!match(";")){
-				System.out.println("Error(Line"+line+"): Expected \";\" token not found");
+				System.out.println("Error(Line"+line+"): Expected token \";\" not found.");
 				exp_ind = temp_ind;
 				line = temp_line;
-				return false;
+				return null;
 			}
-			return true;
+			return statement;
 		}
 		else if(id()!=null){
 			if(!match("=")){
+//				System.out.println("Error(Line"+line+"): Expected token \"=\" not found.");
 				exp_ind = temp_ind;
 				line = temp_line;
-				return false;
+				return null;
 			}
 			if(match("#")){
-				if(!exp()){
+				TreeNode exp = exp();
+				if(exp==null){
 					exp_ind = temp_ind;
 					line = temp_line;
-					return false;
+					return null;
 				}
-				else{
-					if(!match(";")){
-						System.out.println("Error(Line"+line+"): Expected \";\" token not found");
-						exp_ind = temp_ind;
-						line = temp_line;
-						return false;
-					}
+				statement.addChild(exp);
+				if(!match(";")){
+					System.out.println("Error(Line"+line+"): Expected token \";\" not found.");
+					exp_ind = temp_ind;
+					line = temp_line;
+					return null;
 				}
-				return true;
+				return statement;
 			}
 			else if(match("maxfreqstring")){
 				if(!match("(")){
-					System.out.println("Error(Line"+line+"): Expected \")\" token not found");
+					System.out.println("Error(Line"+line+"): Expected token \"(\" not found.");
 					exp_ind = temp_ind;
 					line = temp_line;
-					return false;
+					return null;
 				}
-				if(id()==null){
-					System.out.println("Error(Line"+line+"): Expected \"ID\" token not found");
+				String id = id();
+				if(id==null){
 					exp_ind = temp_ind;
 					line = temp_line;
-					return false;
+					return null;
 				}
+				statement.addArg(id);
 				if(!match(")")){
-					System.out.println("Error(Line"+line+"): Expected \")\" token not found");
+					System.out.println("Error(Line"+line+"): Expected token \")\" not found.");
 					exp_ind = temp_ind;
 					line = temp_line;
-					return false;
+					return null;
 				}
 				if(!match(";")){
-					System.out.println("Error(Line"+line+"): Expected \";\" token not found");
+					System.out.println("Error(Line"+line+"): Expected token \";\" not found.");
 					exp_ind = temp_ind;
 					line = temp_line;
-					return false;
+					return null;
 				}
-				return true;
-			}
-			else if(exp()){
-				if(!match(";")){
-					System.out.println("Error(Line"+line+"): Expected \";\" token not found");
-					exp_ind = temp_ind;
-					return false;
-				}
-				return true;
-			}
-		}
-		exp_ind = temp_ind;
-		line = temp_line;
-		return false;
-	}
-	
-	private String file_names(){
-		if(DEBUG)System.out.println("file_names()");
-		String src_file = source_file();
-		if(match(">!")){
-			String dst_file = destination_file();
-			if(src_file!=null&&dst_file!=null){
-				return src_file+">!"+dst_file;
+
 			}
 			else{
-				System.out.println("Error(Line"+line+"): Expected a \"destination file\"");
+				TreeNode exp = exp();
+				if(exp==null){
+					exp_ind = temp_ind;
+					line = temp_line;
+					return null;
+				}
+				statement.addChild(exp);
+				if(!match(";")){
+					System.out.println("Error(Line"+line+"): Expected token \";\" not found.");
+					exp_ind = temp_ind;
+					line = temp_line;
+					return null;
+				}
+				return statement;
 			}
 		}
+		System.out.println("Error(Line"+line+"): Invalid \"statement\" found.");
+		exp_ind = temp_ind;
+		line = temp_line;
 		return null;
 	}
 	
-	private String source_file(){
-		boolean escaped = false;
-		String filename = null;
-		if(match("\"")){
-			filename="";
+	private TreeNode file_names(){
+		if(DEBUG)System.out.println("file_names()");
+		int temp_ind = exp_ind;
+		int temp_line = line;
+		TreeNode file_names = new TreeNode("file-names");
+		
+		TreeNode src_file = source_file();
+		if(src_file==null){
+			exp_ind = temp_ind;
+			line = temp_line;
+			return null;
+		}
+		file_names.addChild(src_file);
+		
+		if(!match(">!")){
+			System.out.println("Error(Line"+line+"): Expected token \">!\" not found.");
+			exp_ind = temp_ind;
+			line = temp_line;
+			return null;
 		}
 		
-		while((peekChar()>=32&&peekChar()<=126)){
-			if(peekChar()=='\\'){
-				escaped = true;
-			}
-			if(peekChar()=='\"'){
-				if(!escaped){
-					match("\"");
-					break;
-				}
-			}
-			if(peekChar()!='\n'){
-				filename+=getChar();
-				escaped = false;
-			}
-		}
-		return filename;
-	}
-	
-	private String destination_file(){
-		boolean escaped = false;
-		String filename = null;
-		if(match("\"")){
-			filename="";
-		}
-		while((peekChar()>=32&&peekChar()<=126)){
-			if(peekChar()=='\\'){
-				escaped = true;
-			}
-			if(peekChar()=='\"'){
-				if(!escaped){
-					match("\"");
-					break;
-				}
-			}
-			if(peekChar()!='\n'){
-				filename+=getChar();
-			}
-		}
-		return filename;
-	}
-	
-	private boolean exp_list(){
-		int temp_ind = exp_ind;
-		int temp_line = line;
-		if(!exp()){
-			System.out.println("Error(Line"+line+"): Invalid \"exp\" found.");
+		TreeNode dst_file = destination_file();
+		if(dst_file==null){
 			exp_ind = temp_ind;
 			line = temp_line;
-			return false;
+			return null;
 		}
-		if(!epsilon){
-			exp_list_tail();
-		}
-		epsilon = false;
-		return true;
+		file_names.addChild(dst_file);
+		return file_names;
 	}
 	
-	private boolean exp_list_tail(){
-		if(DEBUG)System.out.println("exp_list_tail");
+	private TreeNode source_file(){
+		TreeNode source_file = new TreeNode("source-file");
 		int temp_ind = exp_ind;
 		int temp_line = line;
-		if(!exp()){
-			epsilon = true;
+		
+		String filename = ascii_str();
+		if(filename==null){
 			exp_ind = temp_ind;
 			line = temp_line;
-			return true;
+			return null;
 		}
-		else{
-			return exp_list_tail();
-		}
+		source_file.addArg(filename);
+		return source_file;
 	}
 	
-	private boolean exp(){
+	private TreeNode destination_file(){
+		TreeNode destination_file = new TreeNode("destination-file");
 		int temp_ind = exp_ind;
 		int temp_line = line;
-		if(term()){
-			exp_tail();
-			return true;
+		
+		String filename = ascii_str();
+		if(filename==null){
+			exp_ind = temp_ind;
+			line = temp_line;
+			return null;
 		}
+		destination_file.addArg(filename);
+		return destination_file;
+	}
+	
+	private TreeNode exp_list(){
+		if(DEBUG)System.out.println("exp_list()");
+		TreeNode exp_list = new TreeNode("exp-list");
+		int temp_ind = exp_ind;
+		int temp_line = line;
+		
+		TreeNode exp = exp();
+		if(exp==null){
+			exp_ind = temp_ind;
+			line = temp_line;
+			return null;
+		}
+		exp_list.addChild(exp);
+		
+		TreeNode exp_list_tail = exp_list_tail();
+		if(exp_list_tail!=null){
+			exp_list.addChild(exp_list_tail);
+		}
+		return exp_list;
+	}
+	
+	private TreeNode exp_list_tail(){
+		if(DEBUG)System.out.println("exp_list_tail()");
+		TreeNode exp_list_tail = new TreeNode("exp-list-tail");		
+		int temp_ind = exp_ind;
+		int temp_line = line;
+		
+		TreeNode exp = exp();
+		if(exp==null){
+			exp_ind = temp_ind;
+			line = temp_line;
+			return null;
+		}
+		exp_list_tail.addChild(exp);
+		
+		TreeNode exp_list_tail2 = exp_list_tail();
+		if(exp_list_tail2==null){
+			return exp_list_tail;
+		}
+		exp_list_tail.addChild(exp_list_tail2);
+		return exp_list_tail;
+	}
+	
+	private TreeNode exp(){
+		TreeNode exp = new TreeNode("exp");
+		int temp_ind = exp_ind;
+		int temp_line = line;
+		
+		TreeNode term = term();
+		if(term!=null){
+			exp.addChild(term);
+			TreeNode exp_tail = exp_tail();
+			if(exp_tail!=null){
+				exp.addChild(exp_tail);
+			}
+			return exp;
+		}
+		
 		else if(match("(")){
-			if(!exp()){
-				System.out.println("Error(Line"+line+"): Invalid \"exp\" found.");
+			TreeNode exp2 = exp();
+			if(exp2==null){
 				exp_ind = temp_ind;
 				line = temp_line;
-				return false;
+				return null;
 			}
 			if(!match(")")){
 				System.out.println("Error(Line"+line+"): Expected \")\" token not found");
 				exp_ind = temp_ind;
-				return false;
-			}
-			return true;
-		}
-		if(id()!=null){
-			return true;
-		}
-		return false;
-	}
-	
-	private boolean exp_tail(){
-		int temp_ind = exp_ind;
-		int temp_line = line;
-		if(bin_op()){
-			if(!term()){
-				System.out.println("Error(Line"+line+"): Invalid \"term\" found.");
-				exp_ind = temp_ind;
 				line = temp_line;
-				return false;
+				return null;
 			}
-			if(!exp_tail()){
-				System.out.println("Error(Line"+line+"): Invalid \"exp-tail\" found.");
-				exp_ind = temp_ind;
-				line = temp_line;
-				return false;
-			}
-			epsilon = false;
-			return true;
-		}
-		else{
-			epsilon = true;
-		}
-		return true;
-	}
-	
-	private boolean term(){
-		int temp_ind = exp_ind;
-		int temp_line = line;
-		if(match("find"))
-		{
-			String regex = "";
-			boolean escaped = false;
-			if(!match("\'")){
-				exp_ind = temp_ind;
-				return false;
-			}
-			while(true){
-				if(peekChar()=='\\'){
-					escaped = true;
-				}
-				if(peekChar()=='\''&&!escaped){
-					break;
-				}
-				else{
-					escaped = false;
-					regex+=getChar();
-				}
-			}
-			if(DEBUG)System.out.println("REGEX: "+regex);
-				if(!match("\'")){
-					exp_ind = temp_ind;
-					line = temp_line;
-					return false;
-				}
-				if(!match("in")){
-					System.out.println("Error(Line"+line+"): Expected \"in\" token not found.");
-					exp_ind = temp_ind;
-					line = temp_line;
-					return false;
-				}
-				String file = file_name();
-				if(file==null){
-					System.out.println("Error(Line"+line+"): Invalid \"file-name\" found.");
-					exp_ind = temp_ind;
-					line = temp_line;
-					return false;
-				}
-				NFAGenerator n = new NFAGenerator(new Lexical());
-				n.generateNFA(regex);
-				return true;
-			}
-		return false;
-	}
-
-	private String file_name(){
-		boolean escaped = false;
-		String filename = null;
-		if(match("\"")){
-			filename="";
+			exp.addChild(exp2);
+			return exp;
 		}
 		
-		while((peekChar()>=32&&peekChar()<=126)){
-			if(peekChar()=='\\'){
-				escaped = true;
-			}
-			if(peekChar()=='\"'){
-				if(!escaped){
-					if(DEBUG)System.out.println("File: "+filename);
-					match("\"");
-					break;
-				}
-			}
-			if(peekChar()!='\n'){
-				filename+=getChar();
-				escaped = false;
-			}
+		String id = id();
+		if(id==null){
+			exp_ind = temp_ind;
+			line = temp_line;
+			return null;
 		}
-		return filename;
+		exp.addArg(id);
+		return exp;
 	}
 	
-	private boolean bin_op(){
-		if(match("diff")||match("union")||match("inters")){
-			return true;
+	private TreeNode exp_tail(){
+		TreeNode exp_tail = new TreeNode("exp-tail");
+		int temp_ind = exp_ind;
+		int temp_line = line;
+
+		TreeNode bin_op = bin_op();
+		if(bin_op==null){
+			exp_ind = temp_ind;
+			line = temp_line;
+			return null;
 		}
-		return false;
+		else{
+			TreeNode term = term();
+			if(term==null){
+				exp_ind = temp_ind;
+				line = temp_line;
+				return null;
+			}
+			exp_tail.addChild(term);
+			
+			TreeNode exp_tail2 = exp_tail();
+			if(exp_tail2==null){
+				return exp_tail;
+			}
+			exp_tail.addChild(exp_tail2);
+			return exp_tail;
+		}
+	}
+	
+	private TreeNode term(){
+		TreeNode term = new TreeNode("term");
+		int temp_ind = exp_ind;
+		int temp_line = line;
+		
+		if(!match("find")){
+//			System.out.println("Error(Line"+line+"): Expected \"find\" token not found");
+			exp_ind = temp_ind;
+			line = temp_line;
+			return null;
+		}
+		
+		String regex = regex();
+		if(regex==null){
+			exp_ind = temp_ind;
+			line = temp_line;
+			return null;
+		}
+		term.addArg(regex);
+
+		if(!match("in")){
+			System.out.println("Error(Line"+line+"): Expected \"in\" token not found.");
+			exp_ind = temp_ind;
+			line = temp_line;
+			return null;
+		}
+		TreeNode file_name = file_name();
+		if(file_name==null){
+			exp_ind = temp_ind;
+			line = temp_line;
+			return null;
+		}
+		term.addChild(file_name);
+		return term;
+	}
+
+	private TreeNode file_name(){
+		TreeNode file_name = new TreeNode("file-name");
+		int temp_ind = exp_ind;
+		int temp_line = line;
+		
+		String filename = ascii_str();
+		if(filename==null){
+			exp_ind = temp_ind;
+			line = temp_line;
+			return null;
+		}
+		file_name.addArg(filename);
+		return file_name;
+	}
+	
+	private TreeNode bin_op(){
+		if(match("diff")){
+			TreeNode result = new TreeNode("diff");
+			return result;
+		}
+		if(match("union")){
+			TreeNode result = new TreeNode("union");
+			return result;
+		}
+		if(match("inters")){
+			TreeNode result = new TreeNode("inters");
+			return result;
+		}
+		return null;
 	}
 	
 	private char peekChar(){
@@ -510,10 +539,6 @@ public class MiniREParser {
 				break;
 			}
 			else if(Character.isWhitespace(peekChar())){
-//				if(Character.getType(peekChar())!=Character.LINE_SEPARATOR){
-//					line++;
-//				}
-//				if(DEBUG)System.out.println("WHITESPACE");
 				getChar();
 			}
 			else{
@@ -531,6 +556,56 @@ public class MiniREParser {
 		}
 		if(DEBUG)System.out.println("ID = "+id);
 		return id;
+	}
+	
+	private String ascii_str(){
+		boolean escaped = false;
+		String filename = null;
+		if(match("\"")){
+			filename="";
+		}
+		while((peekChar()>=32&&peekChar()<=126)){
+			if(peekChar()=='\\'){
+				escaped = true;
+			}
+			if(peekChar()=='\"'){
+				if(!escaped){
+					match("\"");
+					break;
+				}
+			}
+			if(peekChar()!='\n'){
+				filename+=getChar();
+			}
+		}
+		return filename;
+	}
+	
+	private String regex(){
+		int temp_ind = exp_ind;
+		int temp_line = line;
+		String regex = "";
+		boolean escaped = false;
+		if(!match("\'")){
+			exp_ind = temp_ind;
+			line = temp_line;
+			System.out.println("Error(Line"+line+"): Invalid regular expression found.");
+			return null;
+		}
+		while(true){
+			if(peekChar()=='\\'){
+				escaped = true;
+			}
+			if(match("\'")&&!escaped){
+				System.out.println("REGEX:"+regex);
+				break;
+			}
+			else{
+				escaped = false;
+				regex+=getChar();
+			}
+		}
+		return regex;
 	}
 	
 	private char getChar(){
