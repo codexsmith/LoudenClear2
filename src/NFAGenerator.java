@@ -285,7 +285,6 @@ public class NFAGenerator {
 			match('[');
 			charset_regex = "[";
 			result = char_class1();
-//			System.out.println(charset_regex);
 			CharacterC period = new CharacterC(charset_regex, lexspec.getCharacters());
 			result = new StateTable();
 			result.getTable().add(new State());

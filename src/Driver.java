@@ -7,7 +7,9 @@ public class Driver {
 	 * @param args
 	 */
 	public static boolean DEBUG = true;
-	public static boolean LLONE_DEBUG = false;
+	public static boolean LLONE_DEBUG = true;
+	public static boolean LEX_PARSE_DEBUG = false;
+	public static boolean DEBUG_TOKENC = false;
   
 	public static void main(String[] args) {
     LLoneGenerator leftOne;
@@ -62,7 +64,7 @@ public class Driver {
 //		System.out.println(output);
 //		for(int i = 1; i<=7; i++){
 //			String test_case = Integer.toString(i);			
-// 			Tokenizer t = new Tokenizer("C:\\Users\\Andrew\\workspace\\Parser\\test_inputs\\"+test_case+"\\input","C:\\Users\\Andrew\\workspace\\Parser\\test_inputs\\"+test_case+"\\spec");
+// 			t = new Tokenizer("C:\\Users\\Andrew\\workspace\\Parser\\test_inputs\\"+test_case+"\\input","C:\\Users\\Andrew\\workspace\\Parser\\test_inputs\\"+test_case+"\\spec");
 //			String output = t.parse();
 //			System.out.println(output);
 //		}
