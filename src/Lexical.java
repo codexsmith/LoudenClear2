@@ -11,22 +11,34 @@ import java.util.Map;
 public class Lexical {
 	private ArrayList<TokenC> tokens;
 	private HashMap<String, CharacterC> characters;
-	
+  private ArrayList<TokenC> rules;
+    
 	public Lexical(){
 		tokens = new ArrayList<TokenC>();
 		characters = new HashMap<String,CharacterC>();
+		rules = new ArrayList<TokenC>();
 	}
 	/**
 	 * Constructor
 	 * @param toks TokenCs to set
 	 * @param chars CharacterCs to set
 	 */
-	public Lexical(ArrayList<TokenC> toks, HashMap<String, CharacterC> chars)
+	public Lexical(ArrayList<TokenC> toks, HashMap<String, CharacterC> chars, ArrayList<TokenC> rules)
 	{
+    this.rules = rules;
 		this.tokens = toks;
 		this.characters = chars;
 	}
-	
+
+    /**
+   * Returns TokenC's
+   * @return rules of TokenC's
+   */
+  public ArrayList<TokenC> getRules()
+  {
+    return rules;
+  }
+    
 	/**
 	 * Returns TokenC's
 	 * @return tokens TokenC's to return

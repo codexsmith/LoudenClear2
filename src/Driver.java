@@ -8,15 +8,13 @@ public class Driver {
 	 */
 	public static boolean DEBUG = true;
 	public static boolean LLONE_DEBUG = false;
-	
-      Tokenizer t = new Tokenizer("C:\\Users\\Andrew\\workspace\\Parser\\test_inputs\\"+test_case+"\\input","C:\\Users\\Andrew\\workspace\\Parser\\test_inputs\\"+test_case+"\\spec");
-
-         
-// 
+  
 	public static void main(String[] args) {
-
+    LLoneGenerator leftOne;
+    Tokenizer t;
+    
   if (LLONE_DEBUG){
-    LLone leftOne = new LLone("miniRE_spec.txt");
+    leftOne = new LLoneGenerator("miniRE_spec.txt");
   }
 	
 // Interpretor Test START

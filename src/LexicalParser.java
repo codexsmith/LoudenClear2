@@ -91,7 +91,7 @@ public class LexicalParser {
 				else if (state == 3 || state == 4){
 					if (line.startsWith("<")){//MINI RE rules
 						TokenC token = new TokenC(line);
-						tokens.rules(token);
+						rules.add(token);
 					}
 				}
 			}
@@ -100,7 +100,7 @@ public class LexicalParser {
 		//Create epsilon using @ symbol
 		String epsilonStr = "$Epsilon [@]";
 		chars.put("$Epsilon", new CharacterC(epsilonStr, chars));
-		return new Lexical(tokens, chars);
+		return new Lexical(tokens, chars, rules);
 	}
 	
 	public String getLine(){
