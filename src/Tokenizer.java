@@ -26,7 +26,7 @@ public class Tokenizer {
 		accept = false;
 		LexicalParser lp = new LexicalParser(lex);
 		Lexical lexspec = lp.scanLexicon();
-// 		NFAGenerator ngen = new NFAGenerator(lexspec);
+ 		NFAGen ngen = new NFAGen(lexspec);
 
 //     //LLONE TESTING
 // 		if (Driver.LLNONE_DEBUG){
@@ -34,9 +34,9 @@ public class Tokenizer {
 //       ArrayList<TokenC> temp = LLone.firstSet();
 // 		}
 
-// 		StateTable nfa = ngen.generateNFA();
-// 		DFAConverter conv = new DFAConverter(nfa);
-// 		dfa = conv.convert();
+ 		StateTable nfa = ngen.generateNFA();
+ 		DFAConverter conv = new DFAConverter(nfa);
+ 		dfa = conv.convert();
 		if(DEBUG)System.out.println(dfa);
 		state = dfa.getTable().get(0);
 		try {
@@ -69,9 +69,9 @@ public class Tokenizer {
 				}
 				name = c;
 				state = dfa.getTable().get(0);
-				System.out.println(state.toString()); //test
+				if(DEBUG)System.out.println(state.toString()); //test
 				state = state.getTable().get(c).get(0);
-				System.out.println(state.toString()); //test
+				if(DEBUG)System.out.println(state.toString()); //test
 				accept = false;
 				if(state.getAccept()){
 					accept = true;
