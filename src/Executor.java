@@ -303,7 +303,7 @@ public class Executor {
 				{
 					currEndIndex = currStartIndex + s.length();
 					if(Pattern.matches(regex, s))
-						foundMatches.add(new ExecutorData(s, filename, currLine, currStartIndex, currEndIndex));
+						foundMatches.add(new ExecutorData(s, filename));
 					
 					currStartIndex = currEndIndex + 2;
 				}
@@ -352,7 +352,7 @@ public class Executor {
 				{
 					currEndIndex = currStartIndex + s.length();
 					if(Pattern.matches(regex, s))
-						foundMatches.add(new ExecutorData(s, filename, currLine, currStartIndex, currEndIndex));
+						foundMatches.add(new ExecutorData(s, filename));
 					
 					currStartIndex = currEndIndex + 2;
 				}

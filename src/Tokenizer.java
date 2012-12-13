@@ -1,7 +1,10 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.Scanner;
+import java.util.Set;
 
 public class Tokenizer {
 	private final boolean DEBUG = false;
@@ -14,17 +17,22 @@ public class Tokenizer {
 	private boolean accept;
 	private String regex;
 	private File file;
+	private Scanner scan;
 	private int index;
+	private int start_index;
+	private HashMap<String,ExecutorData> table;
 	
 	public Tokenizer(String f, String a){
 		input = new File(f);
 		lex = a;
 	}
 	
-	public Tokenizer(File f, String r){
+	public Tokenizer(File f, String r) throws FileNotFoundException{
 		file = f;
 		regex = r;
-		index = 0;
+		scan = new Scanner(file);
+		scan.useDelimiter("");
+		table = new HashMap<String,ExecutorData>();
 	}
 	
 	public String parse(){
@@ -106,21 +114,76 @@ public class Tokenizer {
 		}
 	}
 	
-	public ArrayList<String> getTokens(){
-		ArrayList<String> result = new ArrayList<String>();
+	public ArrayList<ExecutorData> getTokens(){
+		ArrayList<ExecutorData> result = new ArrayList<ExecutorData>();
 		NFAGen ngen = new NFAGen(new Lexical());
 		StateTable nfa = ngen.generateNFA(regex);
 		DFAConverter con = new DFAConverter(nfa);
 		dfa = con.convert();
 		String token = strtok();
 		while(token!=null){
-			result.add(token);
+			if(!table.containsKey(token)){
+				ExecutorData value = new ExecutorData(file.getName(),token);
+				value.addIndex(start_index);
+				table.put(token, value);
+			}
+			else{
+				table.get(token).addIndex(start_index);
+			}
 			token = strtok();
 		}
+		result.addAll(table.values());
 		return result;
 	}
 	
 	public String strtok(){
-		return null;
+		String c = "";
+		state = dfa.getTable().get(0);
+		boolean accept = false;
+		String tok = "";
+		while(scan.hasNext()){
+			c = scan.next();
+			if(Character.isWhitespace(c.toCharArray()[0])){
+				index++;
+				return null;
+			}
+			if(state.getTable().get(c)!=null){
+				start_index = index;
+				index++;
+				tok+=c;
+				state = state.getTable().get(c).get(0);
+				if(state.getAccept()){
+					accept = true;
+				}
+				break;
+			}
+		}
+		
+		while(scan.hasNext()){
+			c = scan.next();
+			index++;
+			if(Character.isWhitespace(c.toCharArray()[0])){
+				if(accept){
+					return tok;
+				}
+				tok = strtok();
+			}
+			if(state.getTable().get(c)!=null){
+				state = state.getTable().get(c).get(0);
+				if(accept&&!state.getAccept()){
+					return tok;
+				}
+				if(state.getAccept()){
+					accept = true;
+				}
+				tok+=c;
+				index++;
+			}
+		}
+		
+		if(tok.length()==0){
+			return null;
+		}
+		return tok;
 	}
 }

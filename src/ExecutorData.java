@@ -1,20 +1,18 @@
+import java.util.ArrayList;
+
 
 public class ExecutorData {
 	private String data;
 	private String filename;
-	private int line;
-	private int startIndex;
-	private int endIndex;
+	private ArrayList<Integer> indices;
 	
 	public ExecutorData(){};
 	
-	public ExecutorData(String data, String filename, int line, int startIndex, int endIndex)
+	public ExecutorData(String data, String filename)
 	{
 		this.data = data;
 		this.filename = filename;
-		this.line = line;
-		this.startIndex = startIndex;
-		this.endIndex = endIndex;
+		this.indices = new ArrayList<Integer>();
 	}
 	
 	public String getData()
@@ -34,29 +32,13 @@ public class ExecutorData {
 	public void setFilename(String filename) {
 		this.filename = filename;
 	}
-
-	public int getLine() {
-		return line;
+	
+	public ArrayList<Integer> getIndices(){
+		return indices;
 	}
 
-	public void setLine(int line) {
-		this.line = line;
-	}
-
-	public int getStartIndex() {
-		return startIndex;
-	}
-
-	public void setStartIndex(int startIndex) {
-		this.startIndex = startIndex;
-	}
-
-	public int getEndIndex() {
-		return endIndex;
-	}
-
-	public void setEndIndex(int endIndex) {
-		this.endIndex = endIndex;
+	public void addIndex(int i){
+		this.indices.add(i);
 	}
 	
 	@Override
@@ -73,7 +55,7 @@ public class ExecutorData {
 		if(filename.equals(""))
 			return "\"" + data + "\"";
 			
-		return "\"" + data + "\" <" + filename + ", " + line + ", " + startIndex + ", " + endIndex + ">";
+		return "\"" + data + "\" <" + filename + ", " +indices+ ">";
 		
 	}
 }
