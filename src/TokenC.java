@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 
 public class TokenC {
 	private String legal; //array list of length 1, containing the regex as a string. this must be of compatible type with the regex parser

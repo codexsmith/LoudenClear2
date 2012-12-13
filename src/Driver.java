@@ -44,17 +44,6 @@ public class Driver {
 //		System.out.println("inters(testget,testset) : " + inter.inters(inter.getID("testget"), inter.getID("testset")));
 // Interpretor Test END		
 		
-<<<<<<< HEAD
-		
-		MiniREParser parser = new MiniREParser();
-		parser.parse("begin\n " +
-				"matches = find \'[A-Z a-z]*ment[A-Z a-z]*\' in \"file1.txt\" inters find \'(A|a) [A-Z a-z]*\' in \"file2.txt\";\n" +
-				"n_matches = #matches;\n" +
-				"print (n_matches);\n" +
-				"replace '[A-Z a-z]*ment' with \"\" in \"file1.txt\" >! \"file3.txt\";\n" +
-				"end");
-=======
-		
 		MiniREParser parser = new MiniREParser();
 		TreeNode root = parser.parse("begin\n " +
 				"matches = find \'[A-Z a-z]*ment[A-Z a-z]*\' in \"file1.txt\" inters find \'(A|a) [A-Z a-z]*\' in \"file2.txt\";\n" +
@@ -69,7 +58,6 @@ public class Driver {
 		System.out.println("*****************");
 		System.out.println("");
 		Executor ex = new Executor(root);
->>>>>>> cc7c748b9e663b678e837923bfbc868e0be9c692
 
 //		System.out.println();
 //		System.out.println(output);
