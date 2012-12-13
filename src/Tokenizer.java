@@ -26,11 +26,13 @@ public class Tokenizer {
 		accept = false;
 		LexicalParser lp = new LexicalParser(lex);
 		Lexical lexspec = lp.scanLexicon();
-		NFAGenerator ngen = new NFAGenerator(lexspec);
 
-		StateTable nfa = ngen.generateNFA();
-		DFAConverter conv = new DFAConverter(nfa);
-		dfa = conv.convert();
+ 		NFAGen ngen = new NFAGen(lexspec);
+
+ 		StateTable nfa = ngen.generateNFA();
+ 		DFAConverter conv = new DFAConverter(nfa);
+ 		dfa = conv.convert();
+
 		if(DEBUG)System.out.println(dfa);
 		state = dfa.getTable().get(0);
 		try {
@@ -63,9 +65,9 @@ public class Tokenizer {
 				}
 				name = c;
 				state = dfa.getTable().get(0);
-				System.out.println(state.toString()); //test
+				if(DEBUG)System.out.println(state.toString()); //test
 				state = state.getTable().get(c).get(0);
-				System.out.println(state.toString()); //test
+				if(DEBUG)System.out.println(state.toString()); //test
 				accept = false;
 				if(state.getAccept()){
 					accept = true;

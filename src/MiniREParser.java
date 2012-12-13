@@ -283,7 +283,6 @@ public class MiniREParser {
 				return statement;
 			}
 		}
-		System.out.println("Error(Line"+line+"): Invalid \"statement\" found.");
 		exp_ind = temp_ind;
 		line = temp_line;
 		return null;
@@ -555,6 +554,7 @@ public class MiniREParser {
 				getChar();
 			}
 			else{
+				System.out.println("Error(Line"+line+"): Unexpected token \""+peekChar()+"\" found.");
 				return null;
 			}
 
@@ -645,7 +645,7 @@ public class MiniREParser {
 				return false;
 			}
 		}
-		if(Character.getType(peekChar())!=Character.SPACE_SEPARATOR){
+		if(peekChar()=='\n'){
 			line++;
 		}
 		if(DEBUG)System.out.println("Matched: "+s);
