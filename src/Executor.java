@@ -282,37 +282,15 @@ public class Executor {
 			return null;
 		}
 		
-//		Tokenizer tokenizer = new Tokenizer(readFile, regex);
-//		
-//		ArrayList<ExecutorData> foundTokens = tokenizer.parse();
-		
-		ArrayList<ExecutorData> foundMatches = new ArrayList<ExecutorData>();
-		Scanner snTemp;
+		Tokenizer tokenizer;
+		ArrayList<ExecutorData> foundMatches = null;
 		try {
-			snTemp = new Scanner(readFile);
-			regex = regex.replace(" ", "");
-			
-			int currLine = 0;
-			int currStartIndex = 0;
-			int currEndIndex = 0;
-			while(snTemp.hasNextLine())
-			{
-				String tmp = snTemp.nextLine();
-				String[] as = tmp.split(" ");
-				for(String s : as)
-				{
-					currEndIndex = currStartIndex + s.length();
-					if(Pattern.matches(regex, s))
-						foundMatches.add(new ExecutorData(s, filename));
-					
-					currStartIndex = currEndIndex + 2;
-				}
-				currLine++;
-			}	
-			snTemp.close();
+			tokenizer = new Tokenizer(readFile, regex);
+			foundMatches = tokenizer.getTokens();
 		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}	
+		}
 		
 		return foundMatches;
 	}
