@@ -478,7 +478,6 @@ public class MiniREParser {
 	}
 	
 	private TreeNode term(){
-		if(DEBUG)System.out.println("term");
 		TreeNode term = new TreeNode("term");
 		int temp_ind = exp_ind;
 		int temp_line = line;
@@ -489,6 +488,8 @@ public class MiniREParser {
 			line = temp_line;
 			return null;
 		}
+		term.setName("find");
+		if(DEBUG)System.out.println("find");
 		
 		String regex = regex();
 		if(regex==null){
@@ -504,6 +505,7 @@ public class MiniREParser {
 			line = temp_line;
 			return null;
 		}
+		
 		TreeNode file_name = file_name();
 		if(file_name==null){
 			exp_ind = temp_ind;
