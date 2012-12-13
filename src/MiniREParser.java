@@ -227,6 +227,7 @@ public class MiniREParser {
 				return null;
 			}
 			if(match("#")){
+				statement.addArg("#");
 				TreeNode exp = exp();
 				if(exp==null){
 					exp_ind = temp_ind;
@@ -447,10 +448,11 @@ public class MiniREParser {
 	}
 	
 	private TreeNode exp_tail(){
-		if(DEBUG)System.out.println("exp-tail");
 		TreeNode exp_tail = new TreeNode("exp-tail");
 		int temp_ind = exp_ind;
 		int temp_line = line;
+
+		if(DEBUG)System.out.println("exp-tail");
 		
 		TreeNode bin_op = bin_op();
 		if(bin_op==null){
@@ -473,6 +475,7 @@ public class MiniREParser {
 			return exp_tail;
 		}
 		exp_tail.addChild(exp_tail2);
+		
 		return exp_tail;
 
 	}
