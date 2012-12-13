@@ -66,84 +66,84 @@ public class Executor {
 			ArrayList<ExecutorData> found = findExpression(filename, node.getArg(0)); //filename & regex
 			returnVals.addAll(found);
 		}
-		else if(nodeName.equals("replace")) //arg0 = filename
-		{
-			String filename = childVals.get(0).get(0).getData();         //file1 name
-			String filename2 = childVals.get(0).get(1).getData();		   //file2 name
-			replace(filename, filename2, node.getArg(0), node.getArg(1)); //filename, regex, str
-		}
-		else if(nodeName.equals("union"))
-		{
-			ExecutorData ed = new ExecutorData();
-			ed.setData("union");
-			returnVals.add(ed);
-		}
-		else if(nodeName.equals("inters"))
-		{
-			ExecutorData ed = new ExecutorData();
-			ed.setData("inters");
-			returnVals.add(ed);
-		}
-		else if(nodeName.equals("diff"))
-		{
-			ExecutorData ed = new ExecutorData();
-			ed.setData("diff");
-			returnVals.add(ed);
-		}
-		else if(nodeName.equals("statement"))
-		{
-			if(node.getArg(1) != null && node.getArg(1).equals("#"))
-			{
-				ids.put(node.getArg(0), childVals.get(0).get(0));
-			}
-			else if(node.getArg(1) != null && !node.getArg(1).equals("#"))
-			{
-				ArrayList<ExecutorData> listCmp = childVals.get(0);
-				ids.put(node.getArg(0), assignMaxFrequentString(listCmp)); 
-			}
-			else
-			{
-				ids.put(node.getArg(0), childVals.get(0).get(0));
-			}	
-		}
-		else if(nodeName.equals("recursiveReplacement"))
-		{
-			
-		}
-		else if(nodeName.equals("print"))
-		{
-			if(node.getArg(0) != null) //has ID arg
-			{
-				System.out.println(Integer.parseInt(node.getArg(0)));
-			}
-			else // has child expression
-			{
-				ArrayList<ExecutorData> childExpression = childVals.get(0);
-				System.out.println(arrayListToString(childExpression));
-			}
-		}
-		else if(nodeName.equals("file-names")) //multiple files, get values from child
-		{
-			//loop through each filename child and get the filename from arg0
-			for(int j = 0; j < childVals.size(); j++)
-				returnVals.add(childVals.get(j).get(0));
-		}
-		else if(nodeName.equals("file-name")) //single file. has name as arg0
-		{
-			ExecutorData ed = new ExecutorData();
-			ed.setData(node.getArg(0)); //get file name
-			returnVals.add(ed);
-		}
-		else if(nodeName.equals("source-file") || nodeName.equals("destination-file"))
-		{
-			ExecutorData ed = new ExecutorData();
-			ed.setData(node.getArg(0));
-			returnVals.add(ed); //return filename
-		}
-		else if(nodeName.equals("exp-list")) //forward data
-		{
-			returnVals.addAll(childVals.get(0));
-		}
+//		else if(nodeName.equals("replace")) //arg0 = filename
+//		{
+//			String filename = childVals.get(0).get(0).getData();         //file1 name
+//			String filename2 = childVals.get(0).get(1).getData();		   //file2 name
+//			replace(filename, filename2, node.getArg(0), node.getArg(1)); //filename, regex, str
+//		}
+//		else if(nodeName.equals("union"))
+//		{
+//			ExecutorData ed = new ExecutorData();
+//			ed.setData("union");
+//			returnVals.add(ed);
+//		}
+//		else if(nodeName.equals("inters"))
+//		{
+//			ExecutorData ed = new ExecutorData();
+//			ed.setData("inters");
+//			returnVals.add(ed);
+//		}
+//		else if(nodeName.equals("diff"))
+//		{
+//			ExecutorData ed = new ExecutorData();
+//			ed.setData("diff");
+//			returnVals.add(ed);
+//		}
+//		else if(nodeName.equals("statement"))
+//		{
+//			if(node.getArg(1) != null && node.getArg(1).equals("#"))
+//			{
+//				ids.put(node.getArg(0), childVals.get(0).get(0));
+//			}
+//			else if(node.getArg(1) != null && !node.getArg(1).equals("#"))
+//			{
+//				ArrayList<ExecutorData> listCmp = childVals.get(0);
+//				ids.put(node.getArg(0), assignMaxFrequentString(listCmp)); 
+//			}
+//			else
+//			{
+//				ids.put(node.getArg(0), childVals.get(0).get(0));
+//			}	
+//		}
+//		else if(nodeName.equals("recursiveReplacement"))
+//		{
+//			
+//		}
+//		else if(nodeName.equals("print"))
+//		{
+//			if(node.getArg(0) != null) //has ID arg
+//			{
+//				System.out.println(Integer.parseInt(node.getArg(0)));
+//			}
+//			else // has child expression
+//			{
+//				ArrayList<ExecutorData> childExpression = childVals.get(0);
+//				System.out.println(arrayListToString(childExpression));
+//			}
+//		}
+//		else if(nodeName.equals("file-names")) //multiple files, get values from child
+//		{
+//			//loop through each filename child and get the filename from arg0
+//			for(int j = 0; j < childVals.size(); j++)
+//				returnVals.add(childVals.get(j).get(0));
+//		}
+//		else if(nodeName.equals("file-name")) //single file. has name as arg0
+//		{
+//			ExecutorData ed = new ExecutorData();
+//			ed.setData(node.getArg(0)); //get file name
+//			returnVals.add(ed);
+//		}
+//		else if(nodeName.equals("source-file") || nodeName.equals("destination-file"))
+//		{
+//			ExecutorData ed = new ExecutorData();
+//			ed.setData(node.getArg(0));
+//			returnVals.add(ed); //return filename
+//		}
+//		else if(nodeName.equals("exp-list")) //forward data
+//		{
+//			returnVals.addAll(childVals.get(0));
+//		}
 		else if(nodeName.equals("exp")) //child 0 - term, child 1 - exp_tail value (0 bin_op, 1+-term
 		{
 				ArrayList<ExecutorData> exp_tail_rtn = childVals.get(1);

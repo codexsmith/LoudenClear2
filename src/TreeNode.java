@@ -37,6 +37,10 @@ public class TreeNode {
 			return null;
 	}
 	
+	public int getSize(){
+		return children.size();
+	}
+	
 	public void addArg(String s){
 		args.add(s);
 	}
