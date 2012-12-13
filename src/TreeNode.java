@@ -31,7 +31,10 @@ public class TreeNode {
 	}
 	
 	public TreeNode getChild(int i){
-		return children.get(i);
+		if(i < children.size())
+			return children.get(i);
+		else
+			return null;
 	}
 	
 	public void addArg(String s){
@@ -39,6 +42,8 @@ public class TreeNode {
 	}
 	
 	public String getArg(int i){
-		return args.get(i);
+		if(i < args.size())
+			return args.get(i);
+		return null;
 	}
 }
