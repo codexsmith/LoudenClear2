@@ -3,7 +3,6 @@ public class MiniREParser {
 	private final boolean DEBUG = true;
 	private String expression;
 	private int exp_ind;
-	private boolean epsilon;
 	private int line;
 	private TreeNode root;
 
@@ -14,10 +13,11 @@ public class MiniREParser {
 		root = null;
 	}//end MiniREParser constructor
 	
-	public void parse(String exp){
+	public TreeNode parse(String exp){
 		expression = exp;
 		exp_ind = 0;
 		root = miniREprogram();
+		return root;
 	}//end parse
 	
 	private TreeNode miniREprogram(){
@@ -98,6 +98,7 @@ public class MiniREParser {
 				return null;
 			}
 			statement.addArg(regex);
+			
 			if(!match("with")){
 				System.out.println("Error(Line"+line+"): Expected token \"with\" not found.");
 				exp_ind = temp_ind;
@@ -207,9 +208,16 @@ public class MiniREParser {
 			}
 			return statement;
 		}
-		else if(id()!=null){
+		String id = id();
+		if(id!=null){
+			if(id.compareTo("end")==0){
+				exp_ind = temp_ind;
+				line = temp_line;
+				return null;
+			}
+			statement.addArg(id);
 			if(!match("=")){
-//				System.out.println("Error(Line"+line+"): Expected token \"=\" not found.");
+				System.out.println("Error(Line"+line+"): Expected token \"=\" not found.");
 				exp_ind = temp_ind;
 				line = temp_line;
 				return null;
@@ -237,7 +245,7 @@ public class MiniREParser {
 					line = temp_line;
 					return null;
 				}
-				String id = id();
+				id = id();
 				if(id==null){
 					exp_ind = temp_ind;
 					line = temp_line;
@@ -369,6 +377,11 @@ public class MiniREParser {
 		int temp_ind = exp_ind;
 		int temp_line = line;
 		
+		if(!match(",")){
+			exp_ind = temp_ind;
+			line = temp_line;
+			return null;
+		}
 		TreeNode exp = exp();
 		if(exp==null){
 			exp_ind = temp_ind;
