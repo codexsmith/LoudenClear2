@@ -54,6 +54,7 @@ public class LexicalParser {
 		String line= "";
 		HashMap<String, CharacterC> chars = new HashMap<String, CharacterC>();
 		ArrayList<TokenC> tokens = new ArrayList<TokenC>();
+		ArrayList<TokenC> rules = new ArrayList<TokenC>();
 		
 		int state = 0; //state 0 = first comments, 1 = in characters, 2 = in identifiers.
 		
@@ -87,16 +88,10 @@ public class LexicalParser {
 					TokenC token = new TokenC(line);
 					tokens.add(token);
 				}
-				else if (state == 3){
-					if (line.startsWith("<")){//start symbol
+				else if (state == 3 || state == 4){
+					if (line.startsWith("<")){//MINI RE rules
 						TokenC token = new TokenC(line);
-						tokens.add(token);
-					}
-				}
-				else if (state == 4){
-					if (line.startsWith("<")){//rules
-						TokenC token = new TokenC(line);
-						tokens.add(token);
+						rules.add(token);
 					}
 				}
 			}
@@ -105,7 +100,7 @@ public class LexicalParser {
 		//Create epsilon using @ symbol
 		String epsilonStr = "$Epsilon [@]";
 		chars.put("$Epsilon", new CharacterC(epsilonStr, chars));
-		return new Lexical(tokens, chars);
+		return new Lexical(tokens, chars, rules);
 	}
 	
 	public String getLine(){

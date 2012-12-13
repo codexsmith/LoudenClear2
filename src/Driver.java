@@ -7,10 +7,20 @@ public class Driver {
 	 * @param args
 	 */
 	public static boolean DEBUG = true;
-	
+	public static boolean LLONE_DEBUG = false;
+  
 	public static void main(String[] args) {
+    LLoneGenerator leftOne;
+    Tokenizer t;
+    
+  if (LLONE_DEBUG){
+    leftOne = new LLoneGenerator("miniRE_spec.txt");
+  }
+	
 // Interpretor Test START
 		Interpretor inter = new Interpretor();
+  
+    
 		
 //		inter.replace("d", "xxx", "sanghun_test_input1.txt", "sanghun_test_output1.txt");
 //		inter.recursivereplace("a", "ax", "sanghun_test_input1.txt", "sanghun_test_output2.txt");

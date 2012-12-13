@@ -12,8 +12,9 @@ public class Tokenizer {
 	private State state;
 	private String name;
 	private boolean accept;
+
 	
-	public Tokenizer(String f,String l){
+	public Tokenizer(String f, String l){
 		input = new File(f);
 		lex = l;
 	}
@@ -25,14 +26,17 @@ public class Tokenizer {
 		accept = false;
 		LexicalParser lp = new LexicalParser(lex);
 		Lexical lexspec = lp.scanLexicon();
-		NFAGenerator ngen = new NFAGenerator(lexspec);
-		
-		LLoneGenerator LLone = new LLoneGenerator(lexspec);
-		ArrayList<TokenC> temp = LLone.firstSet();
-		
-		StateTable nfa = ngen.generateNFA();
-		DFAConverter conv = new DFAConverter(nfa);
-		dfa = conv.convert();
+// 		NFAGenerator ngen = new NFAGenerator(lexspec);
+
+//     //LLONE TESTING
+// 		if (Driver.LLNONE_DEBUG){
+//       LLoneGenerator LLone = new LLoneGenerator(lexspec);
+//       ArrayList<TokenC> temp = LLone.firstSet();
+// 		}
+
+// 		StateTable nfa = ngen.generateNFA();
+// 		DFAConverter conv = new DFAConverter(nfa);
+// 		dfa = conv.convert();
 		if(DEBUG)System.out.println(dfa);
 		state = dfa.getTable().get(0);
 		try {
