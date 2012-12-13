@@ -45,7 +45,7 @@ public class Executor {
 		int i = 0;
 		TreeNode child;
 		
-		System.out.println("current node: " + node.getName());
+		System.out.println("current node up: " + node.getName());
 		
 		//Perform Child operations recursively
 		while((child = node.getChild(i)) != null)
@@ -53,6 +53,8 @@ public class Executor {
 			childVals.add(recursiveExecutor(child));
 			i++;
 		}
+		
+		System.out.println("current node down: " + node.getName());
 		
 		/*
 		 * Determine which operation to perform
@@ -72,35 +74,37 @@ public class Executor {
 		}
 		else if(nodeName.equals("union"))
 		{
-			ArrayList<ExecutorData> set1 = childVals.get(0); //string 1 to union
-			ArrayList<ExecutorData> set2 = childVals.get(1); //string 2 to union
-			returnVals.addAll(union(set1, set2));
+			ExecutorData ed = new ExecutorData();
+			ed.setData("union");
+			returnVals.add(ed);
 		}
 		else if(nodeName.equals("inters"))
 		{
-			ArrayList<ExecutorData> set1 = childVals.get(0); //string 1 to union
-			ArrayList<ExecutorData> set2 = childVals.get(1); //string 2 to union
-			returnVals.addAll(intersect(set1, set2));
+			ExecutorData ed = new ExecutorData();
+			ed.setData("inters");
+			returnVals.add(ed);
 		}
 		else if(nodeName.equals("diff"))
 		{
-			ArrayList<ExecutorData> set1 = childVals.get(0); //string 1 to union
-			ArrayList<ExecutorData> set2 = childVals.get(1); //string 2 to union
-			returnVals.addAll(difference(set1, set2));
+			ExecutorData ed = new ExecutorData();
+			ed.setData("diff");
+			returnVals.add(ed);
 		}
-		else if(nodeName.equals("assign"))
+		else if(nodeName.equals("statement"))
 		{
-			ids.put(node.getArg(0), childVals.get(0).get(0));
-		}
-		else if(nodeName.equals("assignMaxFrequentString"))
-		{
-			ArrayList<ExecutorData> listCmp = childVals.get(0);
-			ids.put(node.getArg(0), assignMaxFrequentString(listCmp)); 
-		}
-		else if(nodeName.equals("assignLength"))
-		{
-			
-			ids.put(node.getArg(0), childVals.get(0).get(0));
+			if(node.getArg(1) != null && node.getArg(1).equals("#"))
+			{
+				ids.put(node.getArg(0), childVals.get(0).get(0));
+			}
+			else if(node.getArg(1) != null && !node.getArg(1).equals("#"))
+			{
+				ArrayList<ExecutorData> listCmp = childVals.get(0);
+				ids.put(node.getArg(0), assignMaxFrequentString(listCmp)); 
+			}
+			else
+			{
+				ids.put(node.getArg(0), childVals.get(0).get(0));
+			}	
 		}
 		else if(nodeName.equals("recursiveReplacement"))
 		{
@@ -118,17 +122,88 @@ public class Executor {
 				System.out.println(arrayListToString(childExpression));
 			}
 		}
-		else if(nodeName.equals("file-names"))
+		else if(nodeName.equals("file-names")) //multiple files, get values from child
 		{
 			//loop through each filename child and get the filename from arg0
 			for(int j = 0; j < childVals.size(); j++)
 				returnVals.add(childVals.get(j).get(0));
+		}
+		else if(nodeName.equals("file-name")) //single file. has name as arg0
+		{
+			ExecutorData ed = new ExecutorData();
+			ed.setData(node.getArg(0)); //get file name
+			returnVals.add(ed);
 		}
 		else if(nodeName.equals("source-file") || nodeName.equals("destination-file"))
 		{
 			ExecutorData ed = new ExecutorData();
 			ed.setData(node.getArg(0));
 			returnVals.add(ed); //return filename
+		}
+		else if(nodeName.equals("exp-list")) //forward data
+		{
+			returnVals.addAll(childVals.get(0));
+		}
+		else if(nodeName.equals("exp")) //child 0 - term, child 1 - exp_tail value (0 bin_op, 1+-term
+		{
+				ArrayList<ExecutorData> exp_tail_rtn = childVals.get(1);
+				
+				if(exp_tail_rtn.get(0).getData().equals("union"))
+				{
+					exp_tail_rtn.remove(0);
+					ArrayList<ExecutorData> set1 = childVals.get(0); //string 1 to union
+					ArrayList<ExecutorData> set2 = exp_tail_rtn; //string 2 to union
+					returnVals.addAll(union(set1, set2));
+				}
+				else if(exp_tail_rtn.get(0).getData().equals("diff"))
+				{
+					exp_tail_rtn.remove(0);
+					ArrayList<ExecutorData> set1 = childVals.get(0); //string 1 to union
+					ArrayList<ExecutorData> set2 = exp_tail_rtn; //string 2 to union
+					returnVals.addAll(difference(set1, set2));
+				}
+				else if(exp_tail_rtn.get(0).getData().equals("inters"))
+				{
+					exp_tail_rtn.remove(0);
+					ArrayList<ExecutorData> set1 = childVals.get(0); //string 1 to union
+					ArrayList<ExecutorData> set2 = exp_tail_rtn; //string 2 to union
+					returnVals.addAll(intersect(set1, set2));
+				}
+		}
+		else if(nodeName.equals("exp-tail")) //child 0 - bin_op, //child 1 - find, //child 2 - exp_tail value (0 bin_op, 1+-term)
+		{
+			try {
+				ArrayList<ExecutorData> exp_tail_rtn = childVals.get(2);
+				
+				returnVals.addAll(childVals.get(0));
+				
+				//Won't reach here if has no right exp_tail recurse and will go to the 
+				//catch stage instead
+				if(exp_tail_rtn.get(0).getData().equals("union"))
+				{
+					exp_tail_rtn.remove(0);
+					ArrayList<ExecutorData> set1 = childVals.get(1); //string 1 to union
+					ArrayList<ExecutorData> set2 = exp_tail_rtn; //string 2 to union
+					returnVals.addAll(union(set1, set2));
+				}
+				else if(exp_tail_rtn.get(0).getData().equals("diff"))
+				{
+					exp_tail_rtn.remove(0);
+					ArrayList<ExecutorData> set1 = childVals.get(1); //string 1 to union
+					ArrayList<ExecutorData> set2 = exp_tail_rtn; //string 2 to union
+					returnVals.addAll(difference(set1, set2));
+				}
+				else if(exp_tail_rtn.get(0).getData().equals("inters"))
+				{
+					exp_tail_rtn.remove(0);
+					ArrayList<ExecutorData> set1 = childVals.get(1); //string 1 to union
+					ArrayList<ExecutorData> set2 = exp_tail_rtn; //string 2 to union
+					returnVals.addAll(intersect(set1, set2));
+				}
+			} catch (IndexOutOfBoundsException e) { //This is the bottom of the tree, go up!
+				returnVals.add(childVals.get(0).get(0)); //return bin_op type
+				returnVals.addAll(childVals.get(1)); //add on all found children.
+			}
 		}
 		
 		return returnVals;
