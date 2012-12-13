@@ -45,7 +45,7 @@ public class Driver {
 		
 		MiniREParser parser = new MiniREParser();
 		TreeNode root = parser.parse("begin\n " +
-				"matches = find \'[A-Z a-z]*ment[A-Z a-z]*\' in \"file1.txt\" inters find \'(A|a) [A-Z a-z]*\' in \"file2.txt\" union find \'(A|a) [A-Z a-z]*\' in \"file2.txt\";\n" +
+				"matches = find \'[A-Z a-z]*ment[A-Z a-z]*\' in \"file1.txt\" inters find \'(A|a)[A-Za-z]*\' in \"file2.txt\" union find \'(A|a)[A-Za-z]*\' in \"file3.txt\";\n" +
 				"n_matches = #matches;\n" +
 				"print (n_matches);\n" +
 				"replace '[A-Z a-z]*ment' with \"\" in \"file1.txt\" >! \"file3.txt\";\n" +

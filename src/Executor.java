@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 public class Executor {
 	
-	private HashMap<String, ExecutorData> ids;
+	private HashMap<String, ArrayList<ExecutorData>> ids;
 	private TreeNode root;
 	
 	/**
@@ -22,7 +22,7 @@ public class Executor {
 	 */
 	public Executor(TreeNode root)
 	{
-		ids = new HashMap<String, ExecutorData>();
+		ids = new HashMap<String, ArrayList<ExecutorData>>();
 		this.root = root;
 		
 		/*
@@ -44,17 +44,18 @@ public class Executor {
 		ArrayList<ArrayList<ExecutorData>> childVals = new ArrayList<ArrayList<ExecutorData>>(); //child return results
 		int i = 0;
 		TreeNode child;
-		
-		System.out.println("current node up: " + node.getName());
+		int childCount = 0;
+		System.out.println("current node down: " + node.getName());
 		
 		//Perform Child operations recursively
 		while((child = node.getChild(i)) != null)
 		{
 			childVals.add(recursiveExecutor(child));
 			i++;
+			childCount++;
 		}
 		
-		System.out.println("current node down: " + node.getName());
+		System.out.println("current node up: " + node.getName());
 		
 		/*
 		 * Determine which operation to perform
@@ -94,16 +95,18 @@ public class Executor {
 		{
 			if(node.getArg(1) != null && node.getArg(1).equals("#"))
 			{
-				ids.put(node.getArg(0), childVals.get(0).get(0));
+				ids.put(node.getArg(0), childVals.get(0));
 			}
 			else if(node.getArg(1) != null && !node.getArg(1).equals("#"))
 			{
-				ArrayList<ExecutorData> listCmp = childVals.get(0);
-				ids.put(node.getArg(0), assignMaxFrequentString(listCmp)); 
+				ArrayList<ExecutorData> listCmp = ids.get(node.getArg(1));
+				ArrayList<ExecutorData> out = new ArrayList<ExecutorData>();
+				out.add(assignMaxFrequentString(listCmp));
+				ids.put(node.getArg(0), out); 
 			}
 			else
 			{
-				ids.put(node.getArg(0), childVals.get(0).get(0));
+				ids.put(node.getArg(0), childVals.get(0));
 			}	
 		}
 		else if(nodeName.equals("recursiveReplacement"))
@@ -146,29 +149,60 @@ public class Executor {
 		}
 		else if(nodeName.equals("exp")) //child 0 - term, child 1 - exp_tail value (0 bin_op, 1+-term
 		{
-				ArrayList<ExecutorData> exp_tail_rtn = childVals.get(1);
+			if(childCount == 0) //if no child, it matches the # assignment
+			{
+				returnVals.addAll(ids.get(node.getArg(0)));
+			}
+			else //children and performing expression operations
+			{
+				ArrayList<ExecutorData> term1 = new ArrayList<ExecutorData>();
+				ArrayList<ExecutorData> term2 = new ArrayList<ExecutorData>();
+				String binaryOperation = "";
+				for(int k = 0; k < childCount; k++)
+				{
+					if(returnVals.isEmpty() &&term1.isEmpty()) 
+						term1 = childVals.get(k);
+					if(!term1.isEmpty() && binaryOperation.equals("") && term2.isEmpty())
+						binaryOperation = childVals.get(k).get(0).getData();
+					if(!term1.isEmpty() && !binaryOperation.equals("") && term2.isEmpty())
+					{
+						term2 = childVals.get(k);
+						if(!term1.isEmpty())
+						{
+							returnVals = union(term1, term2);
+						}
+						else if(!returnVals.isEmpty() && term1.isEmpty())
+						{
+							returnVals = union(returnVals, term2);
+						}
+					}
+				}
 				
-				if(exp_tail_rtn.get(0).getData().equals("union"))
-				{
-					exp_tail_rtn.remove(0);
-					ArrayList<ExecutorData> set1 = childVals.get(0); //string 1 to union
-					ArrayList<ExecutorData> set2 = exp_tail_rtn; //string 2 to union
-					returnVals.addAll(union(set1, set2));
-				}
-				else if(exp_tail_rtn.get(0).getData().equals("diff"))
-				{
-					exp_tail_rtn.remove(0);
-					ArrayList<ExecutorData> set1 = childVals.get(0); //string 1 to union
-					ArrayList<ExecutorData> set2 = exp_tail_rtn; //string 2 to union
-					returnVals.addAll(difference(set1, set2));
-				}
-				else if(exp_tail_rtn.get(0).getData().equals("inters"))
-				{
-					exp_tail_rtn.remove(0);
-					ArrayList<ExecutorData> set1 = childVals.get(0); //string 1 to union
-					ArrayList<ExecutorData> set2 = exp_tail_rtn; //string 2 to union
-					returnVals.addAll(intersect(set1, set2));
-				}
+				
+//				ArrayList<ExecutorData> exp_tail_rtn = childVals.get(1);
+//				
+//				if(exp_tail_rtn.get(0).getData().equals("union"))
+//				{
+//					exp_tail_rtn.remove(0);
+//					ArrayList<ExecutorData> set1 = childVals.get(0); //string 1 to union
+//					ArrayList<ExecutorData> set2 = exp_tail_rtn; //string 2 to union
+//					returnVals.addAll(union(set1, set2));
+//				}
+//				else if(exp_tail_rtn.get(0).getData().equals("diff"))
+//				{
+//					exp_tail_rtn.remove(0);
+//					ArrayList<ExecutorData> set1 = childVals.get(0); //string 1 to union
+//					ArrayList<ExecutorData> set2 = exp_tail_rtn; //string 2 to union
+//					returnVals.addAll(difference(set1, set2));
+//				}
+//				else if(exp_tail_rtn.get(0).getData().equals("inters"))
+//				{
+//					exp_tail_rtn.remove(0);
+//					ArrayList<ExecutorData> set1 = childVals.get(0); //string 1 to union
+//					ArrayList<ExecutorData> set2 = exp_tail_rtn; //string 2 to union
+//					returnVals.addAll(intersect(set1, set2));
+//				}
+			}
 		}
 		else if(nodeName.equals("exp-tail")) //child 0 - bin_op, //child 1 - find, //child 2 - exp_tail value (0 bin_op, 1+-term)
 		{
@@ -255,6 +289,7 @@ public class Executor {
 		Scanner snTemp;
 		try {
 			snTemp = new Scanner(readFile);
+			regex = regex.replace(" ", "");
 			
 			int currLine = 0;
 			int currStartIndex = 0;
@@ -273,6 +308,7 @@ public class Executor {
 				}
 				currLine++;
 			}	
+			snTemp.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}	
@@ -347,6 +383,11 @@ public class Executor {
 	 */
 	public ArrayList<ExecutorData> union(ArrayList<ExecutorData> set1, ArrayList<ExecutorData> set2)
 	{
+		if(set1.isEmpty())
+			return set2;
+		else if(set2.isEmpty())
+			return set1;
+		
 		for(int i = 0; i < set2.size(); i++)
 		{
 			if(!set1.contains(set2.get(i)))
@@ -364,7 +405,7 @@ public class Executor {
 		
 		for(ExecutorData ed : set1)
 		{
-			if(set2.contains(ed.getData()))
+			if(set2.contains(ed))
 				retSet.add(ed);
 		}
 		
