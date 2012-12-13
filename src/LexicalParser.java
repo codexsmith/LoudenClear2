@@ -6,12 +6,13 @@ import java.util.Scanner;
 
 
 public class LexicalParser {
-	public static final boolean DEBUG = true;
+
 	private File lexspec;
 	private Scanner scan;
 	private String buff;
 	
 	public LexicalParser(String path){
+	if(Driver.LEX_PARSE_DEBUG){ System.out.println("LexParse Constr");}
 		lexspec = new File(path);
 		try{
 			scan = new Scanner(lexspec);
@@ -45,12 +46,13 @@ public class LexicalParser {
 		tok = buff.substring(0,1);//gets first element
 		buff = buff.substring(1); //removes the first element
 		
-		if(DEBUG){System.out.printf("Token %s", tok);}
+		if(Driver.LEX_PARSE_DEBUG){System.out.printf("Token %s", tok);}
 
 		return tok;
 	}
-	
-	public Lexical scanLexicon(){		
+
+	public Lexical scanLexicon(){
+    if(Driver.LEX_PARSE_DEBUG){System.out.println("LexParse ScanLex");}
 		String line= "";
 		HashMap<String, CharacterC> chars = new HashMap<String, CharacterC>();
 		ArrayList<TokenC> tokens = new ArrayList<TokenC>();
@@ -60,22 +62,29 @@ public class LexicalParser {
 		
 		while((line = this.getLine()) != null)
 		{
+      if(Driver.LEX_PARSE_DEBUG){ System.out.println("Lex Line :" +line);}
 			if(line.startsWith("%") || line.isEmpty())
 			{
-				if(state == 0)
+				if(state == 0){
+          if(Driver.LEX_PARSE_DEBUG){ System.out.println(state);}
 					state = 1;
-				else if(state == 1)
+        }
+				else if(state == 1){
+          if(Driver.LEX_PARSE_DEBUG){ System.out.println(state);}
 					state = 2;
-				else if (state == 2)//start symbol
+        }
+				else if (state == 2){//start symbol
+          if(Driver.LEX_PARSE_DEBUG){ System.out.println(state);}
 					state =3;
-				else if (state == 3)//rules
+        }
+				else if (state == 3){//rules
+          if(Driver.LEX_PARSE_DEBUG){ System.out.println(state);}
 					state =4;
+				}
 				
-			}
-			else
-			{
 				if(state == 1 || state == 0) // characters
 				{
+          if(Driver.LEX_PARSE_DEBUG){ System.out.println(state);}
 					if(state == 0) state = 1;
 					
 					//Create new char and parse line.
@@ -84,18 +93,21 @@ public class LexicalParser {
 				}
 				else if(state == 2) // identifiers
 				{
+         if(Driver.LEX_PARSE_DEBUG){ System.out.println(state);}
+
 					//create new token and parse line
 					TokenC token = new TokenC(line);
 					tokens.add(token);
 				}
 				else if (state == 3 || state == 4){
+          if(Driver.LEX_PARSE_DEBUG){ System.out.println(state);}
+
 					if (line.startsWith("<")){//MINI RE rules
 						TokenC token = new TokenC(line);
 						rules.add(token);
 					}
 				}
 			}
-
 		}
 		//Create epsilon using @ symbol
 		String epsilonStr = "$Epsilon [@]";

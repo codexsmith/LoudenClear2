@@ -7,7 +7,8 @@ public class Driver {
 	 * @param args
 	 */
 	public static boolean DEBUG = true;
-	public static boolean LLONE_DEBUG = false;
+	public static boolean LLONE_DEBUG = true;
+	public static boolean LEX_PARSE_DEBUG = true;
   
 	public static void main(String[] args) {
     LLoneGenerator leftOne;

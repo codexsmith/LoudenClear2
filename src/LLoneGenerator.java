@@ -27,8 +27,13 @@ public class LLoneGenerator {
 
   public ArrayList<TokenC> genTerminals(){
     ArrayList<TokenC> results = new ArrayList<TokenC>();
+    if(Driver.LLONE_DEBUG){System.out.println("LOLS");}
+    int i = 0;
+    
     for (TokenC t:lexspec.getRules()){
       t.getLegal();
+      if(Driver.LLONE_DEBUG){System.out.println("LOLS " + i);}
+      i++;
       if(Driver.LLONE_DEBUG){
         System.out.println("Gen Terminals"+ t.getTitle());
       }
