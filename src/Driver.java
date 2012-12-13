@@ -8,7 +8,7 @@ public class Driver {
 	 */
 	public static boolean DEBUG = true;
 	public static boolean LLONE_DEBUG = true;
-	public static boolean LEX_PARSE_DEBUG = false;
+	public static boolean LEX_PARSE_DEBUG = true;
 	public static boolean DEBUG_TOKENC = false;
   
 	public static void main(String[] args) {
@@ -55,12 +55,12 @@ public class Driver {
 
 //		System.out.println();
 //		System.out.println(output);
-		for(int i = 1; i<=7; i++){
-			String test_case = Integer.toString(i);			
- 			t = new Tokenizer("C:\\Users\\Andrew\\workspace\\Parser\\test_inputs\\"+test_case+"\\input","C:\\Users\\Andrew\\workspace\\Parser\\test_inputs\\"+test_case+"\\spec");
-			String output = t.parse();
-			System.out.println(output);
-		}
+// 		for(int i = 1; i<=7; i++){
+// 			String test_case = Integer.toString(i);			
+//  			t = new Tokenizer("C:\\Users\\Andrew\\workspace\\Parser\\test_inputs\\"+test_case+"\\input","C:\\Users\\Andrew\\workspace\\Parser\\test_inputs\\"+test_case+"\\spec");
+// 			String output = t.parse();
+// 			System.out.println(output);
+// 		}
 	}
 
 }

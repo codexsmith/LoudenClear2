@@ -57,61 +57,91 @@ public class LexicalParser {
 		HashMap<String, CharacterC> chars = new HashMap<String, CharacterC>();
 		ArrayList<TokenC> tokens = new ArrayList<TokenC>();
 		ArrayList<TokenC> rules = new ArrayList<TokenC>();
+		ArrayList<String> keywords = new ArrayList<String>();
 		
 		int state = 0; //state 0 = first comments, 1 = in characters, 2 = in identifiers.
-		
+
 		while((line = this.getLine()) != null)
 		{
-      if(Driver.LEX_PARSE_DEBUG){ System.out.println("Lex Line :"+line);}
+      
+      if(Driver.LEX_PARSE_DEBUG){ System.out.println("Lex Line "+state+" : "+line);}
 			if(line.startsWith("%") || line.isEmpty())
 			{
 				if(state == 0){
+          if(Driver.LEX_PARSE_DEBUG){ System.out.println("state " + (state-1) + " to " + state);}
 					state = 1;
         }
 				else if(state == 1){
+          if(Driver.LEX_PARSE_DEBUG){ System.out.println("state " + (state-1) + " to " + state);}
 					state = 2;
         }
 				else if (state == 2){//start symbol
+          if(Driver.LEX_PARSE_DEBUG){ System.out.println("state " + (state-1) + " to " + state);}
 					state =3;
         }
 				else if (state == 3){//rules
+          if(Driver.LEX_PARSE_DEBUG){ System.out.println("state " + (state-1) + " to " + state);}
 					state =4;
 				}
       }
       else{
-				if(state == 1 || state == 0) // characters
+				if(state == 1 || state == 0) // KEYWORD TOKENS
 				{
-					if(state == 0) state = 1;
-					
-					//Create new char and parse line.
-					CharacterC character = new CharacterC(line, chars);
-					chars.put(character.getTitle(), character);
-				}
-				else if(state == 2) // identifiers
-				{
+          if(Driver.LEX_PARSE_DEBUG){ System.out.println("state " + state);}
+          System.out.println("line " + line);
 
+          keywords.add(line);
+					
+				}
+				else if(state == 2) //??
+				{
+          if(Driver.LEX_PARSE_DEBUG){ System.out.println("state " + state);}
 					//create new token and parse line
 					TokenC token = new TokenC(line);
 					tokens.add(token);
 				}
 				else if (state == 3 || state == 4){
-
-
+          if(Driver.LEX_PARSE_DEBUG){ System.out.println("state " + state);}
 					if (line.startsWith("<")){//MINI RE rules
 						TokenC token = new TokenC(line);
 						rules.add(token);
+						
 					}
 				}
 			}
 		}
+		
 		//Create epsilon using @ symbol
 		String epsilonStr = "$Epsilon [@]";
 		chars.put("$Epsilon", new CharacterC(epsilonStr, chars));
-		return new Lexical(tokens, chars, rules);
+
+    keywords = createKeywords(keywords);
+		
+		return new Lexical(tokens, chars, rules, keywords);
+	}
+
+	public ArrayList<String> createKeywords(ArrayList<String> list){
+    ArrayList<String> outlist = new ArrayList<String>();
+    String[] temp;
+    
+    for(String line : list){
+      temp = line.split(" ");
+      for (String s : temp){
+          s = s.trim();
+          if (s.length() > 0){
+            outlist.add(s);
+        }
+      }
+    }
+    if(Driver.LEX_PARSE_DEBUG){
+      System.out.println("Keywords List " +outlist);
+    }
+    return outlist;
 	}
 	
 	public String getLine(){
 		if(scan.hasNext())
+//       System.out.println("HERE");
 			return scan.nextLine();
 		else
 			return null;
