@@ -95,7 +95,16 @@ public class Executor {
 		{
 			if(node.getArg(1) != null && node.getArg(1).equals("#"))
 			{
-				ids.put(node.getArg(0), childVals.get(0));
+				int length = 0;
+				ExecutorData ed = new ExecutorData();
+				for(ExecutorData tmp : childVals.get(0))
+				{
+					length += tmp.getData().length();
+				}
+				ed.setData(length + "");
+				ArrayList<ExecutorData> out = new ArrayList<ExecutorData>();
+				out.add(ed);
+				ids.put(node.getArg(0), out);
 			}
 			else if(node.getArg(1) != null && !node.getArg(1).equals("#"))
 			{
@@ -160,48 +169,40 @@ public class Executor {
 				String binaryOperation = "";
 				for(int k = 0; k < childCount; k++)
 				{
-					if(returnVals.isEmpty() &&term1.isEmpty()) 
-						term1 = childVals.get(k);
-					if(!term1.isEmpty() && binaryOperation.equals("") && term2.isEmpty())
-						binaryOperation = childVals.get(k).get(0).getData();
-					if(!term1.isEmpty() && !binaryOperation.equals("") && term2.isEmpty())
+					if(!binaryOperation.equals("") && term2.isEmpty())
 					{
 						term2 = childVals.get(k);
 						if(!term1.isEmpty())
 						{
-							returnVals = union(term1, term2);
+							if(binaryOperation.equals("union"))
+								returnVals = union(term1, term2);
+							else if(binaryOperation.equals("inters"))
+								returnVals = intersect(term1, term2);
+							else if(binaryOperation.equals("diff"))
+								returnVals = difference(term1, term2);
+							term1.clear();
+							term2.clear();
+							binaryOperation = "";
 						}
 						else if(!returnVals.isEmpty() && term1.isEmpty())
 						{
-							returnVals = union(returnVals, term2);
+							if(binaryOperation.equals("union"))
+								returnVals = union(returnVals, term2);
+							else if(binaryOperation.equals("inters"))
+								returnVals = intersect(returnVals, term2);
+							else if(binaryOperation.equals("diff"))
+								returnVals = difference(returnVals, term2);
+							
+							term2.clear();
+							binaryOperation = "";
 						}
 					}
+					if(!term1.isEmpty() && binaryOperation.equals("") && term2.isEmpty())
+						binaryOperation = childVals.get(k).get(0).getData();
+					if(returnVals.isEmpty() &&term1.isEmpty()) 
+						term1 = childVals.get(k);
+					
 				}
-				
-				
-//				ArrayList<ExecutorData> exp_tail_rtn = childVals.get(1);
-//				
-//				if(exp_tail_rtn.get(0).getData().equals("union"))
-//				{
-//					exp_tail_rtn.remove(0);
-//					ArrayList<ExecutorData> set1 = childVals.get(0); //string 1 to union
-//					ArrayList<ExecutorData> set2 = exp_tail_rtn; //string 2 to union
-//					returnVals.addAll(union(set1, set2));
-//				}
-//				else if(exp_tail_rtn.get(0).getData().equals("diff"))
-//				{
-//					exp_tail_rtn.remove(0);
-//					ArrayList<ExecutorData> set1 = childVals.get(0); //string 1 to union
-//					ArrayList<ExecutorData> set2 = exp_tail_rtn; //string 2 to union
-//					returnVals.addAll(difference(set1, set2));
-//				}
-//				else if(exp_tail_rtn.get(0).getData().equals("inters"))
-//				{
-//					exp_tail_rtn.remove(0);
-//					ArrayList<ExecutorData> set1 = childVals.get(0); //string 1 to union
-//					ArrayList<ExecutorData> set2 = exp_tail_rtn; //string 2 to union
-//					returnVals.addAll(intersect(set1, set2));
-//				}
 			}
 		}
 		else if(nodeName.equals("exp-tail")) //child 0 - bin_op, //child 1 - find, //child 2 - exp_tail value (0 bin_op, 1+-term)
