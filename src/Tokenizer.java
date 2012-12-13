@@ -88,13 +88,13 @@ public class Tokenizer {
 				if(DEBUG)System.out.println("("+temp+") -"+c+"-> "+"("+state+")");
 			}
 		}
-		/*else{
+		else{
 			if(accept){
 				output+=state.getToken()+" "+name+"\n";
 			}
 			state = dfa.getTable().get(0);
 			name = "";
 			accept = false;
-		}*/
+		}
 	}
 }

@@ -1,12 +1,11 @@
 import java.util.ArrayList;
-
+import java.util.HashMap;
 
 public class LLoneGenerator {
 	
 	private Lexical lexspec;
-  private ArrayList<TokenC> firstSet = new ArrayList<TokenC>();
-  private ArrayList<TokenC> followSet = new ArrayList<TokenC>();
-  private ArrayList<TokenC> terminalSet = new ArrayList<TokenC>();
+  private HashMap<TokenC, ArrayList<TokenC>> firstSet;
+  private HashMap<TokenC, ArrayList<TokenC>> followSet;
   
 	
 	public LLoneGenerator(String specPath){
@@ -17,34 +16,34 @@ public class LLoneGenerator {
 		LexicalParser lexparse = new LexicalParser(specPath);
 		lexspec = lexparse.scanLexicon();
     
-    terminalSet = genTerminals();
-		
     firstSet = genFirstSet();
-    followSet = genFollowSet();
-
+//     followSet = genFollowSet();
+// 
     
 	}
-
-  public ArrayList<TokenC> genTerminals(){
-    ArrayList<TokenC> results = new ArrayList<TokenC>();
-    for (TokenC t:lexspec.getRules()){
-      t.getLegal();
-      if(Driver.LLONE_DEBUG){
-        System.out.println("Gen Terminals"+ t.getTitle());
-      }
-    }
-    return results;
-  }
 	
-	public ArrayList<TokenC> genFirstSet(){
-		ArrayList<TokenC> first = new ArrayList<TokenC>();
+	public HashMap<TokenC, ArrayList<TokenC>> genFirstSet(){
+		HashMap<TokenC, ArrayList<TokenC>> first = new HashMap<TokenC, ArrayList<TokenC>>();
+
+		ArrayList<TokenC> newSet;//a rule's first set
 		
-		for (TokenC t:lexspec.getRules()){
-			t.getLegal();
-			if(Driver.LLONE_DEBUG){
-        System.out.println("First Set " + t.getTitle());
+		for (TokenC nonTerm:lexspec.getRules()){
+      newSet = new ArrayList<TokenC>();
+      for (TokenC test: lexspec.getRules()){
+      
+        if(nonTerm.getLegal().contains(test.getTitle())){
+          newSet.add(test);
+        }
       }
-		}
+      first.put(nonTerm,newSet);
+    }
+      
+      if(Driver.LLONE_DEBUG){
+        for(TokenC key : first.keySet()){
+          for(TokenC next : first.get(key))
+          System.out.println("FIRST " + key.getTitle() + " : " + next.getTitle());
+        }
+      }
 		
 		return first;
 		

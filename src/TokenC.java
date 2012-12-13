@@ -22,20 +22,20 @@ public class TokenC {
 			this.legal = (symbols);
 		}
 		
-		if(line.startsWith("<")){
+		if(line.substring(0,1).compareTo("<") == 0){
 			this.title = line.substring(0,line.indexOf(">")+1);
-			System.out.println(title);
-			if (line.indexOf("-->") != -1)
+			if(Driver.DEBUG_TOKENC){System.out.println(line);}
+			if (line.indexOf("::=") != -1)
 			{//normal rule of miniRE grammar
-				symbols = line.replace(" ", "").substring(line.replace(" ", "").indexOf("-->")+3);
+				symbols = line.replace(" ", "").substring(line.replace(" ", "").indexOf("::=")+3);
 			
-				System.out.println(symbols);
+				if(Driver.DEBUG_TOKENC){System.out.println("Token Rule "+symbols);}
 				this.legal = (symbols);
 			}
 			else
 			{//start symbol of miniRE grammar
 				symbols = "$";
-				System.out.println(symbols);
+				if(Driver.DEBUG_TOKENC){System.out.println(symbols);}
 				this.legal = (symbols);
 			}
 		}
