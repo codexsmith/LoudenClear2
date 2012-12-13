@@ -26,17 +26,11 @@ public class Tokenizer {
 		accept = false;
 		LexicalParser lp = new LexicalParser(lex);
 		Lexical lexspec = lp.scanLexicon();
-// 		NFAGenerator ngen = new NFAGenerator(lexspec);
+		NFAGenerator ngen = new NFAGenerator(lexspec);
 
-//     //LLONE TESTING
-// 		if (Driver.LLNONE_DEBUG){
-//       LLoneGenerator LLone = new LLoneGenerator(lexspec);
-//       ArrayList<TokenC> temp = LLone.firstSet();
-// 		}
-
-// 		StateTable nfa = ngen.generateNFA();
-// 		DFAConverter conv = new DFAConverter(nfa);
-// 		dfa = conv.convert();
+		StateTable nfa = ngen.generateNFA();
+		DFAConverter conv = new DFAConverter(nfa);
+		dfa = conv.convert();
 		if(DEBUG)System.out.println(dfa);
 		state = dfa.getTable().get(0);
 		try {
