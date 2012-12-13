@@ -464,7 +464,7 @@ public class MiniREParser {
 			TreeNode exp_tail = exp_tail();
 			if(exp_tail!=null){
 				for(int i=0;i<exp_tail.getSize();i++){
-					exp_tail.addChild(exp_tail.getChild(i));
+					exp.addChild(exp_tail.getChild(i));
 				}
 			}
 			return exp;
@@ -514,7 +514,7 @@ public class MiniREParser {
 			line = temp_line;
 			return null;
 		}
-//		exp_tail.addChild(bin_op);
+		exp_tail.addChild(bin_op);
 		
 		TreeNode term = term();
 		if(term==null){
@@ -522,7 +522,6 @@ public class MiniREParser {
 			line = temp_line;
 			return null;
 		}
-		exp_tail.addChild(bin_op);
 		exp_tail.addChild(term);
 		
 		TreeNode exp_tail2 = exp_tail();
