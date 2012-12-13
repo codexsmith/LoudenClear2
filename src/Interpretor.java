@@ -29,7 +29,6 @@ public class Interpretor {
 		idHash.put("testget", testarray);
 
 	}
-
 	
 //	<MiniRE-program> ::= begin <statement-list> end
 //	<statement-list> ::= <statement><statement-list-tail> 
@@ -93,7 +92,7 @@ public class Interpretor {
 //	<source-file> ::= ASCII-STR  
 //	<destination-file> ::= ASCII-STR
 //	<statement> ::= print ( <exp-list> ) ;
-//	Print statement, which prints a list of expressions to the output. If an expression is an integer, it prints the integer and a newline. If it¡¯s a string-match list, prints the elements in the list in order in some readable format (include the matched string, the filename, and the index), and a newline.	
+//	Print statement, which prints a list of expressions to the output. If an expression is an integer, it prints the integer and a newline. If itï¿½ï¿½s a string-match list, prints the elements in the list in order in some readable format (include the matched string, the filename, and the index), and a newline.	
 	public void print(ArrayList<String> ids, ArrayList<ArrayList<String>> strLists, ArrayList<Integer> numList) {
 		if(ids != null)
 			for (int i=0; i < ids.size(); i++) {

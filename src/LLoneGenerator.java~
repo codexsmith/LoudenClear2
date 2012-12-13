@@ -17,7 +17,6 @@ public class LLoneGenerator {
 		lexspec = new Lexical(specPath);
 		
 	}
-
 	
 	public ArrayList<TokenC> firstSet(){
 		ArrayList<TokenC> first = new ArrayList<TokenC>();

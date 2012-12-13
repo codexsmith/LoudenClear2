@@ -88,7 +88,7 @@ public class LexicalParser {
 					TokenC token = new TokenC(line);
 					tokens.add(token);
 				}
-				else if (state == 3 || state == 4){
+				else if (state == 3){
 					if (line.startsWith("<")){//MINI RE rules
 						TokenC token = new TokenC(line);
 						tokens.rules(token);
