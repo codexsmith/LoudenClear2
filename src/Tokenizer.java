@@ -12,11 +12,19 @@ public class Tokenizer {
 	private State state;
 	private String name;
 	private boolean accept;
-
+	private String regex;
+	private File file;
+	private int index;
 	
-	public Tokenizer(String f, String l){
+	public Tokenizer(String f, String a){
 		input = new File(f);
-		lex = l;
+		lex = a;
+	}
+	
+	public Tokenizer(File f, String r){
+		file = f;
+		regex = r;
+		index = 0;
 	}
 	
 	public String parse(){
@@ -96,5 +104,23 @@ public class Tokenizer {
 			name = "";
 			accept = false;
 		}
+	}
+	
+	public ArrayList<String> getTokens(){
+		ArrayList<String> result = new ArrayList<String>();
+		NFAGen ngen = new NFAGen(new Lexical());
+		StateTable nfa = ngen.generateNFA(regex);
+		DFAConverter con = new DFAConverter(nfa);
+		dfa = con.convert();
+		String token = strtok();
+		while(token!=null){
+			result.add(token);
+			token = strtok();
+		}
+		return result;
+	}
+	
+	public String strtok(){
+		return null;
 	}
 }

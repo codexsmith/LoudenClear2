@@ -22,7 +22,7 @@ public class MiniREParser {
 	
 	private TreeNode miniREprogram(){
 		TreeNode root = new TreeNode("MiniRE-program");
-		
+		if(DEBUG)System.out.println("MiniRE-program");
 		if(!match("begin")){//failed to match begin
 			System.out.println("Error(Line"+line+"): Expected token \"begin\" not found.");
 			return null;
@@ -42,7 +42,7 @@ public class MiniREParser {
 	}//end miniREprogram
 	
 	private TreeNode statement_list(){
-		if(DEBUG)System.out.println("statement_list()");
+		if(DEBUG)System.out.println("statement-list");
 		int temp_ind = exp_ind;
 		int temp_line = line;
 		TreeNode statement_list = new TreeNode("statement-list");
@@ -84,12 +84,13 @@ public class MiniREParser {
 	}
 	
 	private TreeNode statement(){
-		if(DEBUG)System.out.println("statement()");
+//		if(DEBUG)System.out.println("statement");
 		int temp_ind = exp_ind;
 		int temp_line = line;
 		TreeNode statement = new TreeNode("statement");
 				
 		if(match("replace")){
+			if(DEBUG)System.out.println("replace");
 			statement.setName("replace");
 			String regex = regex();
 			if(regex==null){
@@ -137,6 +138,7 @@ public class MiniREParser {
 			return statement;
 		}
 		else if(match("recursivereplace")){
+			if(DEBUG)System.out.println("recursivereplace");
 			statement.setName("recursivereplace");
 			String regex = regex();
 			if(regex==null){
@@ -180,6 +182,7 @@ public class MiniREParser {
 			return statement;
 		}
 		else if(match("print")){
+			if(DEBUG)System.out.println("print");
 			statement.setName("print");
 			if(!match("(")){
 				System.out.println("Error(Line"+line+"): Expected token \")\" not found.");
@@ -210,6 +213,7 @@ public class MiniREParser {
 		}
 		String id = id();
 		if(id!=null){
+			System.out.println("statement");
 			if(id.compareTo("end")==0){
 				exp_ind = temp_ind;
 				line = temp_line;
@@ -289,7 +293,7 @@ public class MiniREParser {
 	}
 	
 	private TreeNode file_names(){
-		if(DEBUG)System.out.println("file_names()");
+		if(DEBUG)System.out.println("file-names");
 		int temp_ind = exp_ind;
 		int temp_line = line;
 		TreeNode file_names = new TreeNode("file-names");
@@ -320,6 +324,7 @@ public class MiniREParser {
 	}
 	
 	private TreeNode source_file(){
+		if(DEBUG)System.out.println("source-file");
 		TreeNode source_file = new TreeNode("source-file");
 		int temp_ind = exp_ind;
 		int temp_line = line;
@@ -335,6 +340,7 @@ public class MiniREParser {
 	}
 	
 	private TreeNode destination_file(){
+		if(DEBUG)System.out.println("destination-file");
 		TreeNode destination_file = new TreeNode("destination-file");
 		int temp_ind = exp_ind;
 		int temp_line = line;
@@ -350,7 +356,7 @@ public class MiniREParser {
 	}
 	
 	private TreeNode exp_list(){
-		if(DEBUG)System.out.println("exp_list()");
+		if(DEBUG)System.out.println("exp-list");
 		TreeNode exp_list = new TreeNode("exp-list");
 		int temp_ind = exp_ind;
 		int temp_line = line;
@@ -371,7 +377,7 @@ public class MiniREParser {
 	}
 	
 	private TreeNode exp_list_tail(){
-		if(DEBUG)System.out.println("exp_list_tail()");
+		if(DEBUG)System.out.println("exp-list-tail");
 		TreeNode exp_list_tail = new TreeNode("exp-list-tail");		
 		int temp_ind = exp_ind;
 		int temp_line = line;
@@ -398,6 +404,7 @@ public class MiniREParser {
 	}
 	
 	private TreeNode exp(){
+		if(DEBUG)System.out.println("exp");
 		TreeNode exp = new TreeNode("exp");
 		int temp_ind = exp_ind;
 		int temp_line = line;
@@ -440,35 +447,38 @@ public class MiniREParser {
 	}
 	
 	private TreeNode exp_tail(){
+		if(DEBUG)System.out.println("exp-tail");
 		TreeNode exp_tail = new TreeNode("exp-tail");
 		int temp_ind = exp_ind;
 		int temp_line = line;
-
+		
 		TreeNode bin_op = bin_op();
 		if(bin_op==null){
 			exp_ind = temp_ind;
 			line = temp_line;
 			return null;
 		}
-		else{
-			TreeNode term = term();
-			if(term==null){
-				exp_ind = temp_ind;
-				line = temp_line;
-				return null;
-			}
-			exp_tail.addChild(term);
-			
-			TreeNode exp_tail2 = exp_tail();
-			if(exp_tail2==null){
-				return exp_tail;
-			}
-			exp_tail.addChild(exp_tail2);
+		exp_tail.addChild(bin_op);
+		
+		TreeNode term = term();
+		if(term==null){
+			exp_ind = temp_ind;
+			line = temp_line;
+			return null;
+		}
+		exp_tail.addChild(term);
+		
+		TreeNode exp_tail2 = exp_tail();
+		if(exp_tail2==null){
 			return exp_tail;
 		}
+		exp_tail.addChild(exp_tail2);
+		return exp_tail;
+
 	}
 	
 	private TreeNode term(){
+		if(DEBUG)System.out.println("term");
 		TreeNode term = new TreeNode("term");
 		int temp_ind = exp_ind;
 		int temp_line = line;
@@ -505,6 +515,7 @@ public class MiniREParser {
 	}
 
 	private TreeNode file_name(){
+		if(DEBUG)System.out.println("file-name");
 		TreeNode file_name = new TreeNode("file-name");
 		int temp_ind = exp_ind;
 		int temp_line = line;
@@ -521,14 +532,17 @@ public class MiniREParser {
 	
 	private TreeNode bin_op(){
 		if(match("diff")){
+			if(DEBUG)System.out.println("diff");
 			TreeNode result = new TreeNode("diff");
 			return result;
 		}
 		if(match("union")){
+			if(DEBUG)System.out.println("union");
 			TreeNode result = new TreeNode("union");
 			return result;
 		}
 		if(match("inters")){
+			if(DEBUG)System.out.println("inters");
 			TreeNode result = new TreeNode("inters");
 			return result;
 		}
@@ -543,7 +557,7 @@ public class MiniREParser {
 	}
 	
 	private String id(){
-		if(DEBUG)System.out.println("id()");
+		//if(DEBUG)System.out.println("id()");
 		String id = "";
 		while(true){
 			if(Character.isLetter(peekChar())){
@@ -567,7 +581,7 @@ public class MiniREParser {
 				break;
 			}
 		}
-		if(DEBUG)System.out.println("ID = "+id);
+		//if(DEBUG)System.out.println("ID = "+id);
 		return id;
 	}
 	
@@ -610,7 +624,7 @@ public class MiniREParser {
 				escaped = true;
 			}
 			if(match("\'")&&!escaped){
-				System.out.println("REGEX:"+regex);
+//				if(DEBUG)System.out.println("REGEX:"+regex);
 				break;
 			}
 			else{
@@ -648,7 +662,7 @@ public class MiniREParser {
 		if(peekChar()=='\n'){
 			line++;
 		}
-		if(DEBUG)System.out.println("Matched: "+s);
+		//if(DEBUG)System.out.println("Matched: "+s);
 		return true;
 	}
 }
