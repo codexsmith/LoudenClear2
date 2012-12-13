@@ -62,29 +62,25 @@ public class LexicalParser {
 		
 		while((line = this.getLine()) != null)
 		{
-      if(Driver.LEX_PARSE_DEBUG){ System.out.println("Lex Line :" +line);}
+      if(Driver.LEX_PARSE_DEBUG){ System.out.println("Lex Line :"+line);}
 			if(line.startsWith("%") || line.isEmpty())
 			{
 				if(state == 0){
-          if(Driver.LEX_PARSE_DEBUG){ System.out.println(state);}
 					state = 1;
         }
 				else if(state == 1){
-          if(Driver.LEX_PARSE_DEBUG){ System.out.println(state);}
 					state = 2;
         }
 				else if (state == 2){//start symbol
-          if(Driver.LEX_PARSE_DEBUG){ System.out.println(state);}
 					state =3;
         }
 				else if (state == 3){//rules
-          if(Driver.LEX_PARSE_DEBUG){ System.out.println(state);}
 					state =4;
 				}
-				
+      }
+      else{
 				if(state == 1 || state == 0) // characters
 				{
-          if(Driver.LEX_PARSE_DEBUG){ System.out.println(state);}
 					if(state == 0) state = 1;
 					
 					//Create new char and parse line.
@@ -93,14 +89,13 @@ public class LexicalParser {
 				}
 				else if(state == 2) // identifiers
 				{
-         if(Driver.LEX_PARSE_DEBUG){ System.out.println(state);}
 
 					//create new token and parse line
 					TokenC token = new TokenC(line);
 					tokens.add(token);
 				}
 				else if (state == 3 || state == 4){
-          if(Driver.LEX_PARSE_DEBUG){ System.out.println(state);}
+
 
 					if (line.startsWith("<")){//MINI RE rules
 						TokenC token = new TokenC(line);
