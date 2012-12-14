@@ -8,7 +8,7 @@ public class Driver {
 	 */
 
 	public static boolean DEBUG = false;
-	public static boolean LLONE_DEBUG = true;
+	public static boolean LLONE_DEBUG = false;
 	public static boolean LEX_PARSE_DEBUG = false;
 	public static boolean DEBUG_TOKENC = false;
   
