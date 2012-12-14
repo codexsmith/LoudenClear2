@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.StringTokenizer;
+
 /** 
  *	Contains the representations of the Regex Characters from the lexical spec
  *  Example: $DIGIT [0-9]

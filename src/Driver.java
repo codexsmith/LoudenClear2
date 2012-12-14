@@ -6,6 +6,7 @@ public class Driver {
 	/**
 	 * @param args
 	 */
+
 	public static boolean DEBUG = false;
 	public static boolean LLONE_DEBUG = true;
 	public static boolean LEX_PARSE_DEBUG = false;
@@ -21,8 +22,6 @@ public class Driver {
 	
 // Interpretor Test START
 		Interpretor inter = new Interpretor();
-  
-    
 		
 //		inter.replace("d", "xxx", "sanghun_test_input1.txt", "sanghun_test_output1.txt");
 //		inter.recursivereplace("a", "ax", "sanghun_test_input1.txt", "sanghun_test_output2.txt");
@@ -45,6 +44,7 @@ public class Driver {
 // Interpretor Test END		
 		
 		
+		
 // 		MiniREParser parser = new MiniREParser();
 // 		parser.parse("begin\n " +
 // 				"matches = find \'[A-Z a-z]*ment[A-Z a-z]*\' in \"file1.txt\" inters find \'(A|a) [A-Z a-z]*\' in \"file2.txt\";\n" +
@@ -61,6 +61,32 @@ public class Driver {
 // 			String output = t.parse();
 // 			System.out.println(output);
 // 		}
+
+		MiniREParser parser = new MiniREParser();
+		TreeNode root = parser.parse("begin\n " +
+				"matches = find \'[A-Z a-z]*ment[A-Z a-z]*\' in \"file1.txt\" inters find \'[A-Z a-z]*ment[A-Z a-z]*\' in \"file2.txt\";\n" +
+				"n_matches = #matches;\n" +
+				"print (n_matches);\n" +
+				"print (matches);\n" +
+				"replace '[A-Z a-z]*ment' with \"\" in \"file1.txt\" >! \"file3.txt\";\n" +
+				"end");
+		
+		System.out.println("");
+		System.out.println("*****************");
+		System.out.println("Testing Executor");
+		System.out.println("*****************");
+		System.out.println("");
+		Executor ex = new Executor(root);
+
+//		System.out.println();
+//		System.out.println(output);
+//		for(int i = 1; i<=7; i++){
+//			String test_case = Integer.toString(i);			
+// 			t = new Tokenizer("C:\\Users\\Andrew\\workspace\\Parser\\test_inputs\\"+test_case+"\\input","C:\\Users\\Andrew\\workspace\\Parser\\test_inputs\\"+test_case+"\\spec");
+//			String output = t.parse();
+//			System.out.println(output);
+//		}
+
 	}
 
 }
