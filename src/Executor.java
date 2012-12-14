@@ -121,7 +121,7 @@ public class Executor {
 		{
 			String filename = childVals.get(0).get(0).getData();         //file1 name
 			String filename2 = childVals.get(0).get(1).getData();		   //file2 name
-			recursivereplace(filename, filename2, node.getArg(0), node.getArg(1), 10); //filename, regex, str
+			recursivereplace(filename, filename2, node.getArg(0), node.getArg(1)); //filename, regex, str
 		}
 		else if(nodeName.equals("print"))
 		{
@@ -330,8 +330,9 @@ public class Executor {
 		return foundMatches;
 	}
 	
-	public void replace(String filename, String filename2, String regex, String str)
+	public int replace(String filename, String filename2, String regex, String str)
 	{
+		int numReplaced = 0;
 		File readFile = new File(testDir + filename);
 		File outFile = new File(testDir + filename2); //if exists, overwrite file.
 		
@@ -360,7 +361,6 @@ public class Executor {
 			ArrayList<ExecutorData> foundMatches = new ArrayList<ExecutorData>();
 			Scanner snTemp = new Scanner(readFile);
 			
-			int currLine = 0;
 			int currStartIndex = 0;
 			int currEndIndex = 0;
 			while(snTemp.hasNextLine())
@@ -375,7 +375,6 @@ public class Executor {
 					
 					currStartIndex = currEndIndex + 2;
 				}
-				currLine++;
 			}		
 			
 			BufferedWriter bw = new BufferedWriter(new FileWriter(outFile));
@@ -384,8 +383,10 @@ public class Executor {
 			{
 				String s = sn.nextLine();
 				
-				for(ExecutorData matches : foundMatches)
-					s = s.replace(matches.getData(), str);
+				for(ExecutorData matches : foundMatches){
+					s = s.replaceAll(matches.getData(), str);
+					numReplaced++;
+				}
 				
 				bw.write(s);
 			}
@@ -396,82 +397,50 @@ public class Executor {
 			System.out.println("Can't continue due to problem writing file. Goodbye.");
 			e.printStackTrace();
 		}
+		return numReplaced;
 	}
 	
-	public void recursivereplace(String filename, String filename2, String regex, String str, int recurseCounter)
+	public void recursivereplace(String filename, String filename2, String regex, String str)
 	{
-		File readFile = new File(testDir + filename);
-		File outFile = new File(testDir + filename2); //if exists, overwrite file.
+		int replaced = -1;
+		String f1 = filename;
+		String f2 = "temp1.txt";
 		
-		if(filename.equals(filename2)) 
-		{
-			System.out.println("Parse Error: Can't replace in same file");
-		}
+		boolean toggle = true;
 		
-		if(!readFile.exists()) 
-		{ 
-			System.out.println("Can't continue due to problem reading file. Goodbye.");
-			System.exit(0);
-		}
-		
-//		Tokenizer tokenizer = new Tokenizer(readFile, regex);
-//		ArrayList<String> foundMatches = tokenizer.parse();
-		
-		if(Pattern.matches(regex, str))
+		if(Pattern.matches(regex, str)){
+			System.out.println("The input string causes an infinite loop. Goodbye.");
 			return;
-		
-		/*
-		 * Ran out of time and used the pattern matching class as well as replace all
-		 * because of our project 1 not working intitially. We have fixed project 1 
-		 * but we didn't have the time to get it implemented in project 2 and thus we used
-		 * our temporary solution
-		 */
-		try {
-			
-			ArrayList<ExecutorData> foundMatches = new ArrayList<ExecutorData>();
-			Scanner snTemp = new Scanner(readFile);
-			
-			int currLine = 0;
-			int currStartIndex = 0;
-			int currEndIndex = 0;
-			while(snTemp.hasNextLine())
-			{
-				String tmp = snTemp.nextLine();
-				String[] as = tmp.split(" ");
-				for(String s : as)
-				{
-					currEndIndex = currStartIndex + s.length();
-					if(Pattern.matches(regex, s))
-						foundMatches.add(new ExecutorData(s, filename));
-					
-					currStartIndex = currEndIndex + 2;
-				}
-				currLine++;
-			}		
-			
-			BufferedWriter bw = new BufferedWriter(new FileWriter(outFile));
-			Scanner sn = new Scanner(readFile);
-			while(sn.hasNextLine())
-			{
-				String s = sn.nextLine();
-				
-				for(ExecutorData matches : foundMatches)
-					s = s.replace(matches.getData(), str);
-				
-				bw.write(s);
-			}
-			
-			bw.close();
-			sn.close();
-		} catch (IOException e) {
-			System.out.println("Can't continue due to problem writing file. Goodbye.");
-			e.printStackTrace();
 		}
-		
-		if(recurseCounter > 0)
-			recursivereplace(filename, filename2, regex, str, --recurseCounter);
 
-		return;
+		while(replaced!=0){
+			replaced = replace(f1,f2,regex,str);
+			if(toggle==true){
+				f1 = "temp1.txt";
+				f2 = "temp2.txt";
+				toggle=false;
+			}
+			else{
+				f1 = "temp2.txt";
+				f2 = "temp1.txt";
+				toggle=true;
+			}
+		}
+		if(toggle==true){
+			File temp = new File(testDir+"temp1.txt");
+			File output = new File(testDir+filename2);
+			temp.renameTo(output);
+			temp = new File(testDir+"temp2.txt");
+			temp.delete();
+		}
+		else{
+			File temp = new File(testDir+"temp2.txt");
+			File output = new File(testDir+filename2);
+			temp.renameTo(output);
+			temp = new File(testDir+"temp1.txt");
+			temp.delete();		
+			}
+		
 	}
 	
 	/**
