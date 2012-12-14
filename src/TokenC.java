@@ -11,7 +11,6 @@ public class TokenC {
 		legal = "";
 		
 		line = line.trim();//removes leading & trailing whitespaces
-		
 		if(line.substring(0, 1).compareTo("$") == 0){ //proper identifier
 			this.title = line.substring(0, line.indexOf(" "));
 			
