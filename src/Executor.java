@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.net.ssl.SSLEngineResult.Status;
@@ -356,42 +357,22 @@ public class Executor {
 		 * our temporary solution
 		 */
 		try {
-			
-			ArrayList<ExecutorData> foundMatches = new ArrayList<ExecutorData>();
+			BufferedWriter bw = new BufferedWriter(new FileWriter(outFile));
+			ArrayList<String> foundMatches = new ArrayList<String>();
 			Scanner snTemp = new Scanner(readFile);
 			
-			int currLine = 0;
-			int currStartIndex = 0;
-			int currEndIndex = 0;
+			Pattern p = Pattern.compile(regex);
 			while(snTemp.hasNextLine())
 			{
 				String tmp = snTemp.nextLine();
-				String[] as = tmp.split(" ");
-				for(String s : as)
-				{
-					currEndIndex = currStartIndex + s.length();
-					if(Pattern.matches(regex, s))
-						foundMatches.add(new ExecutorData(s, filename));
-					
-					currStartIndex = currEndIndex + 2;
-				}
-				currLine++;
-			}		
+				Matcher m = p.matcher(tmp);
+				String out = m.replaceAll(str);
+				bw.write(out);
+			}	
 			
-			BufferedWriter bw = new BufferedWriter(new FileWriter(outFile));
-			Scanner sn = new Scanner(readFile);
-			while(sn.hasNextLine())
-			{
-				String s = sn.nextLine();
-				
-				for(ExecutorData matches : foundMatches)
-					s = s.replace(matches.getData(), str);
-				
-				bw.write(s);
-			}
+			snTemp.close();
 			
 			bw.close();
-			sn.close();
 		} catch (IOException e) {
 			System.out.println("Can't continue due to problem writing file. Goodbye.");
 			e.printStackTrace();
