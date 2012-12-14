@@ -5,7 +5,7 @@
  *
  */
 public class MiniREParser {
-	private final boolean DEBUG = true;
+	private final boolean DEBUG = false;
 	private String expression;
 	private int exp_ind;
 	private int line;
@@ -242,7 +242,7 @@ public class MiniREParser {
 		}//end else if
 		String id = id();
 		if(id!=null){
-			System.out.println("statement");
+			if(DEBUG) System.out.println("statement");
 			statement.addArg(id);
 			if(!match("=")){
 				System.out.println("Error(Line"+line+"): Expected token \"=\" not found.");
@@ -293,7 +293,7 @@ public class MiniREParser {
 					line = temp_line;
 					return null;
 				}
-
+				return statement;
 			}
 			else{
 				TreeNode exp = exp();
@@ -796,7 +796,7 @@ public class MiniREParser {
 		if(peekChar()=='\n'){
 			line++;
 		}
-		//if(DEBUG)System.out.println("Matched: "+s);
+		if(DEBUG)System.out.println("Matched: "+s);
 		return true;
 	}//end match
 }//end MiniREParser

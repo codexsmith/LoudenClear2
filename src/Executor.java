@@ -9,10 +9,13 @@ import java.util.HashMap;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
+import javax.net.ssl.SSLEngineResult.Status;
+
 public class Executor {
 	
 	private HashMap<String, ArrayList<ExecutorData>> ids;
 	private TreeNode root;
+	private String testDir;
 	
 	/**
 	 * Execute all the stuffs
@@ -20,10 +23,11 @@ public class Executor {
 	 * 
 	 * @param root 
 	 */
-	public Executor(TreeNode root)
+	public Executor(TreeNode root, String testDir)
 	{
 		ids = new HashMap<String, ArrayList<ExecutorData>>();
 		this.root = root;
+		this.testDir = testDir;
 		
 		/*
 		 * Start at the root of the AST and start parsing
@@ -45,7 +49,7 @@ public class Executor {
 		int i = 0;
 		TreeNode child;
 		int childCount = 0;
-		System.out.println("current node down: " + node.getName());
+		//System.out.println("current node down: " + node.getName());
 		
 		//Perform Child operations recursively
 		while((child = node.getChild(i)) != null)
@@ -55,7 +59,7 @@ public class Executor {
 			childCount++;
 		}
 		
-		System.out.println("current node up: " + node.getName());
+		//System.out.println("current node up: " + node.getName());
 		
 		/*
 		 * Determine which operation to perform
@@ -95,13 +99,8 @@ public class Executor {
 		{
 			if(node.getArg(1) != null && node.getArg(1).equals("#"))
 			{
-				int length = 0;
 				ExecutorData ed = new ExecutorData();
-				for(ExecutorData tmp : childVals.get(0))
-				{
-					length += tmp.getData().length();
-				}
-				ed.setData(length + "");
+				ed.setData(childVals.get(0).size() + "");
 				ArrayList<ExecutorData> out = new ArrayList<ExecutorData>();
 				out.add(ed);
 				ids.put(node.getArg(0), out);
@@ -118,9 +117,11 @@ public class Executor {
 				ids.put(node.getArg(0), childVals.get(0));
 			}	
 		}
-		else if(nodeName.equals("recursiveReplacement"))
+		else if(nodeName.equals("recursivereplace"))
 		{
-			
+			String filename = childVals.get(0).get(0).getData();         //file1 name
+			String filename2 = childVals.get(0).get(1).getData();		   //file2 name
+			recursivereplace(filename, filename2, node.getArg(0), node.getArg(1), 10); //filename, regex, str
 		}
 		else if(nodeName.equals("print"))
 		{
@@ -167,12 +168,13 @@ public class Executor {
 				ArrayList<ExecutorData> term1 = new ArrayList<ExecutorData>();
 				ArrayList<ExecutorData> term2 = new ArrayList<ExecutorData>();
 				String binaryOperation = "";
+				boolean clearStuff = false;
 				for(int k = 0; k < childCount; k++)
 				{
 					if(!binaryOperation.equals("") && term2.isEmpty())
 					{
 						term2 = childVals.get(k);
-						if(!term1.isEmpty())
+						if(!term1.isEmpty() && returnVals.isEmpty())
 						{
 							if(binaryOperation.equals("union"))
 								returnVals = union(term1, term2);
@@ -180,11 +182,9 @@ public class Executor {
 								returnVals = intersect(term1, term2);
 							else if(binaryOperation.equals("diff"))
 								returnVals = difference(term1, term2);
-							term1.clear();
-							term2.clear();
-							binaryOperation = "";
+							clearStuff = true;
 						}
-						else if(!returnVals.isEmpty() && term1.isEmpty())
+						else if(!returnVals.isEmpty())
 						{
 							if(binaryOperation.equals("union"))
 								returnVals = union(returnVals, term2);
@@ -192,53 +192,56 @@ public class Executor {
 								returnVals = intersect(returnVals, term2);
 							else if(binaryOperation.equals("diff"))
 								returnVals = difference(returnVals, term2);
-							
-							term2.clear();
-							binaryOperation = "";
 						}
 					}
 					if(!term1.isEmpty() && binaryOperation.equals("") && term2.isEmpty())
 						binaryOperation = childVals.get(k).get(0).getData();
-					if(returnVals.isEmpty() &&term1.isEmpty()) 
+					if(returnVals.isEmpty() && term1.isEmpty()) 
 						term1 = childVals.get(k);
-					
+					if(clearStuff == true)
+					{
+						//term1.clear();
+						term2.clear();
+						binaryOperation = "";
+						clearStuff = false;
+					}
 				}
 			}
 		}
 		else if(nodeName.equals("exp-tail")) //child 0 - bin_op, //child 1 - find, //child 2 - exp_tail value (0 bin_op, 1+-term)
 		{
-			try {
-				ArrayList<ExecutorData> exp_tail_rtn = childVals.get(2);
-				
-				returnVals.addAll(childVals.get(0));
-				
-				//Won't reach here if has no right exp_tail recurse and will go to the 
-				//catch stage instead
-				if(exp_tail_rtn.get(0).getData().equals("union"))
-				{
-					exp_tail_rtn.remove(0);
-					ArrayList<ExecutorData> set1 = childVals.get(1); //string 1 to union
-					ArrayList<ExecutorData> set2 = exp_tail_rtn; //string 2 to union
-					returnVals.addAll(union(set1, set2));
-				}
-				else if(exp_tail_rtn.get(0).getData().equals("diff"))
-				{
-					exp_tail_rtn.remove(0);
-					ArrayList<ExecutorData> set1 = childVals.get(1); //string 1 to union
-					ArrayList<ExecutorData> set2 = exp_tail_rtn; //string 2 to union
-					returnVals.addAll(difference(set1, set2));
-				}
-				else if(exp_tail_rtn.get(0).getData().equals("inters"))
-				{
-					exp_tail_rtn.remove(0);
-					ArrayList<ExecutorData> set1 = childVals.get(1); //string 1 to union
-					ArrayList<ExecutorData> set2 = exp_tail_rtn; //string 2 to union
-					returnVals.addAll(intersect(set1, set2));
-				}
-			} catch (IndexOutOfBoundsException e) { //This is the bottom of the tree, go up!
-				returnVals.add(childVals.get(0).get(0)); //return bin_op type
-				returnVals.addAll(childVals.get(1)); //add on all found children.
-			}
+//			try {
+//				ArrayList<ExecutorData> exp_tail_rtn = childVals.get(2);
+//				
+//				returnVals.addAll(childVals.get(0));
+//				
+//				//Won't reach here if has no right exp_tail recurse and will go to the 
+//				//catch stage instead
+//				if(exp_tail_rtn.get(0).getData().equals("union"))
+//				{
+//					exp_tail_rtn.remove(0);
+//					ArrayList<ExecutorData> set1 = childVals.get(1); //string 1 to union
+//					ArrayList<ExecutorData> set2 = exp_tail_rtn; //string 2 to union
+//					returnVals.addAll(union(set1, set2));
+//				}
+//				else if(exp_tail_rtn.get(0).getData().equals("diff"))
+//				{
+//					exp_tail_rtn.remove(0);
+//					ArrayList<ExecutorData> set1 = childVals.get(1); //string 1 to union
+//					ArrayList<ExecutorData> set2 = exp_tail_rtn; //string 2 to union
+//					returnVals.addAll(difference(set1, set2));
+//				}
+//				else if(exp_tail_rtn.get(0).getData().equals("inters"))
+//				{
+//					exp_tail_rtn.remove(0);
+//					ArrayList<ExecutorData> set1 = childVals.get(1); //string 1 to union
+//					ArrayList<ExecutorData> set2 = exp_tail_rtn; //string 2 to union
+//					returnVals.addAll(intersect(set1, set2));
+//				}
+//			} catch (IndexOutOfBoundsException e) { //This is the bottom of the tree, go up!
+//				returnVals.add(childVals.get(0).get(0)); //return bin_op type
+//				returnVals.addAll(childVals.get(1)); //add on all found children.
+//			}
 		}
 		
 		return returnVals;
@@ -270,35 +273,60 @@ public class Executor {
 		
 		ExecutorData edCmp = new ExecutorData();
 		edCmp.setData(mostFrequent);
+		if(mostFrequentCount == -1)
+			return null;
+		
 		return list.get(list.indexOf(edCmp));
 	}
 	
 	public ArrayList<ExecutorData> findExpression(String filename, String regex)
 	{
-		File readFile = new File(filename);
+		File readFile = new File(testDir, filename);
 		if(!readFile.exists())
 		{
 			System.out.println("File " + filename + " was not found");
 			return null;
 		}
 		
-		Tokenizer tokenizer;
-		ArrayList<ExecutorData> foundMatches = null;
+//		Tokenizer tokenizer = new Tokenizer(readFile, regex);
+//		
+//		ArrayList<ExecutorData> foundTokens = tokenizer.parse();
+		
+		ArrayList<ExecutorData> foundMatches = new ArrayList<ExecutorData>();
+		Scanner snTemp;
 		try {
-			tokenizer = new Tokenizer(readFile, regex);
-			foundMatches = tokenizer.getTokens();
+			snTemp = new Scanner(readFile);
+			regex = regex.replace(" ", "");
+			
+			int currLine = 0;
+			int currStartIndex = 0;
+			int currEndIndex = 0;
+			while(snTemp.hasNextLine())
+			{
+				String tmp = snTemp.nextLine();
+				String[] as = tmp.split(" ");
+				for(String s : as)
+				{
+					currEndIndex = currStartIndex + s.length();
+					if(Pattern.matches(regex, s))
+						foundMatches.add(new ExecutorData(s, filename));
+					
+					currStartIndex = currEndIndex + 2;
+				}
+				currLine++;
+			}	
+			snTemp.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}	
 		
 		return foundMatches;
 	}
 	
 	public void replace(String filename, String filename2, String regex, String str)
 	{
-		File readFile = new File(filename);
-		File outFile = new File(filename2); //if exists, overwrite file.
+		File readFile = new File(testDir + filename);
+		File outFile = new File(testDir + filename2); //if exists, overwrite file.
 		
 		if(filename.equals(filename2)) 
 		{
@@ -308,6 +336,7 @@ public class Executor {
 		if(!readFile.exists()) 
 		{ 
 			System.out.println("Can't continue due to problem reading file. Goodbye.");
+			System.exit(0);
 		}
 		
 //		Tokenizer tokenizer = new Tokenizer(readFile, regex);
@@ -344,7 +373,7 @@ public class Executor {
 				String s = sn.nextLine();
 				
 				for(ExecutorData matches : foundMatches)
-					s.replaceAll(matches.getData(), str);
+					s = s.replace(matches.getData(), str);
 				
 				bw.write(s);
 			}
@@ -355,6 +384,76 @@ public class Executor {
 			System.out.println("Can't continue due to problem writing file. Goodbye.");
 			e.printStackTrace();
 		}
+	}
+	
+	public void recursivereplace(String filename, String filename2, String regex, String str, int recurseCounter)
+	{
+		File readFile = new File(testDir + filename);
+		File outFile = new File(testDir + filename2); //if exists, overwrite file.
+		
+		if(filename.equals(filename2)) 
+		{
+			System.out.println("Parse Error: Can't replace in same file");
+		}
+		
+		if(!readFile.exists()) 
+		{ 
+			System.out.println("Can't continue due to problem reading file. Goodbye.");
+			System.exit(0);
+		}
+		
+//		Tokenizer tokenizer = new Tokenizer(readFile, regex);
+//		ArrayList<String> foundMatches = tokenizer.parse();
+		
+		if(Pattern.matches(regex, str))
+			return;
+		
+		try {
+			
+			ArrayList<ExecutorData> foundMatches = new ArrayList<ExecutorData>();
+			Scanner snTemp = new Scanner(readFile);
+			
+			int currLine = 0;
+			int currStartIndex = 0;
+			int currEndIndex = 0;
+			while(snTemp.hasNextLine())
+			{
+				String tmp = snTemp.nextLine();
+				String[] as = tmp.split(" ");
+				for(String s : as)
+				{
+					currEndIndex = currStartIndex + s.length();
+					if(Pattern.matches(regex, s))
+						foundMatches.add(new ExecutorData(s, filename));
+					
+					currStartIndex = currEndIndex + 2;
+				}
+				currLine++;
+			}		
+			
+			BufferedWriter bw = new BufferedWriter(new FileWriter(outFile));
+			Scanner sn = new Scanner(readFile);
+			while(sn.hasNextLine())
+			{
+				String s = sn.nextLine();
+				
+				for(ExecutorData matches : foundMatches)
+					s = s.replace(matches.getData(), str);
+				
+				bw.write(s);
+			}
+			
+			bw.close();
+			sn.close();
+		} catch (IOException e) {
+			System.out.println("Can't continue due to problem writing file. Goodbye.");
+			e.printStackTrace();
+		}
+		
+		if(recurseCounter > 0)
+			recursivereplace(filename, filename2, regex, str, --recurseCounter);
+
+		return;
 	}
 	
 	/**
@@ -410,8 +509,11 @@ public class Executor {
 		
 		for(ExecutorData ed: array)
 		{
-			if(!retStr.isEmpty()) retStr += ", ";
-			retStr += ed.getData();
+			if(ed != null)
+			{
+				if(!retStr.isEmpty()) retStr += ", ";
+					retStr += ed.getData();
+			}
 		}
 		
 		return retStr;

@@ -181,7 +181,7 @@ public class Tokenizer {
 			}
 		}
 		
-		if(tok.length()==0){
+		if(tok == null || tok.length()==0){
 			return null;
 		}
 		return tok;

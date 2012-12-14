@@ -1,4 +1,8 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 
 public class Driver {
@@ -11,16 +15,44 @@ public class Driver {
 	public static boolean LEX_PARSE_DEBUG = false;
 	public static boolean DEBUG_TOKENC = false;
   
+	
+	
+	/**
+	 * Main Driver for the application
+	 * 
+	 * @param args 0 - test dir,
+	 */
 	public static void main(String[] args) {
     LLoneGenerator leftOne;
     Tokenizer t;
+    String testDir = "";
+    
+   //System.out.println(System.getProperty("user.dir"));
+    
+    if(args.length == 1)
+    	testDir = args[0];
+    
+    //Load up script in testDir
+    File scriptFile = new File(testDir + "script.txt");
+    Scanner scriptScanner;
+    String scriptStr = "";
+	try {
+		scriptScanner = new Scanner(scriptFile);
+		while(scriptScanner.hasNextLine())
+	    {
+	    	scriptStr += scriptScanner.nextLine();
+	    }
+	} catch (FileNotFoundException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
     
   if (LLONE_DEBUG){
     leftOne = new LLoneGenerator("miniRE_spec.txt");
   }
 	
 // Interpretor Test START
-		Interpretor inter = new Interpretor();
+		//Interpretor inter = new Interpretor();
 		
 //		inter.replace("d", "xxx", "sanghun_test_input1.txt", "sanghun_test_output1.txt");
 //		inter.recursivereplace("a", "ax", "sanghun_test_input1.txt", "sanghun_test_output2.txt");
@@ -44,20 +76,22 @@ public class Driver {
 		
 		
 		MiniREParser parser = new MiniREParser();
-		TreeNode root = parser.parse("begin\n " +
-				"matches = find \'[A-Z a-z]*ment[A-Z a-z]*\' in \"file1.txt\" inters find \'[A-Z a-z]*ment[A-Z a-z]*\' in \"file2.txt\";\n" +
-				"n_matches = #matches;\n" +
-				"print (n_matches);\n" +
-				"print (matches);\n" +
-				"replace '[A-Z a-z]*ment' with \"\" in \"file1.txt\" >! \"file3.txt\";\n" +
-				"end");
+//		TreeNode root = parser.parse("begin\n " +
+//		"matches = find \'[A-Z a-z]*ment[A-Z a-z]*\' in \"file1.txt\" inters find \'[A-Z a-z]*ment[A-Z a-z]*\' in \"file2.txt\";\n" +
+//		"n_matches = #matches;\n" +
+//		"print (n_matches);\n" +
+//		"print (matches);\n" +
+//		"replace '[A-Z a-z]*ment' with \"waffle\" in \"file1.txt\" >! \"file3.txt\";\n" +
+//		"end");
 		
-		System.out.println("");
-		System.out.println("*****************");
-		System.out.println("Testing Executor");
-		System.out.println("*****************");
-		System.out.println("");
-		Executor ex = new Executor(root);
+		TreeNode root = parser.parse(scriptStr);
+		
+//		System.out.println("");
+//		System.out.println("*****************");
+//		System.out.println("Testing Executor");
+//		System.out.println("*****************");
+//		System.out.println("");
+		Executor ex = new Executor(root, testDir);
 
 //		System.out.println();
 //		System.out.println(output);

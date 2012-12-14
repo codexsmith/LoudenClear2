@@ -1,0 +1,10 @@
+begin
+matches = find '(r)([A-Za-z])*' in "input1.txt" union find '(b)([A-Za-z])*' in "input2.txt" union find '(t)([A-Za-z])*' in "input3.txt";
+freq_match = maxfreqstring(matches);
+n_matches = #matches;
+print (matches);
+print (freq_match);
+print (n_matches);
+matches2 = find '(r)([A-Za-z])*' in "input1.txt" inters find '(r)(A-Za-z)*' in "input2.txt" diff find '(r)([A-Za-z])*' in "input3.txt";
+print (matches2);
+end

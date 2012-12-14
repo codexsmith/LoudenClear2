@@ -1,2 +1,2 @@
 #!/bin/bash
-echo 'put your test run script here'
+java -jar ../../src/LoudenClear.jar .

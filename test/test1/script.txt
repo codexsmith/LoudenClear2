@@ -1,0 +1,9 @@
+begin
+matches = find '([A-Za-z])*' in "input1.txt" inters find '([A-Za-z])*su([A-Za-z])*' in "input2.txt" diff find 'ipsum' in "input3.txt";
+freq_match = maxfreqstring(matches);
+n_matches = #matches;
+print (freq_match);
+print (matches);
+print (n_matches);
+recursivereplace '(ip)([A-Za-z])*' with "rocket" in "input1.txt" >! "output1.txt";
+end
