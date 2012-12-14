@@ -48,9 +48,8 @@ public class Driver {
 		e.printStackTrace();
 	}
     
-  if (LLONE_DEBUG){
     leftOne = new LLoneGenerator(testDir + "miniRE_spec.txt");
-  }
+  
 	
 // Interpretor Test START
 		//Interpretor inter = new Interpretor();

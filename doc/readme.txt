@@ -1,8 +1,11 @@
-Put your documentation here.
-Your documentation includes:
+Contribution:
 
-1) Whether you did the bonus part (using LL(1) parser)
-2) Each of your team member's contribution
+	1) Phase I Correction: Andrew Kim
+	2) MiniRE Recursive Descent Parser: Andrew Kim
+	3) LL(1) Parser: Nick Smith
+	4) Executor: Donovan Hatch
+	5) Test Cases: Donovan Hatch
+	6) Interpretor: Sanghun Oh
 
-Do not state how to build / run your program in the documentation.
-Your program will be judged by the scripts in your test directory. (see reademe in test directory for more details)
+Extra Credit:
+	We were not able to fully implement a functional LL(1) parser. However, we have the first set generation working correctly.

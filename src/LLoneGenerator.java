@@ -22,7 +22,7 @@ public class LLoneGenerator {
     
     firstSet = genFirstSet();
     
-//     followSet = genFollowSet();
+//     followSet = genFollowSet(firstSet);
 // 
     
 	}
@@ -117,7 +117,7 @@ public class LLoneGenerator {
 //     if(Driver.LLONE_DEBUG){System.out.println(first);}
     first = replaceFirst(first);
 //     if(Driver.LLONE_DEBUG){System.out.println(first);}
-    if(Driver.LLONE_DEBUG){
+    if(true){
       for(TokenC key : first.keySet()){
         System.out.print("FIRST " + key.getTitle() + " --> ");
         for(String next : first.get(key)){
@@ -129,10 +129,101 @@ public class LLoneGenerator {
     
 		return first;
   }
+
+//   public HashMap<TokenC, ArrayList<String>> genFollowSet(HashMap<TokenC, ArrayList<String>> first){
+//     HashMap<TokenC, ArrayList<String>> follow = new HashMap<TokenC, ArrayList<String>>();
+//     ArrayList<String> newSet;//a rule's first set
+//     String production = null;
+//     boolean deltaFollow = true, ADDEP = true;
+//     int nonTermCount = 0;
+// 
+//     for (String nonTerm : nonTerminalSet){//build first set of this nonTerm
+//       if(Driver.LLONE_DEBUG){System.out.println("Calculating Follow set of " +nonTerm );}
+//       int firstI = -1, endI = -1;
+//       newSet = new ArrayList<String>();
+//       TokenC putTerm = null;
+//        
+// 
+//       for(TokenC tokNonTerm : lexspec.getRules()){//find all rules that match this nonTer
+//         if (tokNonTerm.getTitle().compareTo(nonTerm) == 0){
+//           putTerm = tokNonTerm;
+//           
+//           production = tokNonTerm.getLegal();
+//           nonTermCount = 0;
+//           if(Driver.LLONE_DEBUG){System.out.println("Matched Line, Production " +production+ " Pipe "+nonTermCount);}
+// 
+//           for(int i = 0; i < production.length(); i++){
+//                 if(production.charAt(i) == '<'){
+//                   nonTermCount = nonTermCount +1;
+//                 }
+//               }
+//             }
+//           
+//           while(nonTermCount > 0){
+//             String temp = null;
+//             if(production.startsWith("$") && production.length() == 1 ){
+//               nonTermCount = 0;
+//               newSet.add("$");
+//             }
+//             if(Driver.LLONE_DEBUG){System.out.println("Pipes Left " +nonTermCount );}
+// 
+//             if(production.contains("<") && production.contains(">")){
+//               
+// 
+//               }//look through the production rule
+//               firstI = production.indexOf("<");
+//               if(firstI != -1){
+//                 temp = production.substring(firstI);
+//               }
+//               endI = temp.indexOf(">") + firstI;
+// 
+//               boolean NotSeen = true;
+// 
+//               for(TokenC tok : first.keySet()){
+//                 if (tok.getTitle().compareTo(production.substring(firstI, endI+1)) == 0){
+//                   for (String str : first.get(tok)){
+//                     if(NotSeen){
+//                       if (str.compareTo("@") == 0){ NotSeen = false;}
+//                     }
+//                     newSet.add(str);
+//                   }
+//                   if(NotSeen){
+//                     ADDEP = false;
+//                   }
+//                 }//token matches production
+//               }//token in first
+//               production = production.substring(endI+1);
+//             //contains < or >
+//             //doesnt contain < or >
+//             if(putTerm != null){
+//                 if(ADDEP){newSet.add("@");}
+//                 
+//                 follow.put(putTerm,newSet);
+//             }
+//             
+//           }//nontermcount > 0, while loop
+//           
+// //     if(Driver.LLONE_DEBUG){System.out.println(follow);}
+//       follow = replaceFirst(follow);
+//   //     if(Driver.LLONE_DEBUG){System.out.println(follow);}
+//       if(Driver.LLONE_DEBUG){
+//         for(TokenC key : follow.keySet()){
+//           System.out.print("Follow " + key.getTitle() + " --> ");
+//           for(String next : follow.get(key)){
+//             System.out.print(next + " : ");
+//           }
+//           System.out.println("");
+//         }
+//       }
+// 
+//       }
+//     }
+//     return follow;
+// 
+//   }
   
   public HashMap<TokenC, ArrayList<String>> replaceFirst(HashMap<TokenC, ArrayList<String>> set){
     HashMap<TokenC, ArrayList<String>> inSet = set;
-//     HashMap<TokenC, ArrayList<String>> outSet = null;
     boolean changes = true;
     int startI = 0, endI = 0;
 
@@ -159,6 +250,7 @@ public class LLoneGenerator {
      
     return inSet;
   }
+  
   //replaces a nonterminal in A with the sequence in B
   public ArrayList<String> listMerge(ArrayList<String> A, ArrayList<String> B){
     if(Driver.LLONE_DEBUG){System.out.println("listMerge A: " + A + " B: " + B);}
@@ -224,9 +316,5 @@ public class LLoneGenerator {
     return false;
   }
 	
-	public ArrayList<TokenC> genFollowSet(){
-		ArrayList<TokenC> follow = new ArrayList<TokenC>();
-		return follow;
-		
-	}
+
 }
