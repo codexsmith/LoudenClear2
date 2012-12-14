@@ -9,7 +9,6 @@ public class TokenC {
 		legal = "";
 		
 		line = line.trim();//removes leading & trailing whitespaces
-		
 		if(line.substring(0, 1).compareTo("$") == 0){ //proper identifier
 			this.title = line.substring(0, line.indexOf(" "));
 			
@@ -19,7 +18,8 @@ public class TokenC {
 			
 			this.legal = (symbols);
 		}
-		
+
+  
 		if(line.substring(0,1).compareTo("<") == 0){
 			this.title = line.substring(0,line.indexOf(">")+1);
 			if(Driver.DEBUG_TOKENC){System.out.println(line);}

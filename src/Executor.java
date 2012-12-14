@@ -292,6 +292,13 @@ public class Executor {
 //		
 //		ArrayList<ExecutorData> foundTokens = tokenizer.parse();
 		
+		
+		/*
+		 * Ran out of time and used the pattern matching class as well as replace all
+		 * because of our project 1 not working intitially. We have fixed project 1 
+		 * but we didn't have the time to get it implemented in project 2 and thus we used
+		 * our temporary solution
+		 */
 		ArrayList<ExecutorData> foundMatches = new ArrayList<ExecutorData>();
 		Scanner snTemp;
 		try {
@@ -342,7 +349,12 @@ public class Executor {
 //		Tokenizer tokenizer = new Tokenizer(readFile, regex);
 //		ArrayList<String> foundMatches = tokenizer.parse();
 		
-		
+		/*
+		 * Ran out of time and used the pattern matching class as well as replace all
+		 * because of our project 1 not working intitially. We have fixed project 1 
+		 * but we didn't have the time to get it implemented in project 2 and thus we used
+		 * our temporary solution
+		 */
 		try {
 			
 			ArrayList<ExecutorData> foundMatches = new ArrayList<ExecutorData>();
@@ -408,6 +420,12 @@ public class Executor {
 		if(Pattern.matches(regex, str))
 			return;
 		
+		/*
+		 * Ran out of time and used the pattern matching class as well as replace all
+		 * because of our project 1 not working intitially. We have fixed project 1 
+		 * but we didn't have the time to get it implemented in project 2 and thus we used
+		 * our temporary solution
+		 */
 		try {
 			
 			ArrayList<ExecutorData> foundMatches = new ArrayList<ExecutorData>();
